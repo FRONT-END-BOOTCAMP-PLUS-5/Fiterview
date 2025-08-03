@@ -1,3 +1,5 @@
+---
+
 name: 🐛 Bug Report
 description: 버그 발생 시 사용해주세요.
 title: "[BUG] "
