@@ -12,6 +12,15 @@ const pretendard = localFont({
 export const metadata: Metadata = {
   title: 'Fiterview',
   description: '이력서와 채용공고 기반 AI 맞춤 모의면접 서비스',
+  icons: {
+    icon: [
+      {
+        url: '/assets/icons/favicon.svg',
+        type: 'image/svg+xml',
+      },
+    ],
+    apple: '/assets/icons/favicon.svg',
+  },
 };
 
 export default function RootLayout({
