@@ -28,7 +28,11 @@ const nextConfig: NextConfig = {
             loader: '@svgr/webpack',
             options: {
               typescript: true,
+              icon: true,
               ext: 'tsx',
+              svgProps: {
+                fill: 'currentColor',
+              },
             },
           },
         ],
