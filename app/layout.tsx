@@ -9,6 +9,12 @@ const pretendard = localFont({
   display: 'swap',
 });
 
+const gmarket = localFont({
+  src: '../public/fonts/GmarketSansTTFBold.ttf',
+  variable: '--font-gmarket',
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
   title: 'Fiterview',
   description: '이력서와 채용공고 기반 AI 맞춤 모의면접 서비스',
@@ -30,7 +36,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${pretendard.variable} antialiased`}>{children}</body>
+      <body className={`${pretendard.variable} ${gmarket.variable} antialiased`}>{children}</body>
     </html>
   );
 }

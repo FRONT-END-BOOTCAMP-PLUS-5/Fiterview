@@ -6,6 +6,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-pretendard: var(--font-pretendard);
+  --font-gmarket: var(--font-gmarket);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -13,5 +14,9 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-pretendard), var(--font-geist-sans), sans-serif;
+  font-family: var(--font-pretendard), sans-serif;
+}
+
+.font-gmarket {
+  font-family: var(--font-gmarket), sans-serif !important;
 }
