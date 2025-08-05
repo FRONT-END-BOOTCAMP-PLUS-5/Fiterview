@@ -98,7 +98,7 @@ const config = {
       value: 'prisma-client-js',
     },
     output: {
-      value: '/home/gaeun/FEPL/fiterview/prisma/generated',
+      value: '/Users/jaino/Fiterview/prisma/generated',
       fromEnvVar: null,
     },
     config: {
@@ -107,16 +107,16 @@ const config = {
     binaryTargets: [
       {
         fromEnvVar: null,
-        value: 'debian-openssl-3.0.x',
+        value: 'darwin-arm64',
         native: true,
       },
     ],
     previewFeatures: [],
-    sourceFilePath: '/home/gaeun/FEPL/fiterview/prisma/schema.prisma',
+    sourceFilePath: '/Users/jaino/Fiterview/prisma/schema.prisma',
     isCustomOutput: true,
   },
   relativeEnvPaths: {
-    rootEnvPath: '../../.env',
+    rootEnvPath: null,
     schemaEnvPath: '../../.env',
   },
   relativePath: '..',
@@ -124,7 +124,7 @@ const config = {
   engineVersion: '361e86d0ea4987e9f53a565309b3eed797a6bcbd',
   datasourceNames: ['db'],
   activeProvider: 'postgresql',
-  postinstall: false,
+  postinstall: true,
   inlineDatasources: {
     db: {
       url: {
