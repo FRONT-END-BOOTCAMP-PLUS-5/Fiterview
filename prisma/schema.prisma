@@ -6,10 +6,60 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../prisma/generated"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        Int      @id @default(autoincrement())     
+  username  String   @db.VarChar(50)                   
+  password  String   @db.VarChar(100)                  
+  email     String   @db.VarChar(100)                 
+  nickname  String   @db.VarChar(50)        
+
+  reports   Report[] @relation("UserReports")
+  @@map("users")
+}
+
+model Report {
+  id         Int        @id @default(autoincrement()) 
+  title      String     @db.VarChar(100)              
+  createdAt  DateTime   @default(now())               @map("created_at")
+  status     String     @db.VarChar(20)               
+  userId     Int                                     @map("user_id")
+  reflection String?   @db.Text                       
+
+  user       User       @relation("UserReports", fields: [userId], references: [id])
+  feedback   Feedback?  @relation("ReportFeedback")
+  questions  Question[] @relation("ReportQuestions")
+
+  @@map("reports")
+}
+
+model Feedback {
+  reportId    Int    @id                                @map("report_id")
+  score       Int                                       
+  strength    String @db.Text                           
+  improvement String @db.Text                           
+
+  report      Report @relation("ReportFeedback", fields: [reportId], references: [id])
+
+  @@map("feedbacks")
+}
+
+model Question {
+  id           Int     @id @default(autoincrement())    
+  question     String  @db.Text                         
+  sampleAnswer String  @db.Text                         @map("sample_answer")
+  userAnswer   String  @db.Text                         @map("user_answer")
+  recording    String  @db.Text                         
+  reportId     Int                                     @map("report_id")
+
+  report       Report  @relation("ReportQuestions", fields: [reportId], references: [id])
+
+  @@map("questions")
+}
+
