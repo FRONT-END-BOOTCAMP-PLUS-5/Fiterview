@@ -18,13 +18,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'yarn'
 
-      - name: 📦 Install dependencies (Yarn 4)
+      - name: 📦 Cache Yarn + node_modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            .yarn/cache
+            .yarn/unplugged
+            .yarn/install-state.gz
+            .yarn/build-state.yml
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: 📦 Install dependencies (Yarn Berry with node_modules)
         run: yarn install --immutable
 
       - name: 🛠️ Build project
-        # env:
+       # env:
         #   NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
         #   NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
         run: yarn build
