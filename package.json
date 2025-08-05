@@ -16,7 +16,7 @@
     "@tanstack/react-query-devtools": "^5.84.1",
     "axios": "^1.11.0",
     "framer-motion": "^12.23.12",
-    "next": "15.4.5",
+    "next": "^15.4.5",
     "next-auth": "^4.24.11",
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -50,7 +50,7 @@
     "tailwindcss": "^4.1.11",
     "typescript": "5.8.3"
   },
-  "packageManager": "yarn@4.9.2",
+  "packageManager": "yarn@1.22.0",
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [
       "eslint --fix",
