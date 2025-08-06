@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { CreateReportUsecase } from '../../../backend/reports/application/usecasees/CreateReportUsecase';
-import { GetReportsUsecase } from '../../../backend/reports/application/usecasees/GetReportsUsecase';
+import { CreateReportUsecase } from '../../../backend/reports/application/usecases/CreateReportUsecase';
+import { GetReportsUsecase } from '../../../backend/reports/application/usecases/GetReportsUsecase';
 import { PrReportsRepository } from '../../../backend/reports/infrastructure/repositories/PrReportsRepository';
 
 const reportsRepository = new PrReportsRepository();

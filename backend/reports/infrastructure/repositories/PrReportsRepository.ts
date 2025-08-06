@@ -1,6 +1,6 @@
 import { IReportsRepository } from '../../domain/repositories/IReportsRepository';
 import { Reports } from '../../domain/entities/Reports';
-import { prisma } from '@/utils/prisma';
+import prisma from '@/utils/prisma';
 
 export class PrReportsRepository implements IReportsRepository {
   async createReport(userId: number): Promise<Reports> {
@@ -36,12 +36,15 @@ export class PrReportsRepository implements IReportsRepository {
     return `${year}${month}${day}${hour}${minute}`;
   }
 
-  async updateReflection(reportId: number, reflection: string): Promise<Reports> {
+  async updateReport(reportId: number, updateData: Partial<Reports>): Promise<Reports> {
+    const prismaUpdateData: any = {};
+    if (updateData.title !== undefined) prismaUpdateData.title = updateData.title;
+    if (updateData.reflection !== undefined) prismaUpdateData.reflection = updateData.reflection;
+    if (updateData.status !== undefined) prismaUpdateData.status = updateData.status;
+
     const updatedReport = await prisma.report.update({
       where: { id: reportId },
-      data: {
-        reflection,
-      },
+      data: prismaUpdateData,
     });
 
     return new Reports(
@@ -54,21 +57,22 @@ export class PrReportsRepository implements IReportsRepository {
     );
   }
 
-  async updateTitle(reportId: number, title: string): Promise<Reports> {
-    const updatedReport = await prisma.report.update({
+  async findReportById(reportId: number): Promise<Reports | null> {
+    const report = await prisma.report.findUnique({
       where: { id: reportId },
-      data: {
-        title,
-      },
     });
 
+    if (!report) {
+      return null;
+    }
+
     return new Reports(
-      updatedReport.id,
-      updatedReport.title,
-      updatedReport.createdAt,
-      updatedReport.status,
-      updatedReport.userId,
-      updatedReport.reflection || undefined
+      report.id,
+      report.title,
+      report.createdAt,
+      report.status,
+      report.userId,
+      report.reflection || undefined
     );
   }
 
@@ -80,14 +84,14 @@ export class PrReportsRepository implements IReportsRepository {
     });
 
     return reports.map(
-      (report: Reports) =>
+      (report) =>
         new Reports(
           report.id,
           report.title,
           report.createdAt,
           report.status,
           report.userId,
-          report.reflection || undefined
+          report.reflection ?? undefined
         )
     );
   }
