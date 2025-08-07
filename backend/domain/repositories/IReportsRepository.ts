@@ -1,4 +1,4 @@
-import { Reports } from '../entities/Reports';
+import { Reports } from '../entities/Report';
 
 export interface IReportsRepository {
   createReport(userId: number): Promise<Reports>;

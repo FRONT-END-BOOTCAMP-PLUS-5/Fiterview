@@ -1,5 +1,5 @@
-import { IReportsRepository } from '../../domain/repositories/IReportsRepository';
-import { Reports } from '../../domain/entities/Reports';
+import { Reports } from '@/backend/domain/entities/Report';
+import { IReportsRepository } from '@/backend/domain/repositories/IReportsRepository';
 import prisma from '@/utils/prisma';
 
 export class PrReportsRepository implements IReportsRepository {

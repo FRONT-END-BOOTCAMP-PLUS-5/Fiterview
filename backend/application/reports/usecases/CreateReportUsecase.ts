@@ -1,11 +1,10 @@
-import { IReportsRepository } from '../../domain/repositories/IReportsRepository';
-import { Reports } from '../../domain/entities/Reports';
+import { Reports } from '@/backend/domain/entities/Report';
+import { IReportsRepository } from '@/backend/domain/repositories/IReportsRepository';
 
 export class CreateReportUsecase {
   constructor(private readonly reportsRepository: IReportsRepository) {}
 
   async execute(userId: number): Promise<Reports> {
-    // 비즈니스 로직 검증
     if (!userId || userId <= 0) {
       throw new Error('유효한 사용자 ID가 필요합니다.');
     }
