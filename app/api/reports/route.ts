@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { CreateReportUsecase } from '../../../backend/reports/application/usecases/CreateReportUsecase';
-import { GetReportsUsecase } from '../../../backend/reports/application/usecases/GetReportsUsecase';
 import { PrReportsRepository } from '../../../backend/reports/infrastructure/repositories/PrReportsRepository';
+import { CreateReportUsecase } from '@/backend/application/reports/usecases/CreateReportUsecase';
+import { GetReportsUsecase } from '@/backend/application/reports/usecases/GetReportsUsecase';
 
 const reportsRepository = new PrReportsRepository();
 const createReportUsecase = new CreateReportUsecase(reportsRepository);
