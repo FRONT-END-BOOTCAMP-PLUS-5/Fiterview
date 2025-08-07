@@ -4681,6 +4681,11 @@ onetime@^7.0.0:
   dependencies:
     mimic-function "^5.0.0"
 
+openai@^5.12.0:
+  version "5.12.0"
+  resolved "https://registry.yarnpkg.com/openai/-/openai-5.12.0.tgz#0725fa2125f6ba045d7ef44a833c811a8c0082d2"
+  integrity sha512-vUdt02xiWgOHiYUmW0Hj1Qu9OKAiVQu5Bd547ktVCiMKC1BkB5L3ImeEnCyq3WpRKR6ZTaPgekzqdozwdPs7Lg==
+
 openid-client@^5.4.0:
   version "5.7.1"
   resolved "https://registry.yarnpkg.com/openid-client/-/openid-client-5.7.1.tgz#34cace862a3e6472ed7d0a8616ef73b7fb85a9c3"
