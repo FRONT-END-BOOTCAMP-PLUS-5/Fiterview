@@ -1,5 +1,4 @@
 import { Feedback } from '@/backend/domain/entities/feedback';
-import { IFeedbackRepository } from '@/backend/domain/repositories/IFeedbackRepository';
 import { IQuestionsRepository } from '@/backend/domain/repositories/IQuestionsRepository';
 import { QuestionsRepository } from './QuestionsRepository';
 import { generateOpenAIResponse } from '@/backend/application/ai/llm/GenerateOpenAIResponse';
@@ -7,8 +6,6 @@ import { generateOpenAIResponse } from '@/backend/application/ai/llm/GenerateOpe
 export interface GenerateOpenAIResponseOptions {
   model: string;
   instructions?: string;
-  inputOverride?: string | unknown;
-  temperature?: number;
   maxOutputTokens?: number;
 }
 
@@ -64,7 +61,6 @@ export class GenerateOpenAIResponse implements IFeedbackRepository {
       model,
       instructions,
       input,
-      temperature,
       maxOutputTokens,
     });
 
@@ -101,7 +97,6 @@ export class GenerateOpenAIResponse implements IFeedbackRepository {
       model: this.config.model,
       instructions: this.config.instructions,
       input,
-      temperature: this.config.temperature,
       maxOutputTokens: this.config.maxOutputTokens,
     });
 
