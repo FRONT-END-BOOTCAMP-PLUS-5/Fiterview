@@ -1,5 +1,5 @@
-import { TTSRequest } from '@/backend/application/questions/dtos/TTSRequest';
-import { TTSResponse } from '@/backend/application/questions/dtos/TTSResponse';
+import { TTSRequest } from '@/backend/domain/dtos/TTSRequest';
+import { TTSResponse } from '@/backend/domain/dtos/TTSResponse';
 import { TTSRepository } from '../../domain/repositories/TTSRepository';
 import client from '../providers/GoogleCloudProvider';
 

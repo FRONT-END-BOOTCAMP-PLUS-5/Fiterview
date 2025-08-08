@@ -1,5 +1,5 @@
-import { TTSRequest } from '../dtos/TTSRequest';
-import { TTSResponse } from '../dtos/TTSResponse';
+import { TTSRequest } from '../../../domain/dtos/TTSRequest';
+import { TTSResponse } from '../../../domain/dtos/TTSResponse';
 import { TTSRepository } from '../../../domain/repositories/TTSRepository';
 
 export class GenerateSpeechUsecase {
