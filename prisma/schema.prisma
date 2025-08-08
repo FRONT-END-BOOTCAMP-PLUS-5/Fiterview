@@ -13,6 +13,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ReportStatus {
+  분석중
+  분석완료
+  미응시
+}
+
 model User {
   id        Int      @id @default(autoincrement())     
   username  String   @db.VarChar(50)                   
@@ -25,16 +31,16 @@ model User {
 }
 
 model Report {
-  id         Int        @id @default(autoincrement()) 
-  title      String     @db.VarChar(100)              
-  createdAt  DateTime   @default(now())               @map("created_at")
-  status     String     @db.VarChar(20)               
-  userId     Int                                     @map("user_id")
-  reflection String?   @db.Text                       
+  id         Int          @id @default(autoincrement()) 
+  title      String       @db.VarChar(100)              
+  createdAt  DateTime     @default(now())               @map("created_at")
+  status     ReportStatus                               
+  userId     Int                                       @map("user_id")
+  reflection String?     @db.Text                       
 
-  user       User       @relation("UserReports", fields: [userId], references: [id])
-  feedback   Feedback?  @relation("ReportFeedback")
-  questions  Question[] @relation("ReportQuestions")
+  user       User         @relation("UserReports", fields: [userId], references: [id])
+  feedback   Feedback?    @relation("ReportFeedback")
+  questions  Question[]   @relation("ReportQuestions")
 
   @@map("reports")
 }
