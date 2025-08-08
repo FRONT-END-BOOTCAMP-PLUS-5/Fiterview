@@ -1,7 +1,7 @@
 import { TTSRequest } from '@/backend/domain/dtos/TTSRequest';
 import { TTSResponse } from '@/backend/domain/dtos/TTSResponse';
 import { TTSRepository } from '../../domain/repositories/TTSRepository';
-import client from '../providers/GoogleCloudProvider';
+import client from '../providers/TTSProvider';
 
 export class PrTTSRepository implements TTSRepository {
   // 텍스트를 음성으로 변환
