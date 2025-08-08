@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,59 +7,49 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum ReportStatus {
-  분석중
-  분석완료
-  미응시
-}
-
 model User {
-  id        Int      @id @default(autoincrement())     
-  username  String   @db.VarChar(50)                   
-  password  String   @db.VarChar(100)                  
-  email     String   @db.VarChar(100)                 
-  nickname  String   @db.VarChar(50)        
+  id       Int      @id @default(autoincrement())
+  username String   @db.VarChar(50)
+  password String   @db.VarChar(100)
+  email    String   @db.VarChar(100)
+  nickname String   @db.VarChar(50)
+  reports  Report[] @relation("UserReports")
 
-  reports   Report[] @relation("UserReports")
   @@map("users")
 }
 
 model Report {
-  id         Int          @id @default(autoincrement()) 
-  title      String       @db.VarChar(100)              
-  createdAt  DateTime     @default(now())               @map("created_at")
-  status     ReportStatus                               
-  userId     Int                                       @map("user_id")
-  reflection String?     @db.Text                       
-
-  user       User         @relation("UserReports", fields: [userId], references: [id])
-  feedback   Feedback?    @relation("ReportFeedback")
-  questions  Question[]   @relation("ReportQuestions")
+  id         Int        @id @default(autoincrement())
+  title      String     @db.VarChar(100)
+  createdAt  DateTime   @default(now()) @map("created_at")
+  status     String     @db.VarChar(20)
+  userId     Int        @map("user_id")
+  reflection String?
+  feedback   Feedback?  @relation("ReportFeedback")
+  questions  Question[] @relation("ReportQuestions")
+  user       User       @relation("UserReports", fields: [userId], references: [id])
 
   @@map("reports")
 }
 
 model Feedback {
-  reportId    Int    @id                                @map("report_id")
-  score       Int                                       
-  strength    String @db.Text                           
-  improvement String @db.Text                           
-
+  reportId    Int    @id @map("report_id")
+  score       Int
+  strength    String
+  improvement String
   report      Report @relation("ReportFeedback", fields: [reportId], references: [id])
 
   @@map("feedbacks")
 }
 
 model Question {
-  id           Int     @id @default(autoincrement())    
-  question     String  @db.Text                         
-  sampleAnswer String  @db.Text                         @map("sample_answer")
-  userAnswer   String  @db.Text                         @map("user_answer")
-  recording    String  @db.Text                         
-  reportId     Int                                     @map("report_id")
-
+  id           Int     @id @default(autoincrement())
+  question     String
+  sampleAnswer String? @map("sample_answer")
+  userAnswer   String? @map("user_answer")
+  recording    String?
+  reportId     Int     @map("report_id")
   report       Report  @relation("ReportQuestions", fields: [reportId], references: [id])
 
   @@map("questions")
 }
-
