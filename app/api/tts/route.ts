@@ -1,5 +1,5 @@
 import { GenerateSpeechUsecase } from '@/backend/application/feedbacks/usecases/GenerateSpeechUsecase';
-import { PrTTSRepository } from '@/backend/infrastructure/repositories/PrTTSRepository';
+import { PrTTSRepository } from '@/backend/infrastructure/repositories/TTSRepositoryInfra';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -11,6 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     // UseCase와 Repository 인스턴스 생성
+    // 의존성 주입
     const ttsRepository = new PrTTSRepository();
     const generateSpeechUsecase = new GenerateSpeechUsecase(ttsRepository);
 
