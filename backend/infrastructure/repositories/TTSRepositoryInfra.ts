@@ -1,4 +1,4 @@
-import { TTSRequest, TTSResponse } from '@/backend/application/feedbacks/dtos/GenerateSpeechDto';
+import { TTSRequest, TTSResponse } from '@/backend/application/questions/dtos/GenerateSpeechDto';
 import { TTSRepository } from '../../domain/repositories/TTSRepository';
 import client from '../providers/GoogleCloudProvider';
 

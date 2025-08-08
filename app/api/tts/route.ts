@@ -1,4 +1,4 @@
-import { GenerateSpeechUsecase } from '@/backend/application/feedbacks/usecases/GenerateSpeechUsecase';
+import { GenerateSpeechUsecase } from '@/backend/application/questions/usecases/GenerateSpeechUsecase';
 import { PrTTSRepository } from '@/backend/infrastructure/repositories/TTSRepositoryInfra';
 import { NextRequest, NextResponse } from 'next/server';
 

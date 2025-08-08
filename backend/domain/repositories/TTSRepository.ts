@@ -1,4 +1,4 @@
-import { TTSRequest, TTSResponse } from '@/backend/application/feedbacks/dtos/GenerateSpeechDto';
+import { TTSRequest, TTSResponse } from '@/backend/application/questions/dtos/GenerateSpeechDto';
 export interface TTSRepository {
   synthesizeSpeech(request: TTSRequest): Promise<TTSResponse>;
 }
