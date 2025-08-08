@@ -15,4 +15,8 @@ export class OpenAIProvider {
   getClient(): OpenAI {
     return this.openai;
   }
+
+  getResponses(): OpenAI.Responses {
+    return this.openai.responses;
+  }
 }

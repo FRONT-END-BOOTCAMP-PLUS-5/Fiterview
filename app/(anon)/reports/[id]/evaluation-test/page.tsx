@@ -22,7 +22,9 @@ export default function FeedbackTestPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.get(`/api/reports/feedback?reportId=${id}`);
+      const res = await axios.get(
+        `/api/reports/evaluation?questions_report_id=${id}&answers_report_id=${id}`
+      );
       setFeedback(res.data);
     } catch (e: any) {
       setError(e.message);
