@@ -5,7 +5,6 @@ export class OpenAIProvider {
 
   constructor() {
     const apiKey = process.env.OPENAI_API_KEY;
-    console.log('apiKey', apiKey);
     if (!apiKey) {
       throw new Error('OPENAI_API_KEY environment variable is required');
     }
