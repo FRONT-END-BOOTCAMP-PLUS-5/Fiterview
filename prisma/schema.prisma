@@ -49,13 +49,14 @@ model Question {
   userAnswer   String? @map("user_answer")
   recording    String?
   reportId     Int     @map("report_id")
+  order        Int?
   report       Report  @relation("ReportQuestions", fields: [reportId], references: [id])
 
   @@map("questions")
 }
 
 enum ReportStatus {
-  분석중
-  분석완료
-  미응시
+  ANALYZING
+  COMPLETED
+  PENDING
 }
