@@ -3,15 +3,15 @@ import { PrismaClient } from '@prisma/client';
 import { Question } from '@/backend/domain/entities/Question';
 import { QuestionsResponse } from '@/backend/domain/dtos/QuestionsResponse';
 import { QuestionsRequest } from '@/backend/domain/dtos/QuestionsRequest';
-import { GeminiQuestionGenerator } from '@/backend/infrastructure/repositories/GenerateQuestionRepositoryImpl';
+import { QuestionGenerator } from '@/backend/infrastructure/repositories/GenerateQuestionRepositoryImpl';
 
 export class PrismaQuestionRepository implements QuestionRepository {
   private prisma: PrismaClient;
-  private generator: GeminiQuestionGenerator;
+  private generator: QuestionGenerator;
 
   constructor() {
     this.prisma = new PrismaClient();
-    this.generator = new GeminiQuestionGenerator();
+    this.generator = new QuestionGenerator();
   }
   // 질문 생성
   async generateQuestions(files: QuestionsRequest[]) {
@@ -30,14 +30,17 @@ export class PrismaQuestionRepository implements QuestionRepository {
         this.prisma.question.create({
           data: {
             question: gen.question,
+            order: gen.order,
             reportId,
           },
         })
       )
     );
 
-    return saved.map((q) => ({
+    // 저장 결과에 정렬된 order를 매칭하여 반환
+    return saved.map((q, idx) => ({
       id: q.id,
+      order: (q as any).order ?? sortedQuestions[idx].order,
       question: q.question,
       sampleAnswer: q.sampleAnswer || undefined,
       userAnswer: q.userAnswer || undefined,

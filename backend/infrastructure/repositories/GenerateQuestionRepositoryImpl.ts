@@ -4,7 +4,7 @@ import { GoogleAIProvider } from '@/backend/infrastructure/providers/GoogleAIPro
 import { DEFAULT_GENERATED_QUESTIONS, QUESTIONS_GENERATION_PROMPT } from '@/constants/questions';
 import mime from 'mime-types';
 
-export class GeminiQuestionGenerator {
+export class QuestionGenerator {
   private googleAIProvider: GoogleAIProvider;
 
   constructor() {
@@ -13,7 +13,8 @@ export class GeminiQuestionGenerator {
 
   async generate(files: QuestionsRequest[]): Promise<QuestionsResponse[]> {
     try {
-      return await this.generateQuestionsWithGemini(files);
+      const questions = await this.generateQuestions(files);
+      return questions.sort((a, b) => a.order - b.order);
     } catch (error) {
       throw new Error(
         `질문 생성 중 오류가 발생했습니다: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -21,9 +22,7 @@ export class GeminiQuestionGenerator {
     }
   }
   // 질문 생성
-  private async generateQuestionsWithGemini(
-    files: QuestionsRequest[]
-  ): Promise<QuestionsResponse[]> {
+  private async generateQuestions(files: QuestionsRequest[]): Promise<QuestionsResponse[]> {
     const prompt = QUESTIONS_GENERATION_PROMPT;
 
     const genAI = this.googleAIProvider.getClient();
@@ -56,7 +55,12 @@ export class GeminiQuestionGenerator {
         throw new Error('JSON 응답을 찾을 수 없습니다');
       }
       const parsed = JSON.parse(jsonMatch[0]);
-      return parsed.questions || [];
+      const questions = (parsed.questions || []) as QuestionsResponse[];
+      // ai가 order를 주지 않으면 index순 처리
+      return questions.map((q, idx) => ({
+        order: typeof q.order === 'number' ? q.order : idx + 1,
+        question: q.question,
+      }));
     } catch (parseError) {
       console.error('JSON 파싱 오류:', parseError);
       console.error('원본 응답:', responseText);
