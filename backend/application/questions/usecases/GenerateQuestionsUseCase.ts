@@ -1,10 +1,10 @@
 import { QuestionsRequest } from '@/backend/domain/dtos/QuestionsRequest';
-import { SavedQuestionsResult } from '@/backend/application/questions/dtos/SavedQuestions';
+import { SavedQuestionsDto } from '@/backend/application/questions/dtos/SavedQuestionsDto';
 import { QuestionRepository } from '@/backend/domain/repositories/QuestionRepository';
 export class GenerateQuestionsUseCase {
   constructor(private questionRepository: QuestionRepository) {}
 
-  async execute(files: QuestionsRequest[], reportId: number): Promise<SavedQuestionsResult> {
+  async execute(files: QuestionsRequest[], reportId: number): Promise<SavedQuestionsDto> {
     if (!files || files.length === 0) {
       throw new Error('파일이 필요합니다. 최소 1개 이상의 파일을 업로드해주세요.');
     }

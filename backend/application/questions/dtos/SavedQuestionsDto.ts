@@ -1,6 +1,6 @@
 import { Question } from '@/backend/domain/entities/Question';
 
-export interface SavedQuestionsResult {
+export interface SavedQuestionsDto {
   questions: Question[];
   reportId: number;
 }
