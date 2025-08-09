@@ -1,18 +1,10 @@
-import {
-  Question,
-  QuestionFile,
-  QuestionGenerationResult,
-  QuestionCreationResult,
-  GeneratedQuestion,
-} from '../entities/Question';
+import { Question } from '@/backend/domain/entities/Question';
+import { QuestionsResponse } from '@/backend/domain/dtos/QuestionsResponse';
+import { QuestionsRequest } from '@/backend/domain/dtos/QuestionsRequest';
 
 export interface QuestionRepository {
-  // AI로 질문 생성
-  generateQuestions(files: QuestionFile[]): Promise<QuestionGenerationResult>;
-
-  // 생성된 질문들을 DB에 저장
-  saveQuestions(
-    generatedQuestions: GeneratedQuestion[],
-    reportId: number
-  ): Promise<QuestionCreationResult>;
+  // 질문 생성
+  generateQuestions(files: QuestionsRequest[]): Promise<QuestionsResponse[]>;
+  // 생성된 질문 -> DB에 저장
+  saveQuestions(generatedQuestions: QuestionsResponse[], reportId: number): Promise<Question[]>;
 }
