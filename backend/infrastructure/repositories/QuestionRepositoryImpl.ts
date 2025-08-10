@@ -36,14 +36,17 @@ export class QuestionRepositoryImpl implements QuestionRepository {
     );
 
     // 저장 결과에 정렬된 order를 매칭하여 반환
-    return saved.map((q, idx) => ({
-      id: q.id,
-      order: (q as any).order ?? sortedQuestions[idx].order,
-      question: q.question,
-      sampleAnswer: q.sampleAnswer || undefined,
-      userAnswer: q.userAnswer || undefined,
-      recording: q.recording || undefined,
-      reportId: q.reportId,
-    }));
+    return saved.map(
+      (q, idx) =>
+        new Question(
+          q.id,
+          (q as any).order ?? sortedQuestions[idx].order,
+          q.question,
+          q.reportId,
+          q.sampleAnswer || undefined,
+          q.userAnswer || undefined,
+          q.recording || undefined
+        )
+    );
   }
 }

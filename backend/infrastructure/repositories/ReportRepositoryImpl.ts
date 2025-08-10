@@ -1,12 +1,9 @@
 import { Reports, ReportStatus } from '@/backend/domain/entities/Report';
 import { ReportRepository } from '@/backend/domain/repositories/ReportRepository';
 import prisma from '@/utils/prisma';
-import {
-  mapReportStatusToDb,
-  mapReportStatusToDomain,
-} from '@/backend/infrastructure/mappers/ReportStatusMapper';
+import { mapReportStatusToDb, mapReportStatusToDomain } from '../mappers/ReportStatusMapper';
 
-export class ReportsRepositoryImpl implements ReportRepository {
+export class ReportRepositoryImpl implements ReportRepository {
   async createReport(userId: number): Promise<Reports> {
     const now = new Date();
     const title = this.generateTitle(now);
@@ -87,6 +84,25 @@ export class ReportsRepositoryImpl implements ReportRepository {
       orderBy: {
         createdAt: 'desc',
       },
+    });
+
+    return reports.map(
+      (report) =>
+        new Reports(
+          report.id,
+          report.title,
+          report.createdAt,
+          mapReportStatusToDomain(report.status as any),
+          report.userId,
+          report.reflection ?? undefined
+        )
+    );
+  }
+
+  async findReportsByUserId(userId: number): Promise<Reports[]> {
+    const reports = await prisma.report.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
     });
 
     return reports.map(
