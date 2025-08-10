@@ -5,6 +5,7 @@ import { UpdateReportUsecase } from '@/backend/application/reports/usecases/Upda
 const reportsRepository = new ReportsRepositoryImpl();
 const updateReportUsecase = new UpdateReportUsecase(reportsRepository);
 
+//수정 (제목, 회고)
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -47,6 +48,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   }
 }
 
+//조회
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;

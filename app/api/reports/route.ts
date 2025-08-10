@@ -7,6 +7,7 @@ import { GetReportsUsecase } from '@/backend/application/reports/usecases/GetRep
 const reportsRepository = new ReportsRepositoryImpl();
 const getReportsUsecase = new GetReportsUsecase(reportsRepository);
 
+//조회
 export async function GET() {
   try {
     const reports = await getReportsUsecase.execute();
@@ -24,6 +25,7 @@ export async function GET() {
   }
 }
 
+//생성
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
