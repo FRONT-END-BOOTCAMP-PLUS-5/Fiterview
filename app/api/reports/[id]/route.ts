@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ReportsRepositoryImpl } from '@/backend/infrastructure/repositories/ReportRepositoryImpl';
+import { ReportRepositoryImpl } from '@/backend/infrastructure/repositories/ReportRepositoryImpl';
 import { UpdateReportUsecase } from '@/backend/application/reports/usecases/UpdateReportUsecase';
 import { DeleteReportUsecase } from '@/backend/application/reports/usecases/DeleteReportUsecase';
+import { GetReportByIdUsecase } from '@/backend/application/reports/usecases/GetReportByIdUsecase';
+import { ReportDto } from '@/backend/application/reports/dtos/ReportDto';
 
-const reportsRepository = new ReportsRepositoryImpl();
+const reportsRepository = new ReportRepositoryImpl();
 const updateReportUsecase = new UpdateReportUsecase(reportsRepository);
 const deleteReportUsecase = new DeleteReportUsecase(reportsRepository);
+const getReportByIdUsecase = new GetReportByIdUsecase(reportsRepository);
 
 //수정 (제목, 회고)
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -21,9 +24,17 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const body = await request.json();
-    const { title, reflection, status } = body;
+    const { title, reflection, status } = body as {
+      title?: string;
+      reflection?: string;
+      status?: 'PENDING' | 'ANALYZING' | 'COMPLETED';
+    };
 
-    const updateData: any = {};
+    const updateData: {
+      title?: string;
+      reflection?: string;
+      status?: 'PENDING' | 'ANALYZING' | 'COMPLETED';
+    } = {};
     if (title !== undefined) updateData.title = title;
     if (reflection !== undefined) updateData.reflection = reflection;
     if (status !== undefined) updateData.status = status;
@@ -36,10 +47,18 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const updatedReport = await updateReportUsecase.execute(reportId, updateData);
+    const data: ReportDto = {
+      id: updatedReport.id,
+      title: updatedReport.title,
+      createdAt: updatedReport.createdAt.toISOString(),
+      status: updatedReport.status,
+      userId: updatedReport.userId,
+      reflection: updatedReport.reflection,
+    };
 
     return NextResponse.json({
       success: true,
-      data: updatedReport,
+      data,
     });
   } catch (error) {
     console.error('리포트 업데이트 오류:', error);
@@ -63,7 +82,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       );
     }
 
-    const report = await reportsRepository.findReportById(reportId);
+    const report = await getReportByIdUsecase.execute(reportId);
 
     if (!report) {
       return NextResponse.json(
@@ -72,9 +91,18 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       );
     }
 
+    const data: ReportDto = {
+      id: report.id,
+      title: report.title,
+      createdAt: report.createdAt.toISOString(),
+      status: report.status,
+      userId: report.userId,
+      reflection: report.reflection,
+    };
+
     return NextResponse.json({
       success: true,
-      data: report,
+      data,
     });
   } catch (error) {
     console.error('리포트 조회 오류:', error);
