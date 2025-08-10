@@ -27,8 +27,8 @@ model Report {
   reflection String?
   feedback   Feedback?    @relation("ReportFeedback")
   questions  Question[]   @relation("ReportQuestions")
-  user       User         @relation("UserReports", fields: [userId], references: [id])
-  
+  user       User         @relation("UserReports", fields: [userId], references: [id], onDelete: Cascade)
+
   @@map("reports")
 }
 
@@ -37,7 +37,7 @@ model Feedback {
   score       Int
   strength    String
   improvement String
-  report      Report @relation("ReportFeedback", fields: [reportId], references: [id])
+  report      Report @relation("ReportFeedback", fields: [reportId], references: [id], onDelete: Cascade)
 
   @@map("feedbacks")
 }
@@ -50,7 +50,7 @@ model Question {
   recording    String?
   reportId     Int     @map("report_id")
   order        Int?
-  report       Report  @relation("ReportQuestions", fields: [reportId], references: [id])
+  report       Report  @relation("ReportQuestions", fields: [reportId], references: [id], onDelete: Cascade)
 
   @@map("questions")
 }

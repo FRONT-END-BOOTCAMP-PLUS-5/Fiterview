@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ReportsRepositoryImpl } from '@/backend/infrastructure/repositories/ReportRepositoryImpl';
 import { UpdateReportUsecase } from '@/backend/application/reports/usecases/UpdateReportUsecase';
+import { DeleteReportUsecase } from '@/backend/application/reports/usecases/DeleteReportUsecase';
 
 const reportsRepository = new ReportsRepositoryImpl();
 const updateReportUsecase = new UpdateReportUsecase(reportsRepository);
+const deleteReportUsecase = new DeleteReportUsecase(reportsRepository);
 
 //수정 (제목, 회고)
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -76,6 +78,42 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
   } catch (error) {
     console.error('리포트 조회 오류:', error);
+    return NextResponse.json(
+      { success: false, message: '서버 오류가 발생했습니다.' },
+      { status: 500 }
+    );
+  }
+}
+
+//삭제
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const reportId = parseInt(id, 10);
+
+    if (isNaN(reportId)) {
+      return NextResponse.json(
+        { success: false, message: '유효하지 않은 리포트 ID입니다.' },
+        { status: 400 }
+      );
+    }
+
+    await deleteReportUsecase.execute(reportId);
+
+    return NextResponse.json({
+      success: true,
+      message: '리포트가 성공적으로 삭제되었습니다.',
+    });
+  } catch (error) {
+    console.error('리포트 삭제 오류:', error);
+
+    if (error instanceof Error && error.message.includes('찾을 수 없습니다')) {
+      return NextResponse.json({ success: false, message: error.message }, { status: 404 });
+    }
+
     return NextResponse.json(
       { success: false, message: '서버 오류가 발생했습니다.' },
       { status: 500 }

@@ -101,4 +101,10 @@ export class ReportsRepositoryImpl implements ReportRepository {
         )
     );
   }
+
+  async deleteReport(reportId: number): Promise<void> {
+    await prisma.report.delete({
+      where: { id: reportId },
+    });
+  }
 }

@@ -5,4 +5,5 @@ export interface ReportRepository {
   updateReport(reportId: number, updateData: Partial<Reports>): Promise<Reports>;
   findAllReports(): Promise<Reports[]>;
   findReportById(reportId: number): Promise<Reports | null>;
+  deleteReport(reportId: number): Promise<void>;
 }
