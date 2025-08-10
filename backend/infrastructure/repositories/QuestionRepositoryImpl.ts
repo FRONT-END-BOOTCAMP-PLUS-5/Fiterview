@@ -5,7 +5,7 @@ import { QuestionsRequest } from '@/backend/domain/dtos/QuestionsRequest';
 import { QuestionGenerator } from '@/backend/infrastructure/repositories/GenerateQuestionRepositoryImpl';
 import prisma from '@/utils/prisma';
 
-export class PrQuestionRepository implements QuestionRepository {
+export class QuestionRepositoryImpl implements QuestionRepository {
   private generator: QuestionGenerator;
 
   constructor() {

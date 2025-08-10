@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { CreateReportUsecase } from '@/backend/application/reports/usecases/CreateReportUsecase';
-import { PrReportsRepository } from '@/backend/infrastructure/repositories/PrReportRepository';
-import { PrQuestionRepository } from '@/backend/infrastructure/repositories/PrQuestionRepository';
+import { ReportsRepositoryImpl } from '@/backend/infrastructure/repositories/ReportRepositoryImpl';
+import { QuestionRepositoryImpl } from '@/backend/infrastructure/repositories/QuestionRepositoryImpl';
 import { GetReportsUsecase } from '@/backend/application/reports/usecases/GetReportsUsecase';
 
-const reportsRepository = new PrReportsRepository();
+const reportsRepository = new ReportsRepositoryImpl();
 const getReportsUsecase = new GetReportsUsecase(reportsRepository);
 
 export async function GET() {
@@ -50,7 +50,10 @@ export async function POST(request: NextRequest) {
       }))
     );
 
-    const useCase = new CreateReportUsecase(new PrReportsRepository(), new PrQuestionRepository());
+    const useCase = new CreateReportUsecase(
+      new ReportsRepositoryImpl(),
+      new QuestionRepositoryImpl()
+    );
 
     const result = await useCase.execute({ userId, files: questionFiles });
 

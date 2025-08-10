@@ -1,8 +1,8 @@
 import { Reports } from '@/backend/domain/entities/Report';
-import { IReportsRepository } from '@/backend/domain/repositories/IReportsRepository';
+import { ReportRepository } from '@/backend/domain/repositories/ReportRepository';
 
 export class GetReportsUsecase {
-  constructor(private readonly reportsRepository: IReportsRepository) {}
+  constructor(private readonly reportsRepository: ReportRepository) {}
 
   async execute(): Promise<Reports[]> {
     try {

@@ -6,7 +6,7 @@ import {
   mapReportStatusToDomain,
 } from '@/backend/infrastructure/mappers/ReportStatusMapper';
 
-export class PrReportsRepository implements ReportRepository {
+export class ReportsRepositoryImpl implements ReportRepository {
   async createReport(userId: number): Promise<Reports> {
     const now = new Date();
     const title = this.generateTitle(now);

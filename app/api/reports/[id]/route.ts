@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrReportsRepository } from '@/backend/infrastructure/repositories/PrReportsRepository';
+import { ReportsRepositoryImpl } from '@/backend/infrastructure/repositories/ReportRepositoryImpl';
 import { UpdateReportUsecase } from '@/backend/application/reports/usecases/UpdateReportUsecase';
 
-const reportsRepository = new PrReportsRepository();
+const reportsRepository = new ReportsRepositoryImpl();
 const updateReportUsecase = new UpdateReportUsecase(reportsRepository);
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
