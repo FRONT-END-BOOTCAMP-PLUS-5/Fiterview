@@ -1,18 +1,15 @@
 import OpenAI from 'openai';
 
-export class OpenAIProvider {
-  private openai: OpenAI;
+let cachedClient: OpenAI | null = null;
 
-  constructor() {
-    const apiKey = process.env.OPENAI_API_KEY;
-    console.log('apiKey', apiKey);
-    if (!apiKey) {
-      throw new Error('OPENAI_API_KEY environment variable is required');
-    }
-    this.openai = new OpenAI({ apiKey });
+export default function getOpenAIClient(): OpenAI {
+  if (cachedClient) return cachedClient;
+
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY is required');
   }
 
-  getClient(): OpenAI {
-    return this.openai;
-  }
+  cachedClient = new OpenAI({ apiKey });
+  return cachedClient;
 }
