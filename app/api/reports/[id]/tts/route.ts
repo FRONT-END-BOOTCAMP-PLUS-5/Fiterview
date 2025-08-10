@@ -1,9 +1,9 @@
 import { GenerateQuestionsTTSUsecase } from '@/backend/application/questions/usecases/GenerateQuestionsTTSUsecase';
-import { PrismaQuestionRepository } from '@/backend/infrastructure/repositories/QuestionRepositoryImpl';
+import { PrismaQuestionRepository } from '@/backend/infrastructure/repositories/PrQuestionRepository';
 import { PrTTSRepository } from '@/backend/infrastructure/repositories/TTSRepositoryImpl';
 import { QuestionTTSResponse } from '@/backend/application/questions/dtos/QuestionTTSResponse';
 
-export async function GET(_request: Request, { params }: { params: { id: string } }) {
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const reportId = parseInt((await params).id);
 
@@ -36,7 +36,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
       {
         success: false,
         error: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.',
-        reportId: params.id,
+        reportId: (await params).id,
       },
       { status: 500 }
     );
