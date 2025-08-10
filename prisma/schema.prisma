@@ -19,16 +19,16 @@ model User {
 }
 
 model Report {
-  id         Int        @id @default(autoincrement())
-  title      String     @db.VarChar(100)
-  createdAt  DateTime   @default(now()) @map("created_at")
-  status     String     @db.VarChar(20)
-  userId     Int        @map("user_id")
+  id         Int          @id @default(autoincrement())
+  title      String       @db.VarChar(100)
+  createdAt  DateTime     @default(now()) @map("created_at")
+  status     ReportStatus
+  userId     Int          @map("user_id")
   reflection String?
-  feedback   Feedback?  @relation("ReportFeedback")
-  questions  Question[] @relation("ReportQuestions")
-  user       User       @relation("UserReports", fields: [userId], references: [id])
-
+  feedback   Feedback?    @relation("ReportFeedback")
+  questions  Question[]   @relation("ReportQuestions")
+  user       User         @relation("UserReports", fields: [userId], references: [id])
+  
   @@map("reports")
 }
 
@@ -49,7 +49,14 @@ model Question {
   userAnswer   String? @map("user_answer")
   recording    String?
   reportId     Int     @map("report_id")
+  order        Int?
   report       Report  @relation("ReportQuestions", fields: [reportId], references: [id])
 
   @@map("questions")
+}
+
+enum ReportStatus {
+  ANALYZING
+  COMPLETED
+  PENDING
 }

@@ -1,21 +1,30 @@
-import { Reports } from '@/backend/domain/entities/Report';
-import { IReportsRepository } from '@/backend/domain/repositories/IReportsRepository';
+import { QuestionsRequest } from '@/backend/domain/dtos/QuestionsRequest';
+import { QuestionRepository } from '@/backend/domain/repositories/QuestionRepository';
+import { ReportRepository } from '@/backend/domain/repositories/ReportRepository';
+
+export interface CreateReportInput {
+  userId: number;
+  files: QuestionsRequest[];
+}
+
+export interface CreateReportResult {
+  reportId: number;
+}
 
 export class CreateReportUsecase {
-  constructor(private readonly reportsRepository: IReportsRepository) {}
+  constructor(
+    private reportRepository: ReportRepository,
+    private questionRepository: QuestionRepository
+  ) {}
 
-  async execute(userId: number): Promise<Reports> {
-    if (!userId || userId <= 0) {
-      throw new Error('유효한 사용자 ID가 필요합니다.');
-    }
+  async execute({ userId, files }: CreateReportInput): Promise<CreateReportResult> {
+    // 1) 리포트 생성
+    const report = await this.reportRepository.createReport(userId);
 
-    try {
-      const createdReport = await this.reportsRepository.createReport(userId);
-      return createdReport;
-    } catch (error: unknown) {
-      throw new Error(
-        `리포트 생성 실패: ${error instanceof Error ? error.message : '알 수 없는 오류'}`
-      );
-    }
+    // 2) 질문 생성 및 저장
+    const generated = await this.questionRepository.generateQuestions(files);
+    await this.questionRepository.saveQuestions(generated, report.id);
+
+    return { reportId: report.id };
   }
 }
