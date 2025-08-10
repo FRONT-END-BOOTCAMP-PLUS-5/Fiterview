@@ -1,7 +1,15 @@
 import OpenAI from 'openai';
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+let cachedClient: OpenAI | null = null;
 
-export default client;
+export default function getOpenAIClient(): OpenAI {
+  if (cachedClient) return cachedClient;
+
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY is required');
+  }
+
+  cachedClient = new OpenAI({ apiKey });
+  return cachedClient;
+}
