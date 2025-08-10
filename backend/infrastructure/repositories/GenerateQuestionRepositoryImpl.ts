@@ -32,7 +32,7 @@ export class QuestionGenerator {
       return {
         inlineData: {
           mimeType,
-          data: file.buffer.toString('base64'),
+          data: Buffer.from(file.bytes).toString('base64'),
         },
       };
     });

@@ -1,9 +1,11 @@
-export interface Question {
-  id: number;
-  order: number;
-  question: string;
-  sampleAnswer?: string;
-  userAnswer?: string;
-  recording?: string;
-  reportId: number;
+export class Question {
+  constructor(
+    public id: number,
+    public order: number,
+    public question: string,
+    public reportId: number,
+    public sampleAnswer?: string,
+    public userAnswer?: string,
+    public recording?: string
+  ) {}
 }

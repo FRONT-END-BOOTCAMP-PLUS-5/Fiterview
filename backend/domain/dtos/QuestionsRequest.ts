@@ -1,4 +1,4 @@
 export interface QuestionsRequest {
-  buffer: Buffer;
+  bytes: Uint8Array;
   fileName: string;
 }
