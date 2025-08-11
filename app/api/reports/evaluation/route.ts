@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GenerateEvaluationUsecase } from '@/backend/application/evaluations/usecases/GenerateEvaluationUsecase';
-import { GPTEvaluationRepository } from '@/backend/infrastructure/repositories/GPTEvaluationRepository';
+import { GPTEvaluationRepository } from '@/backend/infrastructure/repositories/GPTEvaluationRepositoryImpl';
 import { GenerateEvaluationDto } from '@/backend/application/evaluations/dtos/GenerateEvaluationDto';
 import { DeliverEvaluationDto } from '@/backend/application/evaluations/dtos/DeliverEvaluationDto';
 

@@ -1,4 +1,4 @@
-import { EvaluationEntity } from '@/backend/domain/entities/EvaluationEntity';
+import { Evaluation } from '@/backend/domain/entities/Evaluation';
 import { IEvaluationRepository } from '@/backend/domain/repositories/IEvaluationRepository';
 import { DbQARepository } from './DbQARepository';
 import { OpenAIProvider } from '@/backend/infrastructure/providers/OpenAIProvider';
@@ -25,9 +25,7 @@ export class GPTEvaluationRepository implements IEvaluationRepository {
     return input;
   }
 
-  public async generateResponse(
-    generateEvaluationDto: GenerateEvaluationDto
-  ): Promise<EvaluationEntity> {
+  public async generateResponse(generateEvaluationDto: GenerateEvaluationDto): Promise<Evaluation> {
     const questionContentArray = await this.questionsRepository.getQuestion(
       generateEvaluationDto.questions_report_id
     );
@@ -48,14 +46,11 @@ export class GPTEvaluationRepository implements IEvaluationRepository {
 
     try {
       const parsed = JSON.parse(outputText);
-      return EvaluationMapper.toEvaluationEntity(
-        generateEvaluationDto.questions_report_id,
-        parsed.score
-      );
+      return EvaluationMapper.toEvaluation(generateEvaluationDto.questions_report_id, parsed.score);
     } catch (error) {
       const scoreMatch = outputText.match(/(\d+)/);
       const fallbackScore = scoreMatch ? scoreMatch[1] : '50';
-      return EvaluationMapper.toEvaluationEntity(
+      return EvaluationMapper.toEvaluation(
         generateEvaluationDto.questions_report_id,
         fallbackScore
       );

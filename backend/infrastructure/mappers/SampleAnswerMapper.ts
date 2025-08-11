@@ -1,7 +1,7 @@
-import { SampleAnswersEntity } from '@/backend/domain/entities/SampleAnswersEntity';
+import { SampleAnswers } from '@/backend/domain/entities/SampleAnswers';
 
 export class SampleAnswerMapper {
-  static toSampleAnswerEntity(reportId: number, sampleAnswers: string[]): SampleAnswersEntity {
-    return new SampleAnswersEntity(reportId, sampleAnswers);
+  static toSampleAnswers(reportId: number, sampleAnswers: string[]): SampleAnswers {
+    return new SampleAnswers(reportId, sampleAnswers);
   }
 }

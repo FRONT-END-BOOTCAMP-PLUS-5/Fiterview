@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GenerateSampleAnswerUsecase } from '@/backend/application/questions/usecases/GenerateSampleAnswerUsecase';
-import { GPTSampleAnswerRepository } from '@/backend/infrastructure/repositories/GPTSampleAnswerRepository';
+import { GPTSampleAnswerRepository } from '@/backend/infrastructure/repositories/GPTSampleAnswerRepositoryImpl';
 import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/GenerateSampleAnswersDto';
 import { DeliverSampleAnswersDto } from '@/backend/application/questions/dtos/DeliverSampleAnswersDto';
 

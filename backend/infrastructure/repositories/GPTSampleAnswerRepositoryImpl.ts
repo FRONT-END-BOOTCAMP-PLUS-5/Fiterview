@@ -1,11 +1,11 @@
 import { DbQARepository } from './DbQARepository';
 import { OpenAIProvider } from '@/backend/infrastructure/providers/OpenAIProvider';
-import { ISampleAnswerEntity } from '@/backend/domain/repositories/ISampleAnswerEntity';
+import { ISampleAnswerRepository } from '@/backend/domain/repositories/ISampleAnswerRepository';
 import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/GenerateSampleAnswersDto';
-import { SampleAnswersEntity } from '@/backend/domain/entities/SampleAnswersEntity';
+import { SampleAnswers } from '@/backend/domain/entities/SampleAnswers';
 import { SampleAnswerMapper } from '../mappers/SampleAnswerMapper';
 
-export class GPTSampleAnswerRepository implements ISampleAnswerEntity {
+export class GPTSampleAnswerRepository implements ISampleAnswerRepository {
   private readonly questionsRepository: DbQARepository = new DbQARepository();
   private readonly openaiProvider: OpenAIProvider = new OpenAIProvider();
 
@@ -25,7 +25,7 @@ export class GPTSampleAnswerRepository implements ISampleAnswerEntity {
 
   public async generateResponse(
     generateBestAnswersDto: GenerateSampleAnswersDto
-  ): Promise<SampleAnswersEntity> {
+  ): Promise<SampleAnswers> {
     const questionContentArray = await this.questionsRepository.getQuestion(
       generateBestAnswersDto.questions_report_id
     );
@@ -57,15 +57,12 @@ export class GPTSampleAnswerRepository implements ISampleAnswerEntity {
         parsedAnswers = outputText.split('\n').filter((line) => line.trim().length > 0);
       }
 
-      return SampleAnswerMapper.toSampleAnswerEntity(
+      return SampleAnswerMapper.toSampleAnswers(
         generateBestAnswersDto.questions_report_id,
         parsedAnswers
       );
     } catch (error) {
-      return SampleAnswerMapper.toSampleAnswerEntity(
-        generateBestAnswersDto.questions_report_id,
-        []
-      );
+      return SampleAnswerMapper.toSampleAnswers(generateBestAnswersDto.questions_report_id, []);
     }
   }
 }

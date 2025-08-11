@@ -1,27 +1,21 @@
 import { STTRepository } from '@/backend/domain/repositories/STTRepository';
 import { STTRequest } from '@/backend/domain/dtos/STTRequest';
 import { STTResponse } from '@/backend/domain/dtos/STTResponse';
-import { OpenAIProvider } from '../providers/OpenAIProvider';
+import getOpenAIClient from '@/backend/infrastructure/providers/OpenAIProvider';
 
 export class STTRepositoryImpl implements STTRepository {
-  private openaiProvider: OpenAIProvider;
-
-  constructor() {
-    this.openaiProvider = new OpenAIProvider();
-  }
-
   async transcribeToText(audioRequest: STTRequest): Promise<STTResponse> {
     try {
-      const openai = this.openaiProvider.getClient();
+      // OpenAI 클라이언트 가져오기
+      const client = getOpenAIClient();
 
-      // OpenAI API 호출하여 음성-텍스트 변환
-      const transcription = await openai.audio.transcriptions.create({
+      // 음성-텍스트 변환
+      const transcription = await client.audio.transcriptions.create({
         file: new File([audioRequest.audioFile], audioRequest.fileName),
         model: 'gpt-4o-transcribe',
         ...(audioRequest.language && { language: audioRequest.language }),
         response_format: 'json',
       });
-
       return {
         text: transcription.text,
         language: audioRequest.language || 'auto',
