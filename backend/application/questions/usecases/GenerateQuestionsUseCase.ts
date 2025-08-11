@@ -12,7 +12,7 @@ export class GenerateQuestionsUseCase {
     const maxFileSize = 100 * 1024 * 1024;
     const allowedExtensions = ['.pdf', '.png', '.jpg', '.jpeg', '.webp'];
     for (const file of files) {
-      if (file.buffer.length > maxFileSize) {
+      if (file.bytes.byteLength > maxFileSize) {
         throw new Error(`파일 크기가 너무 큽니다: ${file.fileName} (최대 100MB)`);
       }
       const fileExt = file.fileName.toLowerCase().split('.').pop();

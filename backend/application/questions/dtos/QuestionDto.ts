@@ -1,8 +1,7 @@
-export interface Question {
+export interface QuestionDto {
   id: number;
   order: number;
   question: string;
-  reportId: number;
   sampleAnswer?: string;
   userAnswer?: string;
   recording?: string;

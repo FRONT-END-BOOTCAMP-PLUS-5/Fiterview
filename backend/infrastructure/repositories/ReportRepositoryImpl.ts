@@ -1,12 +1,9 @@
 import { Reports, ReportStatus } from '@/backend/domain/entities/Report';
 import { ReportRepository } from '@/backend/domain/repositories/ReportRepository';
 import prisma from '@/utils/prisma';
-import {
-  mapReportStatusToDb,
-  mapReportStatusToDomain,
-} from '@/backend/infrastructure/mappers/ReportStatusMapper';
+import { mapReportStatusToDb, mapReportStatusToDomain } from '../mappers/ReportStatusMapper';
 
-export class PrReportsRepository implements ReportRepository {
+export class ReportRepositoryImpl implements ReportRepository {
   async createReport(userId: number): Promise<Reports> {
     const now = new Date();
     const title = this.generateTitle(now);
@@ -20,14 +17,14 @@ export class PrReportsRepository implements ReportRepository {
       },
     });
 
-    return new Reports(
-      createdReport.id,
-      createdReport.title,
-      createdReport.createdAt,
-      mapReportStatusToDomain(createdReport.status as any),
-      createdReport.userId,
-      createdReport.reflection || undefined
-    );
+    return {
+      id: createdReport.id,
+      title: createdReport.title,
+      createdAt: createdReport.createdAt,
+      status: mapReportStatusToDomain(createdReport.status as any),
+      userId: createdReport.userId,
+      reflection: createdReport.reflection || undefined,
+    };
   }
 
   private generateTitle(date: Date): string {
@@ -53,14 +50,14 @@ export class PrReportsRepository implements ReportRepository {
       data: prismaUpdateData,
     });
 
-    return new Reports(
-      updatedReport.id,
-      updatedReport.title,
-      updatedReport.createdAt,
-      mapReportStatusToDomain(updatedReport.status as any),
-      updatedReport.userId,
-      updatedReport.reflection || undefined
-    );
+    return {
+      id: updatedReport.id,
+      title: updatedReport.title,
+      createdAt: updatedReport.createdAt,
+      status: mapReportStatusToDomain(updatedReport.status as any),
+      userId: updatedReport.userId,
+      reflection: updatedReport.reflection || undefined,
+    };
   }
 
   async findReportById(reportId: number): Promise<Reports | null> {
@@ -72,14 +69,14 @@ export class PrReportsRepository implements ReportRepository {
       return null;
     }
 
-    return new Reports(
-      report.id,
-      report.title,
-      report.createdAt,
-      mapReportStatusToDomain(report.status as any),
-      report.userId,
-      report.reflection || undefined
-    );
+    return {
+      id: report.id,
+      title: report.title,
+      createdAt: report.createdAt,
+      status: mapReportStatusToDomain(report.status as any),
+      userId: report.userId,
+      reflection: report.reflection || undefined,
+    };
   }
 
   async findAllReports(): Promise<Reports[]> {
@@ -89,16 +86,35 @@ export class PrReportsRepository implements ReportRepository {
       },
     });
 
-    return reports.map(
-      (report) =>
-        new Reports(
-          report.id,
-          report.title,
-          report.createdAt,
-          mapReportStatusToDomain(report.status as any),
-          report.userId,
-          report.reflection ?? undefined
-        )
-    );
+    return reports.map((report) => ({
+      id: report.id,
+      title: report.title,
+      createdAt: report.createdAt,
+      status: mapReportStatusToDomain(report.status as any),
+      userId: report.userId,
+      reflection: report.reflection ?? undefined,
+    }));
+  }
+
+  async findReportsByUserId(userId: number): Promise<Reports[]> {
+    const reports = await prisma.report.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return reports.map((report) => ({
+      id: report.id,
+      title: report.title,
+      createdAt: report.createdAt,
+      status: mapReportStatusToDomain(report.status as any),
+      userId: report.userId,
+      reflection: report.reflection ?? undefined,
+    }));
+  }
+
+  async deleteReport(reportId: number): Promise<void> {
+    await prisma.report.delete({
+      where: { id: reportId },
+    });
   }
 }

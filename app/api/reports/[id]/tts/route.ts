@@ -1,7 +1,7 @@
 import { GenerateQuestionsTTSUsecase } from '@/backend/application/questions/usecases/GenerateQuestionsTTSUsecase';
-import { PrismaQuestionRepository } from '@/backend/infrastructure/repositories/PrQuestionRepository';
 import { PrTTSRepository } from '@/backend/infrastructure/repositories/TTSRepositoryImpl';
 import { QuestionTTSResponse } from '@/backend/application/questions/dtos/QuestionTTSResponse';
+import { QuestionRepositoryImpl } from '@/backend/infrastructure/repositories/QuestionRepositoryImpl';
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -18,7 +18,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     }
 
     const useCase = new GenerateQuestionsTTSUsecase(
-      new PrismaQuestionRepository(),
+      new QuestionRepositoryImpl(),
       new PrTTSRepository()
     );
 

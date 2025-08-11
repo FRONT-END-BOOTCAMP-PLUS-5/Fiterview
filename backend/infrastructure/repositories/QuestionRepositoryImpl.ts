@@ -5,7 +5,7 @@ import { QuestionsRequest } from '@/backend/domain/dtos/QuestionsRequest';
 import { QuestionGenerator } from '@/backend/infrastructure/repositories/GenerateQuestionRepositoryImpl';
 import prisma from '@/utils/prisma';
 
-export class PrismaQuestionRepository implements QuestionRepository {
+export class QuestionRepositoryImpl implements QuestionRepository {
   private generator: QuestionGenerator;
 
   constructor() {
@@ -45,6 +45,29 @@ export class PrismaQuestionRepository implements QuestionRepository {
     }
   }
 
+  // questions테이블 조회(report 조회 시 사용)
+  async findAllByReportId(reportId: number): Promise<Question[]> {
+    try {
+      const questions = await prisma.question.findMany({
+        where: { reportId },
+        orderBy: { order: 'asc' },
+      });
+
+      return questions.map((q) => ({
+        id: q.id,
+        order: q.order || 0,
+        question: q.question,
+        reportId: q.reportId,
+        sampleAnswer: q.sampleAnswer || undefined,
+        userAnswer: q.userAnswer || undefined,
+        recording: q.recording || undefined,
+      }));
+    } catch (error) {
+      console.error('질문 조회 오류:', error);
+      throw new Error('질문을 조회하는 중 오류가 발생했습니다.');
+    }
+  }
+
   // 질문 생성
   async generateQuestions(files: QuestionsRequest[]) {
     return this.generator.generate(files);
@@ -74,10 +97,10 @@ export class PrismaQuestionRepository implements QuestionRepository {
       id: q.id,
       order: (q as any).order ?? sortedQuestions[idx].order,
       question: q.question,
+      reportId: q.reportId,
       sampleAnswer: q.sampleAnswer || undefined,
       userAnswer: q.userAnswer || undefined,
       recording: q.recording || undefined,
-      reportId: q.reportId,
     }));
   }
 }
