@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
-export default function QuestionsPage() {
+function QuestionsPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [audioFile, setAudioFile] = useState<File | null>(null);
@@ -150,5 +150,13 @@ export default function QuestionsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function QuestionsPage() {
+  return (
+    <Suspense fallback={<div>로딩 중...</div>}>
+      <QuestionsPageContent />
+    </Suspense>
   );
 }
