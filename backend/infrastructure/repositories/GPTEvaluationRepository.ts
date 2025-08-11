@@ -3,6 +3,7 @@ import { IEvaluationRepository } from '@/backend/domain/repositories/IEvaluation
 import { DbQARepository } from './DbQARepository';
 import { OpenAIProvider } from '@/backend/infrastructure/providers/OpenAIProvider';
 import { GenerateEvaluationDto } from '@/backend/application/evaluations/dtos/GenerateEvaluationDto';
+import { EvaluationMapper } from '../mappers/EvaluationMapper';
 
 export class GPTEvaluationRepository implements IEvaluationRepository {
   private readonly questionsRepository: DbQARepository = new DbQARepository();
@@ -47,13 +48,16 @@ export class GPTEvaluationRepository implements IEvaluationRepository {
 
     try {
       const parsed = JSON.parse(outputText);
-      return new EvaluationEntity(generateEvaluationDto.questions_report_id, parsed.score);
-    } catch (error: unknown) {
-      const scoreMatch = outputText.match(/(\d+)/);
-      const fallbackScore = scoreMatch ? parseInt(scoreMatch[1], 10) : 50;
-      return new EvaluationEntity(
+      return EvaluationMapper.toEvaluationEntity(
         generateEvaluationDto.questions_report_id,
-        fallbackScore.toString()
+        parsed.score
+      );
+    } catch (error) {
+      const scoreMatch = outputText.match(/(\d+)/);
+      const fallbackScore = scoreMatch ? scoreMatch[1] : '50';
+      return EvaluationMapper.toEvaluationEntity(
+        generateEvaluationDto.questions_report_id,
+        fallbackScore
       );
     }
   }

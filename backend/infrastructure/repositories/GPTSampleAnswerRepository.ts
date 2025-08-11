@@ -1,14 +1,15 @@
-import { BestAnswersEntity } from '@/backend/domain/entities/BestAnswersEntity';
 import { DbQARepository } from './DbQARepository';
 import { OpenAIProvider } from '@/backend/infrastructure/providers/OpenAIProvider';
-import { IBestAnswerEntity } from '@/backend/domain/repositories/IBestAnswerEntity';
-import { GenerateBestAnswersDto } from '@/backend/application/questions/dtos/GenerateBestAnswersDto';
+import { ISampleAnswerEntity } from '@/backend/domain/repositories/ISampleAnswerEntity';
+import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/GenerateSampleAnswersDto';
+import { SampleAnswersEntity } from '@/backend/domain/entities/SampleAnswersEntity';
+import { SampleAnswerMapper } from '../mappers/SampleAnswerMapper';
 
-export class GPTBestAnswerRepository implements IBestAnswerEntity {
+export class GPTSampleAnswerRepository implements ISampleAnswerEntity {
   private readonly questionsRepository: DbQARepository = new DbQARepository();
   private readonly openaiProvider: OpenAIProvider = new OpenAIProvider();
 
-  constructor(gptSettings: GenerateBestAnswersDto) {
+  constructor(gptSettings: GenerateSampleAnswersDto) {
     if (!gptSettings?.model) {
       throw new Error('OpenAI model is required in constructor.');
     }
@@ -23,8 +24,8 @@ export class GPTBestAnswerRepository implements IBestAnswerEntity {
   }
 
   public async generateResponse(
-    generateBestAnswersDto: GenerateBestAnswersDto
-  ): Promise<BestAnswersEntity> {
+    generateBestAnswersDto: GenerateSampleAnswersDto
+  ): Promise<SampleAnswersEntity> {
     const questionContentArray = await this.questionsRepository.getQuestion(
       generateBestAnswersDto.questions_report_id
     );
@@ -56,9 +57,15 @@ export class GPTBestAnswerRepository implements IBestAnswerEntity {
         parsedAnswers = outputText.split('\n').filter((line) => line.trim().length > 0);
       }
 
-      return new BestAnswersEntity(generateBestAnswersDto.questions_report_id, parsedAnswers);
-    } catch (error: unknown) {
-      return new BestAnswersEntity(generateBestAnswersDto.questions_report_id, []);
+      return SampleAnswerMapper.toSampleAnswerEntity(
+        generateBestAnswersDto.questions_report_id,
+        parsedAnswers
+      );
+    } catch (error) {
+      return SampleAnswerMapper.toSampleAnswerEntity(
+        generateBestAnswersDto.questions_report_id,
+        []
+      );
     }
   }
 }

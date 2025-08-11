@@ -1,4 +1,4 @@
-export class GenerateBestAnswersDto {
+export class GenerateSampleAnswersDto {
   questions_report_id: number;
   model: string;
   instructions: string;
