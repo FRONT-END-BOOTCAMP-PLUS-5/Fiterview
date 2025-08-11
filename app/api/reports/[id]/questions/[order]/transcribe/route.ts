@@ -8,10 +8,10 @@ import { PrismaClient } from '@prisma/client';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string; order: string } }
+  { params }: { params: Promise<{ id: string; order: string }> }
 ) {
   try {
-    const { id, order } = params;
+    const { id, order } = await params;
     const reportIdNumber = parseInt(id);
     const orderNumber = parseInt(order);
 
