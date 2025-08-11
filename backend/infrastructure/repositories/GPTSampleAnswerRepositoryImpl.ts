@@ -1,4 +1,4 @@
-import { DbQARepository } from './DbQARepository';
+import { PrAnswerRepository } from './PrAnswerRepository';
 import { OpenAIProvider } from '@/backend/infrastructure/providers/OpenAIProvider';
 import { ISampleAnswerRepository } from '@/backend/domain/repositories/ISampleAnswerRepository';
 import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/GenerateSampleAnswersDto';
@@ -6,7 +6,7 @@ import { SampleAnswers } from '@/backend/domain/entities/SampleAnswers';
 import { SampleAnswerMapper } from '../mappers/SampleAnswerMapper';
 
 export class GPTSampleAnswerRepository implements ISampleAnswerRepository {
-  private readonly questionsRepository: DbQARepository = new DbQARepository();
+  private readonly questionsRepository: PrAnswerRepository = new PrAnswerRepository();
   private readonly openaiProvider: OpenAIProvider = new OpenAIProvider();
 
   constructor(gptSettings: GenerateSampleAnswersDto) {

@@ -1,15 +1,15 @@
-import { Evaluation } from '@/backend/domain/entities/Evaluation';
-import { IEvaluationRepository } from '@/backend/domain/repositories/IEvaluationRepository';
-import { DbQARepository } from './DbQARepository';
+import { Feedback } from '@/backend/domain/entities/feedback';
+import { IFeedbackRepository } from '@/backend/domain/repositories/IFeedbackRepository';
+import { PrAnswerRepository } from './PrAnswerRepository';
 import { OpenAIProvider } from '@/backend/infrastructure/providers/OpenAIProvider';
-import { GenerateEvaluationDto } from '@/backend/application/evaluations/dtos/GenerateEvaluationDto';
-import { EvaluationMapper } from '../mappers/EvaluationMapper';
+import { GenerateFeedbackDto } from '@/backend/application/evaluations/dtos/GenerateFeedbackDto';
+import { FeedbackMapper } from '../mappers/FeedbackMapper';
 
-export class GPTEvaluationRepository implements IEvaluationRepository {
-  private readonly questionsRepository: DbQARepository = new DbQARepository();
+export class GPTFeedbackRepository implements IFeedbackRepository {
+  private readonly questionsRepository: PrAnswerRepository = new PrAnswerRepository();
   private readonly openaiProvider: OpenAIProvider = new OpenAIProvider();
 
-  constructor(gptSettings: GenerateEvaluationDto) {
+  constructor(gptSettings: GenerateFeedbackDto) {
     if (!gptSettings?.model) {
       throw new Error('OpenAI model is required in constructor.');
     }
@@ -25,7 +25,7 @@ export class GPTEvaluationRepository implements IEvaluationRepository {
     return input;
   }
 
-  public async generateResponse(generateEvaluationDto: GenerateEvaluationDto): Promise<Evaluation> {
+  public async generateResponse(generateEvaluationDto: GenerateFeedbackDto): Promise<Feedback> {
     const questionContentArray = await this.questionsRepository.getQuestion(
       generateEvaluationDto.questions_report_id
     );
@@ -46,13 +46,20 @@ export class GPTEvaluationRepository implements IEvaluationRepository {
 
     try {
       const parsed = JSON.parse(outputText);
-      return EvaluationMapper.toEvaluation(generateEvaluationDto.questions_report_id, parsed.score);
+      return FeedbackMapper.toFeedback(
+        generateEvaluationDto.questions_report_id,
+        parsed.score,
+        parsed.strength,
+        parsed.improvement
+      );
     } catch (error) {
       const scoreMatch = outputText.match(/(\d+)/);
       const fallbackScore = scoreMatch ? scoreMatch[1] : '50';
-      return EvaluationMapper.toEvaluation(
+      return FeedbackMapper.toFeedback(
         generateEvaluationDto.questions_report_id,
-        fallbackScore
+        fallbackScore,
+        '',
+        ''
       );
     }
   }

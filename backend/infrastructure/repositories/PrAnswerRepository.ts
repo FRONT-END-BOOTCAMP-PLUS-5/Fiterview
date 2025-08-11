@@ -8,10 +8,10 @@ export interface QuestionsModel {
 
 export interface AnswersModel {
   id: number;
-  userAnswer: string;
+  userAnswer: string | null;
 }
 
-export class DbQARepository implements IQuestionsRepository {
+export class PrAnswerRepository implements IQuestionsRepository {
   async getQuestion(questions_report_id: number): Promise<string[]> {
     try {
       const questions: QuestionsModel[] = await prisma.question.findMany({
@@ -42,7 +42,7 @@ export class DbQARepository implements IQuestionsRepository {
       if (answers.length === 0) {
         throw new Error(`No answers found for report ID: ${answers_report_id}`);
       }
-      return answers.map((a) => a.userAnswer);
+      return answers.map((a) => a.userAnswer ?? '');
     } catch (error) {
       throw new Error(`Failed to get answer for report ${answers_report_id}: ${error}`);
     }

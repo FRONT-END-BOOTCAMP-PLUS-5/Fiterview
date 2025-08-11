@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GenerateEvaluationUsecase } from '@/backend/application/evaluations/usecases/GenerateEvaluationUsecase';
-import { GPTEvaluationRepository } from '@/backend/infrastructure/repositories/GPTEvaluationRepositoryImpl';
-import { GenerateEvaluationDto } from '@/backend/application/evaluations/dtos/GenerateEvaluationDto';
-import { DeliverEvaluationDto } from '@/backend/application/evaluations/dtos/DeliverEvaluationDto';
+import { GenerateFeedbackUsecase } from '@/backend/application/evaluations/usecases/GenerateFeedbackUsecase';
+import { GPTFeedbackRepository } from '@/backend/infrastructure/repositories/GPTFeedbackRepositoryImpl';
+import { GenerateFeedbackDto } from '@/backend/application/evaluations/dtos/GenerateFeedbackDto';
+import { DeliverFeedbackDto } from '@/backend/application/evaluations/dtos/DeliverFeedbackDto';
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,24 +29,29 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const inputDto = new GenerateEvaluationDto(
+    const inputDto = new GenerateFeedbackDto(
       questions_report_idNumber,
       answers_report_idNumber,
       'gpt-4o',
-      'Return a JSON object with a numeric "score" between 0 and 100. Example: {"score": 85}',
+      'Return a JSON object with a numeric "score" between 0 and 100, a "strength" and an "improvement" in Korean. Example: {"score": 85, "strength": "이 답변의 강점은...", "improvement": "이 답변의 개선 방법은..."}',
       '',
       1000
     );
 
-    const evaluationService = new GPTEvaluationRepository(inputDto);
-    const generateEvaluationUsecase = new GenerateEvaluationUsecase(evaluationService);
-    const evaluation = await generateEvaluationUsecase.execute(inputDto);
+    const feedbackService = new GPTFeedbackRepository(inputDto);
+    const generateFeedbackUsecase = new GenerateFeedbackUsecase(feedbackService);
+    const feedback = await generateFeedbackUsecase.execute(inputDto);
 
-    const outputDto = new DeliverEvaluationDto(evaluation.evaluation_report_id, evaluation.score);
+    const outputDto = new DeliverFeedbackDto(
+      feedback.feedback_report_id,
+      feedback.score,
+      feedback.strength,
+      feedback.improvement
+    );
 
     return NextResponse.json(outputDto, { status: 200 });
   } catch (error) {
-    console.error('Error generating evaluation:', error);
-    return NextResponse.json({ error: 'Failed to generate evaluation' }, { status: 500 });
+    console.error('Error generating feedback:', error);
+    return NextResponse.json({ error: 'Failed to generate feedback' }, { status: 500 });
   }
 }

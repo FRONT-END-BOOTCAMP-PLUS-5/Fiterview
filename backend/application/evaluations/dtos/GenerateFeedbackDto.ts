@@ -1,4 +1,4 @@
-export class GenerateEvaluationDto {
+export class GenerateFeedbackDto {
   questions_report_id: number;
   answers_report_id: number;
   model: string;
