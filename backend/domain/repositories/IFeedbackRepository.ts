@@ -1,6 +1,9 @@
-import { Feedback } from '../entities/feedback';
-import { GenerateFeedbackDto } from '@/backend/application/evaluations/dtos/GenerateFeedbackDto';
+import { Feedback } from '../entities/Feedback';
 
 export interface IFeedbackRepository {
-  generateResponse(dto: GenerateFeedbackDto): Promise<Feedback>;
+  getFeedback(feedback_report_id: number): Promise<Feedback>;
+  saveFeedback(feedback: Feedback): Promise<void>;
+  getQuestionsAndAnswers(
+    reportId: number
+  ): Promise<{ question: string; sampleAnswer?: string | null; userAnswer?: string | null }[]>;
 }

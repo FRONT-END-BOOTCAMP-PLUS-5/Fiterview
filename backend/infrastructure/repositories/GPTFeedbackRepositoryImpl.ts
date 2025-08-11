@@ -1,45 +1,37 @@
-import { Feedback } from '@/backend/domain/entities/feedback';
-import { IFeedbackRepository } from '@/backend/domain/repositories/IFeedbackRepository';
-import { PrAnswerRepository } from './PrAnswerRepository';
+import { Feedback } from '@/backend/domain/entities/Feedback';
 import { OpenAIProvider } from '@/backend/infrastructure/providers/OpenAIProvider';
-import { GenerateFeedbackDto } from '@/backend/application/evaluations/dtos/GenerateFeedbackDto';
-import { FeedbackMapper } from '../mappers/FeedbackMapper';
+import { RequestFeedbackDto } from '@/backend/application/feedback/dtos/RequestFeedbackDto';
+import { FeedbackMapper } from '@/backend/infrastructure/mappers/FeedbackMapper';
+import { FeedbackLLMRepository } from '@/backend/domain/repositories/FeedbackLLMRepository';
 
-export class GPTFeedbackRepository implements IFeedbackRepository {
-  private readonly questionsRepository: PrAnswerRepository = new PrAnswerRepository();
+export class GPTFeedbackRepositoryImpl implements FeedbackLLMRepository {
   private readonly openaiProvider: OpenAIProvider = new OpenAIProvider();
 
-  constructor(gptSettings: GenerateFeedbackDto) {
+  constructor(gptSettings: RequestFeedbackDto) {
     if (!gptSettings?.model) {
       throw new Error('OpenAI model is required in constructor.');
     }
-    // Remove these lines as properties don't exist on the class
-    // Questions and answers should be loaded dynamically when needed
   }
 
-  private createInputToGpt(questionContentArray: string[], answerContentArray: string[]) {
-    let input = '';
-    for (let i = 0; i < questionContentArray.length; i++) {
-      input += `Question: ${questionContentArray[i]}\n\nCandidate Answer: ${answerContentArray[i]}\n\n`;
-    }
-    return input;
+  private createInputToGpt(
+    pairs: { question: string; sampleAnswer?: string | null; userAnswer?: string | null }[]
+  ) {
+    return pairs
+      .map(
+        (p, idx) =>
+          `Q${idx + 1}: ${p.question}\nSample Answer: ${p.sampleAnswer ?? ''}\nUser Answer: ${p.userAnswer ?? ''}`
+      )
+      .join('\n\n');
   }
 
-  public async generateResponse(generateEvaluationDto: GenerateFeedbackDto): Promise<Feedback> {
-    const questionContentArray = await this.questionsRepository.getQuestion(
-      generateEvaluationDto.questions_report_id
-    );
-    const answerContentArray = await this.questionsRepository.getAnswer(
-      generateEvaluationDto.answers_report_id
-    );
-
-    const input = this.createInputToGpt(questionContentArray, answerContentArray);
+  public async generateFeedback(requestFeedbackDto: RequestFeedbackDto): Promise<Feedback> {
+    const input = this.createInputToGpt(requestFeedbackDto.pairs);
 
     const response = await this.openaiProvider.getResponses().create({
-      model: generateEvaluationDto.model,
-      instructions: generateEvaluationDto.instructions,
+      model: requestFeedbackDto.model,
+      instructions: requestFeedbackDto.instructions,
       input,
-      max_output_tokens: generateEvaluationDto.maxOutputTokens,
+      max_output_tokens: requestFeedbackDto.maxOutputTokens,
     } as any);
 
     const outputText = (response as any).output_text as string;
@@ -47,20 +39,15 @@ export class GPTFeedbackRepository implements IFeedbackRepository {
     try {
       const parsed = JSON.parse(outputText);
       return FeedbackMapper.toFeedback(
-        generateEvaluationDto.questions_report_id,
-        parsed.score,
-        parsed.strength,
-        parsed.improvement
+        requestFeedbackDto.reportId,
+        Number(parsed.score),
+        Array.isArray(parsed.strength) ? parsed.strength.join(' ') : parsed.strength,
+        Array.isArray(parsed.improvement) ? parsed.improvement.join(' ') : parsed.improvement
       );
     } catch (error) {
       const scoreMatch = outputText.match(/(\d+)/);
       const fallbackScore = scoreMatch ? scoreMatch[1] : '50';
-      return FeedbackMapper.toFeedback(
-        generateEvaluationDto.questions_report_id,
-        fallbackScore,
-        '',
-        ''
-      );
+      return FeedbackMapper.toFeedback(requestFeedbackDto.reportId, Number(fallbackScore), '', '');
     }
   }
 }

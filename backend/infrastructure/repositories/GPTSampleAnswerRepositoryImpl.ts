@@ -1,12 +1,7 @@
-import { PrAnswerRepository } from './PrAnswerRepository';
 import { OpenAIProvider } from '@/backend/infrastructure/providers/OpenAIProvider';
-import { ISampleAnswerRepository } from '@/backend/domain/repositories/ISampleAnswerRepository';
-import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/GenerateSampleAnswersDto';
-import { SampleAnswers } from '@/backend/domain/entities/SampleAnswers';
-import { SampleAnswerMapper } from '../mappers/SampleAnswerMapper';
+import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/GenerateSampleAnswerDto';
 
-export class GPTSampleAnswerRepository implements ISampleAnswerRepository {
-  private readonly questionsRepository: PrAnswerRepository = new PrAnswerRepository();
+export class GPTSampleAnswerRepositoryImpl {
   private readonly openaiProvider: OpenAIProvider = new OpenAIProvider();
 
   constructor(gptSettings: GenerateSampleAnswersDto) {
@@ -23,20 +18,20 @@ export class GPTSampleAnswerRepository implements ISampleAnswerRepository {
     return input;
   }
 
-  public async generateResponse(
-    generateBestAnswersDto: GenerateSampleAnswersDto
-  ): Promise<SampleAnswers> {
-    const questionContentArray = await this.questionsRepository.getQuestion(
-      generateBestAnswersDto.questions_report_id
-    );
+  public async generateSampleAnswer(
+    generateSampleAnswersDto: GenerateSampleAnswersDto
+  ): Promise<string> {
+    const questionContentArray = generateSampleAnswersDto.input
+      .split('\n')
+      .filter((s) => s.trim().length > 0);
 
     const input = this.createInputToGpt(questionContentArray);
 
     const response = await this.openaiProvider.getResponses().create({
-      model: generateBestAnswersDto.model,
-      instructions: generateBestAnswersDto.instructions,
+      model: generateSampleAnswersDto.model,
+      instructions: generateSampleAnswersDto.instructions,
       input,
-      max_output_tokens: generateBestAnswersDto.maxOutputTokens,
+      max_output_tokens: generateSampleAnswersDto.maxOutputTokens,
     } as any);
 
     const outputText = (response as any).output_text as string;
@@ -57,12 +52,9 @@ export class GPTSampleAnswerRepository implements ISampleAnswerRepository {
         parsedAnswers = outputText.split('\n').filter((line) => line.trim().length > 0);
       }
 
-      return SampleAnswerMapper.toSampleAnswers(
-        generateBestAnswersDto.questions_report_id,
-        parsedAnswers
-      );
+      return parsedAnswers.join('\n');
     } catch (error) {
-      return SampleAnswerMapper.toSampleAnswers(generateBestAnswersDto.questions_report_id, []);
+      return '';
     }
   }
 }

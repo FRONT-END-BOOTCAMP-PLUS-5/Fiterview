@@ -1,12 +1,12 @@
-import { Feedback } from '@/backend/domain/entities/feedback';
+import { Feedback } from '@/backend/domain/entities/Feedback';
 
 export class FeedbackMapper {
   static toFeedback(
     feedback_report_id: number,
-    score: string,
+    score: number,
     strength: string,
     improvement: string
   ): Feedback {
-    return new Feedback(feedback_report_id, score, strength, improvement);
+    return { feedback_report_id, score, strength, improvement };
   }
 }

@@ -1,46 +1,54 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GenerateFeedbackUsecase } from '@/backend/application/evaluations/usecases/GenerateFeedbackUsecase';
-import { GPTFeedbackRepository } from '@/backend/infrastructure/repositories/GPTFeedbackRepositoryImpl';
-import { GenerateFeedbackDto } from '@/backend/application/evaluations/dtos/GenerateFeedbackDto';
-import { DeliverFeedbackDto } from '@/backend/application/evaluations/dtos/DeliverFeedbackDto';
+import { GenerateFeedbackUsecase } from '@/backend/application/feedback/usecases/GenerateFeedbackUsecase';
+import { GPTFeedbackRepositoryImpl } from '@/backend/infrastructure/repositories/GPTFeedbackRepositoryImpl';
+import { RequestFeedbackDto } from '@/backend/application/feedback/dtos/RequestFeedbackDto';
+import { DeliverFeedbackDto } from '@/backend/application/feedback/dtos/DeliverFeedbackDto';
+import { PrFeedbackRepository } from '@/backend/infrastructure/repositories/PrFeedbackRepository';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const questions_report_id = searchParams.get('questions_report_id');
-    const answers_report_id = searchParams.get('answers_report_id');
 
     console.log('questions_report_id', questions_report_id);
-    console.log('answers_report_id', answers_report_id);
 
-    if (!questions_report_id || !answers_report_id) {
+    if (!questions_report_id) {
       return NextResponse.json(
-        { error: 'questions_report_id and answers_report_id query parameters are required' },
+        { error: 'questions_report_id query parameters are required' },
         { status: 400 }
       );
     }
 
-    const questions_report_idNumber = parseInt(questions_report_id, 10);
-    const answers_report_idNumber = parseInt(answers_report_id, 10);
-    if (isNaN(questions_report_idNumber) || isNaN(answers_report_idNumber)) {
+    const reportId = parseInt(questions_report_id, 10);
+    if (isNaN(reportId)) {
       return NextResponse.json(
-        { error: 'questions_report_id and answers_report_id must be valid numbers' },
+        { error: 'questions_report_id must be valid numbers' },
         { status: 400 }
       );
     }
 
-    const inputDto = new GenerateFeedbackDto(
-      questions_report_idNumber,
-      answers_report_idNumber,
+    // Fetch questions and answers from the database
+    const persistenceRepository = new PrFeedbackRepository();
+    const questionsAndAnswers = await persistenceRepository.getQuestionsAndAnswers(reportId);
+
+    if (questionsAndAnswers.length === 0) {
+      return NextResponse.json(
+        { error: 'No questions with answers found for this report' },
+        { status: 404 }
+      );
+    }
+
+    const dto = new RequestFeedbackDto(
+      reportId,
+      questionsAndAnswers,
       'gpt-4o',
-      'Return a JSON object with a numeric "score" between 0 and 100, a "strength" and an "improvement" in Korean. Example: {"score": 85, "strength": "이 답변의 강점은...", "improvement": "이 답변의 개선 방법은..."}',
-      '',
+      'Return a JSON object: {"score": number 0-100, "strength": [string, string], "improvement": [string, string]}. Use Korean for text fields. Consider both sampleAnswer and userAnswer when evaluating.',
       1000
     );
 
-    const feedbackService = new GPTFeedbackRepository(inputDto);
-    const generateFeedbackUsecase = new GenerateFeedbackUsecase(feedbackService);
-    const feedback = await generateFeedbackUsecase.execute(inputDto);
+    const llmRepo = new GPTFeedbackRepositoryImpl(dto);
+    const usecase = new GenerateFeedbackUsecase(llmRepo, persistenceRepository);
+    const feedback = await usecase.execute(dto);
 
     const outputDto = new DeliverFeedbackDto(
       feedback.feedback_report_id,

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GenerateSampleAnswerUsecase } from '@/backend/application/questions/usecases/GenerateSampleAnswerUsecase';
-import { GPTSampleAnswerRepository } from '@/backend/infrastructure/repositories/GPTSampleAnswerRepositoryImpl';
-import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/GenerateSampleAnswersDto';
+import { GPTSampleAnswerRepositoryImpl } from '@/backend/infrastructure/repositories/GPTSampleAnswerRepositoryImpl';
+import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/GenerateSampleAnswerDto';
 import { DeliverSampleAnswersDto } from '@/backend/application/questions/dtos/DeliverSampleAnswersDto';
 
 export async function GET(request: NextRequest) {
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       1000
     );
 
-    const sampleAnswerRepository = new GPTSampleAnswerRepository(inputDto);
+    const sampleAnswerRepository = new GPTSampleAnswerRepositoryImpl(inputDto);
     const generateSampleAnswerUsecase = new GenerateSampleAnswerUsecase(sampleAnswerRepository);
     const sampleAnswers = await generateSampleAnswerUsecase.execute(inputDto);
 
