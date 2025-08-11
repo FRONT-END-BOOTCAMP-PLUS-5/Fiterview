@@ -1,6 +1,6 @@
-import { STTRequest } from '../dtos/STTRequest';
-import { STTResponse } from '../dtos/STTResponse';
+import { STTRequest } from '@/backend/domain/dtos/STTRequest';
+import { STTResponse } from '@/backend/domain/dtos/STTResponse';
 
 export interface STTRepository {
-  transcribe(request: STTRequest): Promise<STTResponse>;
+  transcribeToText(audioRequest: STTRequest): Promise<STTResponse>;
 }
