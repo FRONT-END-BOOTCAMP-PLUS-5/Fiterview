@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GenerateBestAnswersUsecase } from '@/backend/application/questions/usecases/GenerateBestAnswersUsecase';
+import { GenerateBestAnswerUsecase } from '@/backend/application/questions/usecases/GenerateBestAnswerUsecase';
 import { GPTBestAnswerRepository } from '@/backend/infrastructure/repositories/GPTBestAnswerRepository';
 import { GenerateBestAnswersDto } from '@/backend/application/questions/dtos/GenerateBestAnswersDto';
 import { DeliverBestAnswersDto } from '@/backend/application/questions/dtos/DeliverBestAnswersDto';
@@ -32,9 +32,9 @@ export async function GET(request: NextRequest) {
       1000
     );
 
-    const bestAnswersService = new GPTBestAnswerRepository(inputDto);
-    const generateBestAnswersUsecase = new GenerateBestAnswersUsecase(bestAnswersService);
-    const bestAnswers = await generateBestAnswersUsecase.execute(inputDto);
+    const bestAnswerRepository = new GPTBestAnswerRepository(inputDto);
+    const generateBestAnswerUsecase = new GenerateBestAnswerUsecase(bestAnswerRepository);
+    const bestAnswers = await generateBestAnswerUsecase.execute(inputDto);
 
     const outputDto = new DeliverBestAnswersDto(
       bestAnswers.best_answers_report_id,
