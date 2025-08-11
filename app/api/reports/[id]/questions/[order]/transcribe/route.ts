@@ -3,7 +3,7 @@ import { STTRepositoryImpl } from '@/backend/infrastructure/repositories/STTRepo
 import { STTRequest } from '@/backend/domain/dtos/STTRequest';
 import { STTResponse } from '@/backend/domain/dtos/STTResponse';
 import { TranscribeQuestionResponse } from '@/backend/application/questions/dtos/TranscribeQuestionResponse';
-import { saveUserAnswer } from '@/backend/application/questions/usecases/SaveUserAnswerUseCase';
+import { SaveUserAnswerUseCase } from '@/backend/application/questions/usecases/SaveUserAnswerUseCase';
 import { PrismaClient } from '@prisma/client';
 
 export async function POST(
@@ -94,7 +94,8 @@ export async function POST(
     console.log('✅ 변환 완료!');
 
     // UseCase를 통해 DB에 변환된 텍스트 저장
-    await saveUserAnswer(prisma, {
+    const saveUserAnswerUseCase = new SaveUserAnswerUseCase(prisma);
+    await saveUserAnswerUseCase.execute({
       reportId: reportIdNumber,
       order: orderNumber,
       transcription: sttResult,
@@ -116,9 +117,6 @@ export async function POST(
     };
 
     console.log('📝 결과:', response);
-
-    // Prisma 클라이언트 연결 종료
-    await prisma.$disconnect();
 
     return NextResponse.json(response);
   } catch (error) {
