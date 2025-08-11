@@ -41,10 +41,22 @@ export class GPTBestAnswerRepository implements IBestAnswerEntity {
     const outputText = (response as any).output_text as string;
 
     try {
-      return new BestAnswersEntity(
-        generateBestAnswersDto.questions_report_id,
-        outputText.split('\n')
-      );
+      // Try to parse as JSON first (in case AI returns proper JSON array)
+      let parsedAnswers: string[];
+      try {
+        const jsonMatch = outputText.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          parsedAnswers = JSON.parse(jsonMatch[0]);
+        } else {
+          // Fallback to splitting by newlines if no JSON array found
+          parsedAnswers = outputText.split('\n').filter((line) => line.trim().length > 0);
+        }
+      } catch (parseError) {
+        // If JSON parsing fails, fallback to splitting by newlines
+        parsedAnswers = outputText.split('\n').filter((line) => line.trim().length > 0);
+      }
+
+      return new BestAnswersEntity(generateBestAnswersDto.questions_report_id, parsedAnswers);
     } catch (error: unknown) {
       return new BestAnswersEntity(generateBestAnswersDto.questions_report_id, []);
     }

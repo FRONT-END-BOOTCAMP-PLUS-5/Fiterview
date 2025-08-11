@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     const inputDto = new GenerateBestAnswersDto(
       questions_report_idNumber,
       'gpt-4o',
-      'Return an array of best answers to each question divided by a new line. Example: ["Best answer 1", "Best answer 2", "Best answer 3"]',
+      'Return a JSON array of best answers to each question. Format: ["Best answer 1", "Best answer 2", "Best answer 3"]. Each answer should be a string that provides a comprehensive and well-structured response to the corresponding question.',
       '',
       1000
     );

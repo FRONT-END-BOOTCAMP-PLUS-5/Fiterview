@@ -22,6 +22,7 @@ export default function BestAnswerTestPage() {
     try {
       const res = await axios.get(`/api/reports/best-answers?questions_report_id=${id}`);
       const data = res.data ?? {};
+      console.log('Raw API response:', data);
       const normalized: BestAnswers = {
         reportId:
           (data.reportId as number) ?? (data.best_answers_report_id as number) ?? Number(id),
@@ -31,6 +32,7 @@ export default function BestAnswerTestPage() {
             ? (data.best_answers as string[])
             : [],
       };
+      console.log('Normalized data:', normalized);
       setBestAnswers(normalized);
     } catch (e: any) {
       setError(e.message);
@@ -57,15 +59,18 @@ export default function BestAnswerTestPage() {
           <h2>최적 답안 결과</h2>
           {Array.isArray(bestAnswers.bestAnswers) && bestAnswers.bestAnswers.length > 0 ? (
             <div>
-              {bestAnswers.bestAnswers.map((answer, index) => (
-                <div
-                  key={index}
-                  style={{ marginBottom: '1rem', padding: '0.5rem', backgroundColor: '#f5f5f5' }}
-                >
-                  <strong>Answer {index + 1}:</strong>
-                  <p>{answer}</p>
-                </div>
-              ))}
+              {bestAnswers.bestAnswers.map((answer, index) => {
+                console.log(`Answer ${index + 1}:`, answer, 'Type:', typeof answer);
+                return (
+                  <div
+                    key={index}
+                    style={{ marginBottom: '1rem', padding: '0.5rem', backgroundColor: '#f5f5f5' }}
+                  >
+                    <strong>Answer {index + 1}:</strong>
+                    <p>{Array.isArray(answer) ? JSON.stringify(answer) : answer}</p>
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <p>최적 답안이 생성되지 않았습니다.</p>
