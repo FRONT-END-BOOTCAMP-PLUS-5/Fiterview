@@ -1,7 +1,7 @@
-import { TTSRequest } from '../../../domain/dtos/TTSRequest';
-import { TTSResponse } from '../../../domain/dtos/TTSResponse';
-import { TTSRepository } from '../../../domain/repositories/TTSRepository';
-import { QuestionTTSResponse } from '../dtos/QuestionTTSResponse';
+import { TTSRequest } from '@/backend/domain/dtos/TTSRequest';
+import { TTSResponse } from '@/backend/domain/dtos/TTSResponse';
+import { TTSRepository } from '@/backend/domain/repositories/TTSRepository';
+import { QuestionTTSResponse } from '@/backend/application/questions/dtos/QuestionTTSResponse';
 import { QuestionRepository } from '@/backend/domain/repositories/QuestionRepository';
 
 export class GenerateQuestionsTTSUsecase {
