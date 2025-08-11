@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ReportRepositoryImpl } from '@/backend/infrastructure/repositories/ReportRepositoryImpl';
+import { QuestionRepositoryImpl } from '@/backend/infrastructure/repositories/QuestionRepositoryImpl';
 import { UpdateReportUsecase } from '@/backend/application/reports/usecases/UpdateReportUsecase';
 import { DeleteReportUsecase } from '@/backend/application/reports/usecases/DeleteReportUsecase';
 import { GetReportByIdUsecase } from '@/backend/application/reports/usecases/GetReportByIdUsecase';
+import { GetQuestionsUsecase } from '@/backend/application/questions/usecases/GetQuestionsUsecase';
 import { ReportDto } from '@/backend/application/reports/dtos/ReportDto';
 
 const reportsRepository = new ReportRepositoryImpl();
+const questionRepository = new QuestionRepositoryImpl();
 const updateReportUsecase = new UpdateReportUsecase(reportsRepository);
 const deleteReportUsecase = new DeleteReportUsecase(reportsRepository);
 const getReportByIdUsecase = new GetReportByIdUsecase(reportsRepository);
+const getQuestionsUsecase = new GetQuestionsUsecase(questionRepository);
 
 //수정 (제목, 회고)
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -91,13 +95,17 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       );
     }
 
-    const data: ReportDto = {
+    // 해당 리포트의 질문들도 함께 조회
+    const questions = await getQuestionsUsecase.execute(reportId);
+
+    const data = {
       id: report.id,
       title: report.title,
       createdAt: report.createdAt.toISOString(),
       status: report.status,
       userId: report.userId,
       reflection: report.reflection,
+      questions: questions,
     };
 
     return NextResponse.json({
