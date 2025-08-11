@@ -3,6 +3,7 @@ import { GenerateSampleAnswerUsecase } from '@/backend/application/questions/use
 import { GPTSampleAnswerRepositoryImpl } from '@/backend/infrastructure/repositories/GPTSampleAnswerRepositoryImpl';
 import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/GenerateSampleAnswerDto';
 import { DeliverSampleAnswersDto } from '@/backend/application/questions/dtos/DeliverSampleAnswersDto';
+import { PrismaClient } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {
@@ -32,9 +33,10 @@ export async function GET(request: NextRequest) {
       1000
     );
 
-    const sampleAnswerRepository = new GPTSampleAnswerRepositoryImpl(inputDto);
-    const generateSampleAnswerUsecase = new GenerateSampleAnswerUsecase(sampleAnswerRepository);
-    const sampleAnswers = await generateSampleAnswerUsecase.execute(inputDto);
+    const prisma = new PrismaClient();
+    const llm = new GPTSampleAnswerRepositoryImpl(inputDto);
+    const usecase = new GenerateSampleAnswerUsecase(prisma, llm);
+    const sampleAnswers = await usecase.execute(inputDto);
 
     const outputDto = new DeliverSampleAnswersDto(
       sampleAnswers.sample_answers_report_id,
