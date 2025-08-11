@@ -1,6 +1,6 @@
 export interface Question {
   id: number;
-  order?: number;
+  order: number;
   question: string;
   sampleAnswer?: string;
   userAnswer?: string;
