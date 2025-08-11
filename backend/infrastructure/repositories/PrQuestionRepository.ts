@@ -23,9 +23,6 @@ export class PrismaQuestionRepository implements QuestionRepository {
           id: true,
           order: true,
           question: true,
-          sampleAnswer: true,
-          userAnswer: true,
-          recording: true,
           reportId: true,
         },
         orderBy: {
@@ -38,9 +35,6 @@ export class PrismaQuestionRepository implements QuestionRepository {
         id: q.id,
         order: q.order || 0, // falsy
         question: q.question,
-        sampleAnswer: q.sampleAnswer || undefined,
-        userAnswer: q.userAnswer || undefined,
-        recording: q.recording || undefined,
         reportId: q.reportId,
       }));
     } catch (error) {
