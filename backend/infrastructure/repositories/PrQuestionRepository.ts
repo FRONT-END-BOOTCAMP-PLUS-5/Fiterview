@@ -36,7 +36,7 @@ export class PrismaQuestionRepository implements QuestionRepository {
 
       return questions.map((q) => ({
         id: q.id,
-        order: q.order || undefined,
+        order: q.order || 0,
         question: q.question,
         sampleAnswer: q.sampleAnswer || undefined,
         userAnswer: q.userAnswer || undefined,
