@@ -2,19 +2,13 @@ import { BestAnswersEntity } from '@/backend/domain/entities/BestAnswersEntity';
 import { DbQARepository } from './DbQARepository';
 import { OpenAIProvider } from '@/backend/infrastructure/providers/OpenAIProvider';
 import { IBestAnswerEntity } from '@/backend/domain/repositories/IBestAnswerEntity';
-
-export interface GPTBestAnswerRepositoryProps {
-  questions_report_id: number;
-  model: string;
-  instructions: string;
-  maxOutputTokens: number;
-}
+import { GenerateBestAnswersDto } from '@/backend/application/questions/dtos/GenerateBestAnswersDto';
 
 export class GPTBestAnswerRepository implements IBestAnswerEntity {
   private readonly questionsRepository: DbQARepository = new DbQARepository();
   private readonly openaiProvider: OpenAIProvider = new OpenAIProvider();
 
-  constructor(gptSettings: GPTBestAnswerRepositoryProps) {
+  constructor(gptSettings: GenerateBestAnswersDto) {
     if (!gptSettings?.model) {
       throw new Error('OpenAI model is required in constructor.');
     }
@@ -29,10 +23,10 @@ export class GPTBestAnswerRepository implements IBestAnswerEntity {
   }
 
   public async generateResponse(
-    generateBestAnswersDto: GPTBestAnswerRepositoryProps
+    generateBestAnswersDto: GenerateBestAnswersDto
   ): Promise<BestAnswersEntity> {
     const questionContentArray = await this.questionsRepository.getQuestion(
-      gptSettings.questions_report_id
+      generateBestAnswersDto.questions_report_id
     );
 
     const input = this.createInputToGpt(questionContentArray);
