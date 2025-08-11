@@ -1,5 +1,5 @@
-// STT 응답 데이터 구조
+// STT 모델에서 반환하는 기본 결과
 export interface STTResponse {
-  text: string; // 변환된 텍스트
-  language: string; // 사용된 언어
+  text: string;
+  language: string;
 }
