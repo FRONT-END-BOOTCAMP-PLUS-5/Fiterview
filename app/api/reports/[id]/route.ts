@@ -123,7 +123,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       data,
     });
   } catch (error) {
-    console.error('리포트 조회 오류:', error);
     return NextResponse.json(
       { success: false, message: '서버 오류가 발생했습니다.' },
       { status: 500 }
