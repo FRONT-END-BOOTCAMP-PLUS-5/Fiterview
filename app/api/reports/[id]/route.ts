@@ -6,6 +6,7 @@ import { DeleteReportUsecase } from '@/backend/application/reports/usecases/Dele
 import { GetReportByIdUsecase } from '@/backend/application/reports/usecases/GetReportByIdUsecase';
 import { GetQuestionsUsecase } from '@/backend/application/questions/usecases/GetQuestionsUsecase';
 import { ReportDto } from '@/backend/application/reports/dtos/ReportDto';
+import { QuestionDto } from '@/backend/application/questions/dtos/QuestionDto';
 
 const reportsRepository = new ReportRepositoryImpl();
 const questionRepository = new QuestionRepositoryImpl();
@@ -98,6 +99,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     // 해당 리포트의 질문들도 함께 조회
     const questions = await getQuestionsUsecase.execute(reportId);
 
+    const questionDtos: QuestionDto[] = questions.map((q) => ({
+      id: q.id,
+      order: q.order,
+      question: q.question,
+      sampleAnswer: q.sampleAnswer,
+      userAnswer: q.userAnswer,
+      recording: q.recording,
+    }));
+
     const data = {
       id: report.id,
       title: report.title,
@@ -105,7 +115,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       status: report.status,
       userId: report.userId,
       reflection: report.reflection,
-      questions: questions,
+      questions: questionDtos,
     };
 
     return NextResponse.json({
