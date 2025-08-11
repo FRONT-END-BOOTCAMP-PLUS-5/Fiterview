@@ -1,6 +1,6 @@
 export class BestAnswersEntity {
   constructor(
-    public readonly reportId: number,
-    public readonly answers: string[]
+    public readonly best_answers_report_id: number,
+    public readonly best_answers: string[]
   ) {}
 }

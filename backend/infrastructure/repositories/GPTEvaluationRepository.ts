@@ -24,7 +24,7 @@ export class GPTEvaluationRepository implements IEvaluationRepository {
     return input;
   }
 
-  public async generateEvaluation(
+  public async generateResponse(
     generateEvaluationDto: GenerateEvaluationDto
   ): Promise<EvaluationEntity> {
     const questionContentArray = await this.questionsRepository.getQuestion(

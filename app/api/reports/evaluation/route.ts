@@ -2,12 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GenerateEvaluationUsecase } from '@/backend/application/evaluations/usecases/GenerateEvaluationUsecase';
 import { GPTEvaluationRepository } from '@/backend/infrastructure/repositories/GPTEvaluationRepository';
 import { GenerateEvaluationDto } from '@/backend/application/evaluations/dtos/GenerateEvaluationDto';
+import { DeliverEvaluationDto } from '@/backend/application/evaluations/dtos/DeliverEvaluationDto';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const questions_report_id = searchParams.get('questions_report_id');
     const answers_report_id = searchParams.get('answers_report_id');
+
+    console.log('questions_report_id', questions_report_id);
+    console.log('answers_report_id', answers_report_id);
 
     if (!questions_report_id || !answers_report_id) {
       return NextResponse.json(
@@ -25,19 +29,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const evaluationService = new GPTEvaluationRepository(
-      new GenerateEvaluationDto(
-        questions_report_idNumber,
-        answers_report_idNumber,
-        'gpt-4o',
-        'Return a JSON object with a numeric "score" between 0 and 100. Example: {"score": 85}',
-        '',
-        1000
-      )
-    );
-    const generateEvaluationUsecase = new GenerateEvaluationUsecase(evaluationService);
-
-    // Create input DTO
     const inputDto = new GenerateEvaluationDto(
       questions_report_idNumber,
       answers_report_idNumber,
@@ -47,15 +38,11 @@ export async function GET(request: NextRequest) {
       1000
     );
 
-    // Execute usecase
-    // Use the repository through the usecase (constructor carries config)
+    const evaluationService = new GPTEvaluationRepository(inputDto);
+    const generateEvaluationUsecase = new GenerateEvaluationUsecase(evaluationService);
     const evaluation = await generateEvaluationUsecase.execute(inputDto);
 
-    // Create output DTO
-    const outputDto = {
-      questions_report_id: evaluation.evaluation_report_id,
-      score: evaluation.score,
-    };
+    const outputDto = new DeliverEvaluationDto(evaluation.evaluation_report_id, evaluation.score);
 
     return NextResponse.json(outputDto, { status: 200 });
   } catch (error) {
