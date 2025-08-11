@@ -16,38 +16,45 @@ export class QuestionRepositoryImpl implements QuestionRepository {
   async getQuestionsByReportId(reportId: number): Promise<Question[]> {
     try {
       const questions = await prisma.question.findMany({
-        where: {
-          reportId: reportId,
-        },
-        select: {
-          id: true,
-          order: true,
-          question: true,
-          sampleAnswer: true,
-          userAnswer: true,
-          recording: true,
-          reportId: true,
-        },
-        orderBy: {
-          order: 'asc',
-        },
-        take: 10, // 최대 10개 질문 조회
+        where: { reportId },
+        orderBy: { order: 'asc' },
       });
 
       return questions.map((q) => ({
         id: q.id,
-        order: q.order || 0, // falsy
+        order: q.order || 0,
         question: q.question,
+        reportId: q.reportId,
         sampleAnswer: q.sampleAnswer || undefined,
         userAnswer: q.userAnswer || undefined,
         recording: q.recording || undefined,
-        reportId: q.reportId,
       }));
     } catch (error) {
-      console.error('질문 조회 중 오류 발생:', error);
-      throw new Error(
-        `질문 조회에 실패했습니다: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+      console.error('질문 조회 오류:', error);
+      throw new Error('질문을 조회하는 중 오류가 발생했습니다.');
+    }
+  }
+
+  // questions테이블 조회(report 조회 시 사용)
+  async findAllByReportId(reportId: number): Promise<Question[]> {
+    try {
+      const questions = await prisma.question.findMany({
+        where: { reportId },
+        orderBy: { order: 'asc' },
+      });
+
+      return questions.map((q) => ({
+        id: q.id,
+        order: q.order || 0,
+        question: q.question,
+        reportId: q.reportId,
+        sampleAnswer: q.sampleAnswer || undefined,
+        userAnswer: q.userAnswer || undefined,
+        recording: q.recording || undefined,
+      }));
+    } catch (error) {
+      console.error('질문 조회 오류:', error);
+      throw new Error('질문을 조회하는 중 오류가 발생했습니다.');
     }
   }
 
