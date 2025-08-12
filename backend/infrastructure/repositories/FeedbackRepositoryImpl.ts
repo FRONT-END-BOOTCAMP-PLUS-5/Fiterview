@@ -1,8 +1,8 @@
 import prisma from '@/utils/prisma';
-import { IFeedbackRepository } from '@/backend/domain/repositories/IFeedbackRepository';
+import { FeedbackRepository } from '@/backend/domain/repositories/FeedbackRepository';
 import { Feedback } from '@/backend/domain/entities/Feedback';
 
-export class PrFeedbackRepository implements IFeedbackRepository {
+export class FeedbackRepositoryImpl implements FeedbackRepository {
   async getFeedback(feedback_report_id: number): Promise<Feedback> {
     const feedback = await prisma.feedback.findUnique({
       where: { reportId: feedback_report_id },
