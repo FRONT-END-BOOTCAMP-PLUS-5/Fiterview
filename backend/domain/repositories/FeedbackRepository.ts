@@ -1,6 +1,6 @@
 import { Feedback } from '../entities/Feedback';
 
-export interface IFeedbackRepository {
+export interface FeedbackRepository {
   getFeedback(feedback_report_id: number): Promise<Feedback>;
   saveFeedback(feedback: Feedback): Promise<void>;
   getQuestionsAndAnswers(
