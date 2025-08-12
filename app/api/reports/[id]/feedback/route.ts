@@ -6,26 +6,14 @@ import { DeliverFeedbackDto } from '@/backend/application/feedbacks/dtos/Deliver
 import { FeedbackRepositoryImpl } from '@/backend/infrastructure/repositories/FeedbackRepositoryImpl';
 import { FEEDBACK_GENERATION_INSTRUCTIONS } from '@/constants/feedback';
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { searchParams } = new URL(request.url);
-    const questions_report_id = searchParams.get('questions_report_id');
+    const reportId = parseInt(params.id, 10);
 
-    console.log('questions_report_id', questions_report_id);
+    console.log('questions_report_id', reportId);
 
-    if (!questions_report_id) {
-      return NextResponse.json(
-        { error: 'questions_report_id query parameters are required' },
-        { status: 400 }
-      );
-    }
-
-    const reportId = parseInt(questions_report_id, 10);
     if (isNaN(reportId)) {
-      return NextResponse.json(
-        { error: 'questions_report_id must be valid numbers' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid report ID' }, { status: 400 });
     }
 
     // Fetch questions and answers from the database
