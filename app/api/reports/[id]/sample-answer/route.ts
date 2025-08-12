@@ -5,25 +5,14 @@ import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/G
 import { DeliverSampleAnswersDto } from '@/backend/application/questions/dtos/DeliverSampleAnswersDto';
 import { PrismaClient } from '@prisma/client';
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { searchParams } = new URL(request.url);
-    const questions_report_id = searchParams.get('questions_report_id');
+    const questions_report_idNumber = parseInt(params.id, 10);
 
-    if (!questions_report_id) {
-      return NextResponse.json(
-        { error: 'questions_report_id query parameter is required' },
-        { status: 400 }
-      );
-    }
-
-    const questions_report_idNumber = parseInt(questions_report_id, 10);
     if (isNaN(questions_report_idNumber)) {
-      return NextResponse.json(
-        { error: 'questions_report_id must be valid numbers' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid report ID' }, { status: 400 });
     }
+
     // Create input DTO
     const inputDto: GenerateSampleAnswersDto = {
       questions_report_id: questions_report_idNumber,
