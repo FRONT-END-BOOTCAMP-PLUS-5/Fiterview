@@ -1,5 +1,5 @@
 import { GenerateRecordingUsecase } from '@/backend/application/questions/usecases/GenerateRecordingUsecase';
-import { PrismaQuestionRepository } from '@/backend/infrastructure/repositories/PrQuestionRepository';
+import { QuestionRepositoryImpl } from '@/backend/infrastructure/repositories/QuestionRepositoryImpl';
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -33,7 +33,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const arrayBuffer = await audioFile.arrayBuffer();
     const audioBuffer = Buffer.from(arrayBuffer);
 
-    const usecase = new GenerateRecordingUsecase(new PrismaQuestionRepository());
+    const usecase = new GenerateRecordingUsecase(new QuestionRepositoryImpl());
     const result = await usecase.execute({
       reportId,
       order,
