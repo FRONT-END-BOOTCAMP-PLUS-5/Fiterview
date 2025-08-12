@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GenerateFeedbackUsecase } from '@/backend/application/feedback/usecases/GenerateFeedbackUsecase';
+import { GenerateFeedbackUsecase } from '@/backend/application/feedbacks/usecases/GenerateFeedbackUsecase';
 import { GPTFeedbackRepositoryImpl } from '@/backend/infrastructure/repositories/GPTFeedbackRepositoryImpl';
-import { RequestFeedbackDto } from '@/backend/application/feedback/dtos/RequestFeedbackDto';
-import { DeliverFeedbackDto } from '@/backend/application/feedback/dtos/DeliverFeedbackDto';
-import { PrFeedbackRepository } from '@/backend/infrastructure/repositories/PrFeedbackRepository';
+import { RequestFeedbackDto } from '@/backend/application/feedbacks/dtos/RequestFeedbackDto';
+import { DeliverFeedbackDto } from '@/backend/application/feedbacks/dtos/DeliverFeedbackDto';
+import { FeedbackRepositoryImpl } from '@/backend/infrastructure/repositories/FeedbackRepositoryImpl';
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch questions and answers from the database
-    const persistenceRepository = new PrFeedbackRepository();
+    const persistenceRepository = new FeedbackRepositoryImpl();
     const questionsAndAnswers = await persistenceRepository.getQuestionsAndAnswers(reportId);
 
     if (questionsAndAnswers.length === 0) {

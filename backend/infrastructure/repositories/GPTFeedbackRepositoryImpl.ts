@@ -1,6 +1,6 @@
 import { Feedback } from '@/backend/domain/entities/Feedback';
 import { OpenAIProvider } from '@/backend/infrastructure/providers/OpenAIProvider';
-import { RequestFeedbackDto } from '@/backend/application/feedback/dtos/RequestFeedbackDto';
+import { RequestFeedbackDto } from '@/backend/application/feedbacks/dtos/RequestFeedbackDto';
 import { FeedbackMapper } from '@/backend/infrastructure/mappers/FeedbackMapper';
 import { FeedbackLLMRepository } from '@/backend/domain/repositories/FeedbackLLMRepository';
 
