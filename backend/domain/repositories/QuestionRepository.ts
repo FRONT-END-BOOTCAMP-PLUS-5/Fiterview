@@ -10,7 +10,4 @@ export interface QuestionRepository {
   // 사용자 답변 수정
   // getUserAnswer():
   // updateUserAnswer():
-
-  // 생성된 질문 -> DB에 저장
-  saveQuestions(generatedQuestions: QuestionsResponse[], reportId: number): Promise<Question[]>;
 }

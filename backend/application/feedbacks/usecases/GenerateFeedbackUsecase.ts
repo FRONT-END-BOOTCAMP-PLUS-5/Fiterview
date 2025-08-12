@@ -1,7 +1,7 @@
 import { Feedback } from '@/backend/domain/entities/Feedback';
 import { FeedbackRepository } from '@/backend/domain/repositories/FeedbackRepository';
 import { RequestFeedbackDto } from '@/backend/application/feedbacks/dtos/RequestFeedbackDto';
-import { FeedbackLLMRepository } from '@/backend/domain/repositories/FeedbackLLMRepository';
+import { FeedbackLLMRepository } from '@/backend/domain/AI/openAI/FeedbackLLMRepository';
 
 export class GenerateFeedbackUsecase {
   constructor(

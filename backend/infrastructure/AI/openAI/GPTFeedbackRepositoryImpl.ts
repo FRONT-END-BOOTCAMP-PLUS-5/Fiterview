@@ -2,7 +2,7 @@ import { Feedback } from '@/backend/domain/entities/Feedback';
 import getOpenAIClient from '@/utils/AI/OpenAI';
 import { RequestFeedbackDto } from '@/backend/application/feedbacks/dtos/RequestFeedbackDto';
 import { toFeedback } from '@/backend/infrastructure/mappers/FeedbackMapper';
-import { FeedbackLLMRepository } from '@/backend/domain/repositories/FeedbackLLMRepository';
+import { FeedbackLLMRepository } from '@/backend/domain/AI/openAI/FeedbackLLMRepository';
 
 export class GPTFeedbackRepositoryImpl implements FeedbackLLMRepository {
   constructor(gptSettings: RequestFeedbackDto) {

@@ -1,8 +1,8 @@
 import { QuestionsRequest } from '@/backend/domain/dtos/QuestionsRequest';
 import { SavedQuestionsDto } from '@/backend/application/questions/dtos/SavedQuestionsDto';
-import { QuestionRepository } from '@/backend/domain/repositories/QuestionRepository';
+import { GenerateQuestionRepository } from '@/backend/domain/AI/googleAI/GenerateQuestionRepository';
 export class GenerateQuestionsUseCase {
-  constructor(private questionRepository: QuestionRepository) {}
+  constructor(private questionRepository: GenerateQuestionRepository) {}
 
   async execute(files: QuestionsRequest[], reportId: number): Promise<SavedQuestionsDto> {
     if (!files || files.length === 0) {

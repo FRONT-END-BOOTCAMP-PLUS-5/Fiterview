@@ -1,5 +1,5 @@
 import { QuestionsRequest } from '@/backend/domain/dtos/QuestionsRequest';
-import { QuestionRepository } from '@/backend/domain/repositories/QuestionRepository';
+import { GenerateQuestionRepository } from '@/backend/domain/AI/googleAI/GenerateQuestionRepository';
 import { ReportRepository } from '@/backend/domain/repositories/ReportRepository';
 
 export interface CreateReportInput {
@@ -14,7 +14,7 @@ export interface CreateReportResult {
 export class CreateReportUsecase {
   constructor(
     private reportRepository: ReportRepository,
-    private questionRepository: QuestionRepository
+    private questionRepository: GenerateQuestionRepository
   ) {}
 
   async execute({ userId, files }: CreateReportInput): Promise<CreateReportResult> {
