@@ -1,5 +1,5 @@
 import { GenerateQuestionsTTSUsecase } from '@/backend/application/questions/usecases/GenerateQuestionsTTSUsecase';
-import { PrTTSRepository } from '@/backend/infrastructure/repositories/TTSRepositoryImpl';
+import { PrTTSRepository } from '@/backend/infrastructure/AI/ttsAI/TTSRepositoryImpl';
 import { QuestionTTSResponse } from '@/backend/application/questions/dtos/QuestionTTSResponse';
 import { QuestionRepositoryImpl } from '@/backend/infrastructure/repositories/QuestionRepositoryImpl';
 
