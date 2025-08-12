@@ -42,9 +42,6 @@ export class ReportRepositoryImpl implements ReportRepository {
     const prismaUpdateData: any = {};
     if (updateData.title !== undefined) prismaUpdateData.title = updateData.title;
     if (updateData.reflection !== undefined) prismaUpdateData.reflection = updateData.reflection;
-    if (updateData.status !== undefined) {
-      prismaUpdateData.status = mapReportStatusToDb(updateData.status as ReportStatus) as any;
-    }
 
     const updatedReport = await prisma.report.update({
       where: { id: reportId },
@@ -59,6 +56,15 @@ export class ReportRepositoryImpl implements ReportRepository {
       userId: updatedReport.userId,
       reflection: updatedReport.reflection || undefined,
     };
+  }
+
+  async updateReportStatus(reportId: number, status: ReportStatus): Promise<void> {
+    await prisma.report.update({
+      where: { id: reportId },
+      data: {
+        status: mapReportStatusToDb(status) as any,
+      },
+    });
   }
 
   async findReportById(reportId: number): Promise<Reports | null> {
