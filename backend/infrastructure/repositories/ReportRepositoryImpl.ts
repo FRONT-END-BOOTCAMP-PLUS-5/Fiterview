@@ -2,6 +2,7 @@ import { Reports, ReportStatus } from '@/backend/domain/entities/Report';
 import { ReportRepository } from '@/backend/domain/repositories/ReportRepository';
 import prisma from '@/utils/prisma';
 import { mapReportStatusToDb, mapReportStatusToDomain } from '../mappers/ReportStatusMapper';
+import { Prisma, ReportStatus as PrismaReportStatus } from '@prisma/client';
 
 export class ReportRepositoryImpl implements ReportRepository {
   async createReport(userId: number): Promise<Reports> {
@@ -90,15 +91,21 @@ export class ReportRepositoryImpl implements ReportRepository {
       id: report.id,
       title: report.title,
       createdAt: report.createdAt,
-      status: mapReportStatusToDomain(report.status as any),
+      status: mapReportStatusToDomain(report.status),
       userId: report.userId,
       reflection: report.reflection ?? undefined,
     }));
   }
 
-  async findReportsByUserId(userId: number): Promise<Reports[]> {
+  async findReportsByUserId(userId: number, status?: ReportStatus): Promise<Reports[]> {
+    const whereClause: Prisma.ReportWhereInput = { userId };
+
+    if (status) {
+      whereClause.status = mapReportStatusToDb(status) as PrismaReportStatus;
+    }
+
     const reports = await prisma.report.findMany({
-      where: { userId },
+      where: whereClause,
       orderBy: { createdAt: 'desc' },
     });
 

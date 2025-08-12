@@ -23,12 +23,23 @@ const badRequest = (message: string) =>
 //조회
 export async function GET(request: NextRequest) {
   try {
+    // status 검증
+    const parseStatus = (value: string | null): ReportDto['status'] | undefined => {
+      if (!value) return undefined;
+      const upperValue = value.toUpperCase();
+      if (['PENDING', 'ANALYZING', 'COMPLETED'].includes(upperValue)) {
+        return upperValue as ReportDto['status'];
+      }
+      return undefined;
+    };
+
     const { searchParams } = new URL(request.url);
     const userId = parseUserId(searchParams.get('userId'));
+    const status = parseStatus(searchParams.get('status'));
 
     if (userId === null) return badRequest('userId가 필요합니다.');
 
-    const reports = await getUserReportsUsecase.execute(userId);
+    const reports = await getUserReportsUsecase.execute(userId, status);
     const data: ReportDto[] = reports.map((r) => ({
       id: r.id,
       title: r.title,
@@ -43,7 +54,6 @@ export async function GET(request: NextRequest) {
       data,
     });
   } catch (error) {
-    console.error('리포트 조회 오류:', error);
     return NextResponse.json(
       { success: false, message: '서버 오류가 발생했습니다.' },
       { status: 500 }
@@ -78,7 +88,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
-    console.error('리포트 생성 API 오류:', error);
     return NextResponse.json(
       {
         success: false,
