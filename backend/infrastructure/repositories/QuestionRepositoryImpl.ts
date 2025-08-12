@@ -175,7 +175,7 @@ export class QuestionRepositoryImpl implements QuestionRepository {
   }
 
   // 녹음본 생성
-  async generateRecording(reportId: number, order: number, filePath: string): Promise<Question> {
+  async generateRecording(reportId: number, order: number, fileName: string): Promise<Question> {
     try {
       const target = await prisma.question.findFirst({
         where: { reportId, order },
@@ -186,7 +186,7 @@ export class QuestionRepositoryImpl implements QuestionRepository {
 
       const updated = await prisma.question.update({
         where: { id: target.id },
-        data: { recording: filePath },
+        data: { recording: fileName },
       });
       return updated as Question;
     } catch (e) {

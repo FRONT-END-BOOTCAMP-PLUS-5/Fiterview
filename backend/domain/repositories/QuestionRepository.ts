@@ -18,5 +18,5 @@ export interface QuestionRepository {
   // 생성된 질문 -> DB에 저장
   saveQuestions(generatedQuestions: QuestionsResponse[], reportId: number): Promise<Question[]>;
   // 녹음본 생성
-  generateRecording(reportId: number, order: number, filePath: string): Promise<Question>;
+  generateRecording(reportId: number, order: number, fileName: string): Promise<Question>;
 }

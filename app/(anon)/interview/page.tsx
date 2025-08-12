@@ -35,7 +35,7 @@ export default function InterviewPage() {
   const audioChunksRef = useRef<Blob[]>([]);
 
   // TODO: 실제로는 reportId를 props나 URL에서 가져와야 합니다.
-  const reportId = 1;
+  const reportId = 2;
 
   const currentQuestion = questions[currentQuestionIndex];
 
