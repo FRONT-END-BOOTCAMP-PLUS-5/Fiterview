@@ -103,4 +103,38 @@ export class QuestionRepositoryImpl implements QuestionRepository {
       recording: q.recording || undefined,
     }));
   }
+  // async getQuestion(questions_report_id: number): Promise<string> {
+  //   try {
+  //     const questions: QuestionsModel[] = await prisma.question.findMany({
+  //       where: { reportId: questions_report_id },
+  //       take: 10,
+  //       select: { id: true, question: true, order: true },
+  //       orderBy: { id: 'asc' },
+  //     });
+
+  //     if (questions.length === 0) {
+  //       throw new Error(`No questions found for report ID: ${questions_report_id}`);
+  //     }
+  //     return questions[0].question;
+  //   } catch (error) {
+  //     throw new Error(`Failed to get question for report ${questions_report_id}: ${error}`);
+  //   }
+  // }
+
+  // async getSampleAnswer(questions_report_id: number): Promise<string> {
+  //   try {
+  //     const answers: SampleAnswersModel[] = await prisma.question.findMany({
+  //       where: { reportId: questions_report_id },
+  //       take: 10,
+  //       select: { id: true, sampleAnswer: true },
+  //       orderBy: { id: 'asc' },
+  //     });
+
+  //     if (answers.length === 0) {
+  //       throw new Error(`No answers found for report ID: ${questions_report_id}`);
+  //     }
+  //     return answers[0].sampleAnswer ?? '';
+  //   } catch (error) {
+  //     throw new Error(`Failed to get answer for report ${questions_report_id}: ${error}`);
+  //   }
 }
