@@ -43,3 +43,6 @@ next-env.d.ts
 
 # google cloud key file
 fiterview-62256864450d.json
+
+# audio files
+/public/assets/audios
