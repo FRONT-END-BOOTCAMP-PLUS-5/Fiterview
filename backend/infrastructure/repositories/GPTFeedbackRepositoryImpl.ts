@@ -1,12 +1,10 @@
 import { Feedback } from '@/backend/domain/entities/Feedback';
-import { OpenAIProvider } from '@/backend/infrastructure/providers/OpenAIProvider';
+import getOpenAIClient from '@/backend/infrastructure/providers/OpenAIProvider';
 import { RequestFeedbackDto } from '@/backend/application/feedbacks/dtos/RequestFeedbackDto';
 import { toFeedback } from '@/backend/infrastructure/mappers/FeedbackMapper';
 import { FeedbackLLMRepository } from '@/backend/domain/repositories/FeedbackLLMRepository';
 
 export class GPTFeedbackRepositoryImpl implements FeedbackLLMRepository {
-  private readonly openaiProvider: OpenAIProvider = new OpenAIProvider();
-
   constructor(gptSettings: RequestFeedbackDto) {
     if (!gptSettings?.model) {
       throw new Error('OpenAI model is required in constructor.');
@@ -27,7 +25,8 @@ export class GPTFeedbackRepositoryImpl implements FeedbackLLMRepository {
   public async generateFeedback(requestFeedbackDto: RequestFeedbackDto): Promise<Feedback> {
     const input = this.createInputToGpt(requestFeedbackDto.pairs);
 
-    const response = await this.openaiProvider.getResponses().create({
+    const client = getOpenAIClient();
+    const response = await client.responses.create({
       model: requestFeedbackDto.model,
       instructions: requestFeedbackDto.instructions,
       input,

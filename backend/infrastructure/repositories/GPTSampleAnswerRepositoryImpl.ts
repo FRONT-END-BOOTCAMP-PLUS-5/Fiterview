@@ -1,9 +1,7 @@
-import { OpenAIProvider } from '@/backend/infrastructure/providers/OpenAIProvider';
+import getOpenAIClient from '@/backend/infrastructure/providers/OpenAIProvider';
 import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/GenerateSampleAnswerDto';
 
 export class GPTSampleAnswerRepositoryImpl {
-  private readonly openaiProvider: OpenAIProvider = new OpenAIProvider();
-
   constructor(gptSettings: GenerateSampleAnswersDto) {
     if (!gptSettings?.model) {
       throw new Error('OpenAI model is required in constructor.');
@@ -27,7 +25,8 @@ export class GPTSampleAnswerRepositoryImpl {
 
     const input = this.createInputToGpt(questionContentArray);
 
-    const response = await this.openaiProvider.getResponses().create({
+    const client = getOpenAIClient();
+    const response = await client.responses.create({
       model: generateSampleAnswersDto.model,
       instructions: generateSampleAnswersDto.instructions,
       input,
