@@ -14,9 +14,9 @@ export class GenerateRecordingUsecase {
     // 1) 파일명 및 경로 구성 (question{order}.{ext})
     let ext = (contentType && extension(contentType)) || 'wav';
     // 확장자 변환 (weba -> webm)
-    if (ext === 'weba') {
-      ext = 'webm';
-    }
+    // if (ext === 'weba') {
+    //   ext = 'webm';
+    // }
     const fileName = `question${order}.${ext}`;
 
     const publicDir = path.join(process.cwd(), 'public', 'assets', 'audios', String(reportId));
