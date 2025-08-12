@@ -1,4 +1,4 @@
-import { STTRepository } from '@/backend/domain/repositories/STTRepository';
+import { STTRepository } from '@/backend/domain/AI/openAI/STTRepository';
 import { STTRequest } from '@/backend/domain/dtos/STTRequest';
 import { STTResponse } from '@/backend/domain/dtos/STTResponse';
 import getOpenAIClient from '@/utils/AI/OpenAI';
