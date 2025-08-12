@@ -80,6 +80,25 @@ export class ReportRepositoryImpl implements ReportRepository {
     };
   }
 
+  async findReportsByUserId(userId: number): Promise<Reports[]> {
+    const whereClause: Prisma.ReportWhereInput = { userId };
+
+    const reports = await prisma.report.findMany({
+      where: whereClause,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return reports.map((report) => ({
+      id: report.id,
+      title: report.title,
+      createdAt: report.createdAt,
+      status: mapReportStatusToDomain(report.status as any),
+      userId: report.userId,
+      reflection: report.reflection ?? undefined,
+    }));
+  }
+
+  //로그인 구현 이후 수정 예정
   async findAllReports(): Promise<Reports[]> {
     const reports = await prisma.report.findMany({
       orderBy: {
@@ -97,7 +116,7 @@ export class ReportRepositoryImpl implements ReportRepository {
     }));
   }
 
-  async findReportsByUserId(userId: number, status?: ReportStatus): Promise<Reports[]> {
+  async findReportsByStatus(userId: number, status: ReportStatus): Promise<Reports[]> {
     const whereClause: Prisma.ReportWhereInput = { userId };
 
     if (status) {

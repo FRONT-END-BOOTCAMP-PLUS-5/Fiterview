@@ -3,11 +3,13 @@ import { CreateReportUsecase } from '@/backend/application/reports/usecases/Crea
 import { ReportRepositoryImpl } from '@/backend/infrastructure/repositories/ReportRepositoryImpl';
 import { QuestionRepositoryImpl } from '@/backend/infrastructure/repositories/QuestionRepositoryImpl';
 import { GetUserReportsUsecase } from '@/backend/application/reports/usecases/GetUserReportsUsecase';
+import { GetReportsByStatusUsecase } from '@/backend/application/reports/usecases/GetReportsByStatusUsecase';
 import { ReportDto } from '@/backend/application/reports/dtos/ReportDto';
 
 const reportsRepository = new ReportRepositoryImpl();
 const questionRepository = new QuestionRepositoryImpl();
 const getUserReportsUsecase = new GetUserReportsUsecase(reportsRepository);
+const getReportsByStatusUsecase = new GetReportsByStatusUsecase(reportsRepository);
 const createReportUsecase = new CreateReportUsecase(reportsRepository, questionRepository);
 
 // userId 검증
@@ -39,7 +41,14 @@ export async function GET(request: NextRequest) {
 
     if (userId === null) return badRequest('userId가 필요합니다.');
 
-    const reports = await getUserReportsUsecase.execute(userId, status);
+    let reports;
+    if (status) {
+      // status 리포트만 조회
+      reports = await getReportsByStatusUsecase.execute(userId, status);
+    } else {
+      // 전체 리포트 조회
+      reports = await getUserReportsUsecase.execute(userId);
+    }
     const data: ReportDto[] = reports.map((r) => ({
       id: r.id,
       title: r.title,

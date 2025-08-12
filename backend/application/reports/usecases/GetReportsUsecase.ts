@@ -4,7 +4,7 @@ import { Reports } from '@/backend/domain/entities/Report';
 export class GetUserReportsUsecase {
   constructor(private readonly reportsRepository: ReportRepository) {}
 
-  async execute(userId: number): Promise<Reports[]> {
-    return this.reportsRepository.findReportsByUserId(userId);
+  async execute(): Promise<Reports[]> {
+    return this.reportsRepository.findAllReports();
   }
 }
