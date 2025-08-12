@@ -16,7 +16,6 @@ export class STTRepositoryImpl implements STTRepository {
         ...(audioRequest.language && { language: audioRequest.language }),
         response_format: 'json',
       });
-
       return {
         text: transcription.text,
         language: audioRequest.language || 'auto',
