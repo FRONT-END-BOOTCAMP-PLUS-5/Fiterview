@@ -21,20 +21,23 @@ export class GenerateSampleAnswerUsecase {
     });
 
     if (questions.length === 0) {
-      return new DeliverSampleAnswersDto(reportId, []);
+      return {
+        sample_answers_report_id: reportId,
+        sample_answers: [],
+      };
     }
 
     // 2) Build input from questions
     const input = questions.map((q) => `${q.question}`).join('\n');
 
     // 3) Ask LLM for sample answers
-    const llmDto = new GenerateSampleAnswersDto(
-      reportId,
-      dto.model,
-      dto.instructions,
+    const llmDto: GenerateSampleAnswersDto = {
+      questions_report_id: reportId,
+      model: dto.model,
+      instructions: dto.instructions,
       input,
-      dto.maxOutputTokens
-    );
+      maxOutputTokens: dto.maxOutputTokens,
+    };
     const raw = await this.llmRepository.generateSampleAnswer(llmDto);
 
     // 4) Parse into array (try JSON array; fallback to newline split)
@@ -73,7 +76,10 @@ export class GenerateSampleAnswerUsecase {
       )
     );
 
-    return new DeliverSampleAnswersDto(reportId, answers);
+    return {
+      sample_answers_report_id: reportId,
+      sample_answers: answers,
+    };
   }
 }
 // legacy removed

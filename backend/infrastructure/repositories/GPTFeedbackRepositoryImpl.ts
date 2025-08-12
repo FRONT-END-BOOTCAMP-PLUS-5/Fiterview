@@ -1,7 +1,7 @@
 import { Feedback } from '@/backend/domain/entities/Feedback';
 import { OpenAIProvider } from '@/backend/infrastructure/providers/OpenAIProvider';
 import { RequestFeedbackDto } from '@/backend/application/feedbacks/dtos/RequestFeedbackDto';
-import { FeedbackMapper } from '@/backend/infrastructure/mappers/FeedbackMapper';
+import { toFeedback } from '@/backend/infrastructure/mappers/FeedbackMapper';
 import { FeedbackLLMRepository } from '@/backend/domain/repositories/FeedbackLLMRepository';
 
 export class GPTFeedbackRepositoryImpl implements FeedbackLLMRepository {
@@ -38,7 +38,7 @@ export class GPTFeedbackRepositoryImpl implements FeedbackLLMRepository {
 
     try {
       const parsed = JSON.parse(outputText);
-      return FeedbackMapper.toFeedback(
+      return toFeedback(
         requestFeedbackDto.reportId,
         Number(parsed.score),
         Array.isArray(parsed.strength) ? parsed.strength.join(' ') : parsed.strength,
@@ -47,7 +47,7 @@ export class GPTFeedbackRepositoryImpl implements FeedbackLLMRepository {
     } catch (error) {
       const scoreMatch = outputText.match(/(\d+)/);
       const fallbackScore = scoreMatch ? scoreMatch[1] : '50';
-      return FeedbackMapper.toFeedback(requestFeedbackDto.reportId, Number(fallbackScore), '', '');
+      return toFeedback(requestFeedbackDto.reportId, Number(fallbackScore), '', '');
     }
   }
 }

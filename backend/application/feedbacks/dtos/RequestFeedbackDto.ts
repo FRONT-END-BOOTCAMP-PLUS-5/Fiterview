@@ -4,24 +4,10 @@ export interface FeedbackPair {
   userAnswer?: string | null;
 }
 
-export class RequestFeedbackDto {
+export interface RequestFeedbackDto {
   reportId: number;
   pairs: FeedbackPair[];
   model: string;
   instructions: string;
   maxOutputTokens?: number;
-
-  constructor(
-    reportId: number,
-    pairs: FeedbackPair[],
-    model: string,
-    instructions: string,
-    maxOutputTokens?: number
-  ) {
-    this.reportId = reportId;
-    this.pairs = pairs;
-    this.model = model;
-    this.instructions = instructions;
-    this.maxOutputTokens = maxOutputTokens;
-  }
 }

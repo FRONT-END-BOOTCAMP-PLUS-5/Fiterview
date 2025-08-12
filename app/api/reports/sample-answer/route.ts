@@ -25,23 +25,24 @@ export async function GET(request: NextRequest) {
       );
     }
     // Create input DTO
-    const inputDto = new GenerateSampleAnswersDto(
-      questions_report_idNumber,
-      'gpt-4o',
-      'Return a JSON array of best answers to each question. Format: ["Best answer 1", "Best answer 2", "Best answer 3"]. Each answer should be a string that provides a comprehensive and well-structured response to the corresponding question.',
-      '',
-      1000
-    );
+    const inputDto: GenerateSampleAnswersDto = {
+      questions_report_id: questions_report_idNumber,
+      model: 'gpt-4o',
+      instructions:
+        'Return a JSON array of best answers to each question. Format: ["Best answer 1", "Best answer 2", "Best answer 3"]. Each answer should be a string that provides a comprehensive and well-structured response to the corresponding question.',
+      input: '',
+      maxOutputTokens: 1000,
+    };
 
     const prisma = new PrismaClient();
     const llm = new GPTSampleAnswerRepositoryImpl(inputDto);
     const usecase = new GenerateSampleAnswerUsecase(prisma, llm);
     const sampleAnswers = await usecase.execute(inputDto);
 
-    const outputDto = new DeliverSampleAnswersDto(
-      sampleAnswers.sample_answers_report_id,
-      sampleAnswers.sample_answers
-    );
+    const outputDto: DeliverSampleAnswersDto = {
+      sample_answers_report_id: sampleAnswers.sample_answers_report_id,
+      sample_answers: sampleAnswers.sample_answers,
+    };
 
     return NextResponse.json(outputDto, { status: 200 });
   } catch (error) {

@@ -1,8 +1,6 @@
-export class DeliverFeedbackDto {
-  constructor(
-    public feedback_report_id: number,
-    public score: number,
-    public strength: string,
-    public improvement: string
-  ) {}
+export interface DeliverFeedbackDto {
+  feedback_report_id: number;
+  score: number;
+  strength: string;
+  improvement: string;
 }

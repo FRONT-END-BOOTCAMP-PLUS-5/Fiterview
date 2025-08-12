@@ -38,24 +38,25 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const dto = new RequestFeedbackDto(
+    const dto: RequestFeedbackDto = {
       reportId,
-      questionsAndAnswers,
-      'gpt-4o',
-      'Return a JSON object: {"score": number 0-100, "strength": [string, string], "improvement": [string, string]}. Use Korean for text fields. Consider both sampleAnswer and userAnswer when evaluating.',
-      1000
-    );
+      pairs: questionsAndAnswers,
+      model: 'gpt-4o',
+      instructions:
+        'Return a JSON object: {"score": number 0-100, "strength": [string, string], "improvement": [string, string]}. Use Korean for text fields. Consider both sampleAnswer and userAnswer when evaluating.',
+      maxOutputTokens: 1000,
+    };
 
     const llmRepo = new GPTFeedbackRepositoryImpl(dto);
     const usecase = new GenerateFeedbackUsecase(llmRepo, persistenceRepository);
     const feedback = await usecase.execute(dto);
 
-    const outputDto = new DeliverFeedbackDto(
-      feedback.feedback_report_id,
-      feedback.score,
-      feedback.strength,
-      feedback.improvement
-    );
+    const outputDto: DeliverFeedbackDto = {
+      feedback_report_id: feedback.feedback_report_id,
+      score: feedback.score,
+      strength: feedback.strength,
+      improvement: feedback.improvement,
+    };
 
     return NextResponse.json(outputDto, { status: 200 });
   } catch (error) {
