@@ -1,6 +1,6 @@
 import { TTSRequest } from '@/backend/domain/dtos/TTSRequest';
 import { TTSResponse } from '@/backend/domain/dtos/TTSResponse';
-import { TTSRepository } from '../../../domain/repositories/TTSRepository';
+import { TTSRepository } from '../../../domain/AI/ttsAI/TTSRepository';
 import client from '@/utils/AI/TTSAI';
 
 export class PrTTSRepository implements TTSRepository {

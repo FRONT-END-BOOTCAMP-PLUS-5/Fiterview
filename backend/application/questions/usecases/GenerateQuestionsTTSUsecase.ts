@@ -1,6 +1,6 @@
 import { TTSRequest } from '@/backend/domain/dtos/TTSRequest';
 import { TTSResponse } from '@/backend/domain/dtos/TTSResponse';
-import { TTSRepository } from '@/backend/domain/repositories/TTSRepository';
+import { TTSRepository } from '@/backend/domain/AI/ttsAI/TTSRepository';
 import { QuestionTTSResponse } from '@/backend/application/questions/dtos/QuestionTTSResponse';
 import { QuestionRepository } from '@/backend/domain/repositories/QuestionRepository';
 

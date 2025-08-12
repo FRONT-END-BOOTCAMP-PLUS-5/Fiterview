@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GenerateFeedbackUsecase } from '@/backend/application/feedbacks/usecases/GenerateFeedbackUsecase';
-import { GPTFeedbackRepositoryImpl } from '@/backend/infrastructure/repositories/GPTFeedbackRepositoryImpl';
+import { GPTFeedbackRepositoryImpl } from '@/backend/infrastructure/AI/openAI/GPTFeedbackRepositoryImpl';
 import { RequestFeedbackDto } from '@/backend/application/feedbacks/dtos/RequestFeedbackDto';
 import { DeliverFeedbackDto } from '@/backend/application/feedbacks/dtos/DeliverFeedbackDto';
 import { FeedbackRepositoryImpl } from '@/backend/infrastructure/repositories/FeedbackRepositoryImpl';

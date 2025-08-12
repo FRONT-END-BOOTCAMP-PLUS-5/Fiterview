@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { STTRepositoryImpl } from '@/backend/infrastructure/repositories/STTRepositoryImpl';
+import { STTRepositoryImpl } from '@/backend/infrastructure/AI/openAI/STTRepositoryImpl';
 import { STTRequest } from '@/backend/domain/dtos/STTRequest';
 import { STTResponse } from '@/backend/domain/dtos/STTResponse';
 import { TranscribeQuestionResponse } from '@/backend/application/questions/dtos/TranscribeQuestionResponse';
