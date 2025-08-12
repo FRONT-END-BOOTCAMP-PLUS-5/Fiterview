@@ -1,6 +1,7 @@
 import prisma from '@/utils/prisma';
 import { FeedbackRepository } from '@/backend/domain/repositories/FeedbackRepository';
 import { Feedback } from '@/backend/domain/entities/Feedback';
+import { Question } from '@/backend/domain/entities/Question';
 
 export class FeedbackRepositoryImpl implements FeedbackRepository {
   async getFeedback(feedback_report_id: number): Promise<Feedback> {
@@ -54,19 +55,16 @@ export class FeedbackRepositoryImpl implements FeedbackRepository {
     });
   }
 
-  async getQuestionsAndAnswers(reportId: number): Promise<
-    {
-      question: string;
-      sampleAnswer?: string | null;
-      userAnswer?: string | null;
-    }[]
-  > {
+  async getQuestionsAndAnswers(
+    reportId: number
+  ): Promise<Pick<Question, 'question' | 'sampleAnswer' | 'userAnswer'>[]> {
     const rows = await prisma.question.findMany({
       where: { reportId },
       select: { question: true, sampleAnswer: true, userAnswer: true },
       take: 10,
     });
-    return rows.map((r) => ({
+
+    return rows.map((r: Pick<Question, 'question' | 'sampleAnswer' | 'userAnswer'>) => ({
       question: r.question,
       sampleAnswer: r.sampleAnswer,
       userAnswer: r.userAnswer,
