@@ -1,5 +1,5 @@
 import { QuestionsRequest } from '@/backend/domain/dtos/QuestionsRequest';
-import { GenerateQuestionRepository } from '@/backend/domain/AI/googleAI/GenerateQuestionRepository';
+import { GenerateQuestionRepository } from '@/backend/domain/ai/googleAI/GenerateQuestionRepository';
 import { ReportRepository } from '@/backend/domain/repositories/ReportRepository';
 
 export interface CreateReportInput {

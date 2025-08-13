@@ -1,9 +1,9 @@
-import { STTRepository } from '@/backend/domain/AI/openAI/STTRepository';
+import { SttAI } from '@/backend/domain/ai/SttAI';
 import { STTRequest } from '@/backend/domain/dtos/STTRequest';
 import { STTResponse } from '@/backend/domain/dtos/STTResponse';
 import getOpenAIClient from '@/utils/AI/OpenAI';
 
-export class STTRepositoryImpl implements STTRepository {
+export class STTRepositoryImpl implements SttAI {
   async transcribeToText(audioRequest: STTRequest): Promise<STTResponse> {
     try {
       // OpenAI 클라이언트 가져오기

@@ -1,6 +1,6 @@
 import { QuestionsRequest } from '@/backend/domain/dtos/QuestionsRequest';
 import { SavedQuestionsDto } from '@/backend/application/questions/dtos/SavedQuestionsDto';
-import { GenerateQuestionRepository } from '@/backend/domain/AI/googleAI/GenerateQuestionRepository';
+import { GenerateQuestionRepository } from '@/backend/domain/ai/googleAI/GenerateQuestionRepository';
 export class GenerateQuestionsUseCase {
   constructor(private questionRepository: GenerateQuestionRepository) {}
 
