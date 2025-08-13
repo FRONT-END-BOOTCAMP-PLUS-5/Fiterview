@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { STTRepositoryImpl } from '@/backend/infrastructure/AI/openAI/STTRepositoryImpl';
+import { TranscribeSttAI } from '@/backend/infrastructure/ai/TranscribeSttAI';
 import { STTRequest } from '@/backend/domain/dtos/STTRequest';
 import { STTResponse } from '@/backend/domain/dtos/STTResponse';
 import { TranscribeQuestionResponse } from '@/backend/application/questions/dtos/TranscribeQuestionResponse';
@@ -42,7 +42,7 @@ export async function POST(
     const prisma = new PrismaClient();
 
     // STT Repository 구현체 생성 (의존성 주입)
-    const sttRepository = new STTRepositoryImpl();
+    const sttRepository = new TranscribeSttAI();
     console.log('✅ STT Repository 초기화 완료');
 
     console.log('✅ saveUserAnswer 함수 준비 완료');

@@ -1,14 +1,14 @@
 import { QuestionsRequest } from '@/backend/domain/dtos/QuestionsRequest';
 import { QuestionsResponse } from '@/backend/domain/dtos/QuestionsResponse';
-import { GoogleAI } from '@/utils/AIs/GoogleAI';
+import { GeminiAI } from '@/utils/AIs/GeminiAI';
 import { DEFAULT_GENERATED_QUESTIONS, QUESTIONS_GENERATION_PROMPT } from '@/constants/questions';
 import mime from 'mime-types';
 
 export class QuestionGenerator {
-  private googleAI: GoogleAI;
+  private GeminiAI: GeminiAI;
 
   constructor() {
-    this.googleAI = new GoogleAI();
+    this.GeminiAI = new GeminiAI();
   }
 
   async generate(files: QuestionsRequest[]): Promise<QuestionsResponse[]> {
@@ -25,7 +25,7 @@ export class QuestionGenerator {
   private async generateQuestions(files: QuestionsRequest[]): Promise<QuestionsResponse[]> {
     const prompt = QUESTIONS_GENERATION_PROMPT;
 
-    const genAI = this.googleAI.getClient();
+    const genAI = this.GeminiAI.getClient();
 
     const fileParts = files.map((file) => {
       const mimeType = this.getMimeType(file.fileName);
