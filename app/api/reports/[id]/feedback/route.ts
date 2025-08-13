@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GenerateFeedbackUsecase } from '@/backend/application/feedbacks/usecases/GenerateFeedbackUsecase';
 import { GetFeedbackUsecase } from '@/backend/application/feedbacks/usecases/GetFeedbackUsecase';
+import { UpdateReportStatusUsecase } from '@/backend/application/reports/usecases/UpdateReportStatusUsecase';
 import { GPTFeedbackRepositoryImpl } from '@/backend/infrastructure/repositories/GPTFeedbackRepositoryImpl';
 import { RequestFeedbackDto } from '@/backend/application/feedbacks/dtos/RequestFeedbackDto';
 import { DeliverFeedbackDto } from '@/backend/application/feedbacks/dtos/DeliverFeedbackDto';
@@ -73,7 +74,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     };
 
     const llmRepo = new GPTFeedbackRepositoryImpl(dto);
-    const usecase = new GenerateFeedbackUsecase(llmRepo, persistenceRepository, reportRepository);
+    const updateReportStatusUsecase = new UpdateReportStatusUsecase(reportRepository);
+    const usecase = new GenerateFeedbackUsecase(
+      llmRepo,
+      persistenceRepository,
+      updateReportStatusUsecase
+    );
     const feedback = await usecase.execute(dto);
 
     const outputDto: DeliverFeedbackDto = {
