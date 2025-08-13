@@ -2,7 +2,7 @@ import { QuestionRepository } from '@/backend/domain/repositories/QuestionReposi
 import { Question } from '@/backend/domain/entities/Question';
 import { QuestionsResponse } from '@/backend/domain/dtos/QuestionsResponse';
 import { QuestionsRequest } from '@/backend/domain/dtos/QuestionsRequest';
-import { QuestionGenerator } from '@/backend/infrastructure/ai/googleAI/GenerateQuestionRepositoryImpl';
+import { QuestionGenerator } from '../ai/GeminiLlmAI';
 import prisma from '@/utils/prisma';
 
 export class QuestionRepositoryImpl implements QuestionRepository {
