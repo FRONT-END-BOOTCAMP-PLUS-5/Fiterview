@@ -4,7 +4,6 @@ import { ReportRepository } from '@/backend/domain/repositories/ReportRepository
 export interface UpdateReportInput {
   title?: string;
   reflection?: string;
-  status?: ReportStatus;
 }
 
 export class UpdateReportUsecase {
@@ -14,7 +13,6 @@ export class UpdateReportUsecase {
     const repoUpdate: Partial<Reports> = {
       title: updateData.title,
       reflection: updateData.reflection,
-      status: updateData.status,
     };
     return await this.reportsRepository.updateReport(reportId, repoUpdate);
   }

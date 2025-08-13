@@ -1,5 +1,5 @@
 export class GenerateSampleAnswersDto {
-  questions_report_id: number;
+  reportId: number;
   model: string;
   instructions: string;
   input: string;
@@ -12,7 +12,7 @@ export class GenerateSampleAnswersDto {
     input: string,
     maxOutputTokens?: number
   ) {
-    this.questions_report_id = questions_report_id;
+    this.reportId = questions_report_id;
     this.model = model;
     this.instructions = instructions;
     this.input = input;

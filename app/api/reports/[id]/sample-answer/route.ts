@@ -5,28 +5,18 @@ import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/G
 import { DeliverSampleAnswersDto } from '@/backend/application/questions/dtos/DeliverSampleAnswersDto';
 import { PrismaClient } from '@prisma/client';
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { searchParams } = new URL(request.url);
-    const questions_report_id = searchParams.get('questions_report_id');
+    const resolvedParams = await params;
+    const questions_report_idNumber = parseInt(resolvedParams.id, 10);
 
-    if (!questions_report_id) {
-      return NextResponse.json(
-        { error: 'questions_report_id query parameter is required' },
-        { status: 400 }
-      );
-    }
-
-    const questions_report_idNumber = parseInt(questions_report_id, 10);
     if (isNaN(questions_report_idNumber)) {
-      return NextResponse.json(
-        { error: 'questions_report_id must be valid numbers' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid report ID' }, { status: 400 });
     }
+
     // Create input DTO
     const inputDto: GenerateSampleAnswersDto = {
-      questions_report_id: questions_report_idNumber,
+      reportId: questions_report_idNumber,
       model: 'gpt-4o',
       instructions:
         'Return a JSON array of best answers to each question. Format: ["Best answer 1", "Best answer 2", "Best answer 3"]. Each answer should be a string that provides a comprehensive and well-structured response to the corresponding question.',
@@ -40,7 +30,7 @@ export async function GET(request: NextRequest) {
     const sampleAnswers = await usecase.execute(inputDto);
 
     const outputDto: DeliverSampleAnswersDto = {
-      sample_answers_report_id: sampleAnswers.sample_answers_report_id,
+      reportId: sampleAnswers.reportId,
       sample_answers: sampleAnswers.sample_answers,
     };
 

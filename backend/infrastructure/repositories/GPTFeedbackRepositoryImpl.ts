@@ -37,16 +37,31 @@ export class GPTFeedbackRepositoryImpl implements FeedbackLLMRepository {
 
     try {
       const parsed = JSON.parse(outputText);
+      const strength = Array.isArray((parsed as any).strength)
+        ? ((parsed as any).strength as unknown[]).map((v) => String(v))
+        : typeof (parsed as any).strength === 'string'
+          ? String((parsed as any).strength)
+              .split(/(?<=[.!?])\s+|\n+/)
+              .filter(Boolean)
+          : [];
+      const improvement = Array.isArray((parsed as any).improvement)
+        ? ((parsed as any).improvement as unknown[]).map((v) => String(v))
+        : typeof (parsed as any).improvement === 'string'
+          ? String((parsed as any).improvement)
+              .split(/(?<=[.!?])\s+|\n+/)
+              .filter(Boolean)
+          : [];
+
       return toFeedback(
         requestFeedbackDto.reportId,
-        Number(parsed.score),
-        Array.isArray(parsed.strength) ? parsed.strength.join(' ') : parsed.strength,
-        Array.isArray(parsed.improvement) ? parsed.improvement.join(' ') : parsed.improvement
+        Number((parsed as any).score),
+        strength,
+        improvement
       );
     } catch (error) {
       const scoreMatch = outputText.match(/(\d+)/);
       const fallbackScore = scoreMatch ? scoreMatch[1] : '50';
-      return toFeedback(requestFeedbackDto.reportId, Number(fallbackScore), '', '');
+      return toFeedback(requestFeedbackDto.reportId, Number(fallbackScore), [], []);
     }
   }
 }

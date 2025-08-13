@@ -10,7 +10,7 @@ export class GenerateSampleAnswerUsecase {
   ) {}
 
   async execute(dto: GenerateSampleAnswersDto): Promise<DeliverSampleAnswersDto> {
-    const reportId = dto.questions_report_id;
+    const reportId = dto.reportId;
 
     // 1) Fetch up to 10 questions under the report, ordered
     const questions = await this.prisma.question.findMany({
@@ -22,7 +22,7 @@ export class GenerateSampleAnswerUsecase {
 
     if (questions.length === 0) {
       return {
-        sample_answers_report_id: reportId,
+        reportId: reportId,
         sample_answers: [],
       };
     }
@@ -30,14 +30,8 @@ export class GenerateSampleAnswerUsecase {
     // 2) Build input from questions
     const input = questions.map((q) => `${q.question}`).join('\n');
 
-    // 3) Ask LLM for sample answers
-    const llmDto: GenerateSampleAnswersDto = {
-      questions_report_id: reportId,
-      model: dto.model,
-      instructions: dto.instructions,
-      input,
-      maxOutputTokens: dto.maxOutputTokens,
-    };
+    // 3) Create DTO for LLM
+    const llmDto = new GenerateSampleAnswersDto(reportId, dto.model, dto.instructions, input);
     const raw = await this.llmRepository.generateSampleAnswer(llmDto);
 
     // 4) Parse into array (try JSON array; fallback to newline split)
@@ -77,7 +71,7 @@ export class GenerateSampleAnswerUsecase {
     );
 
     return {
-      sample_answers_report_id: reportId,
+      reportId: reportId,
       sample_answers: answers,
     };
   }
