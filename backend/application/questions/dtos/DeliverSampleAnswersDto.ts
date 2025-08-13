@@ -1,4 +1,4 @@
 export interface DeliverSampleAnswersDto {
-  sample_answers_report_id: number;
+  reportId: number;
   sample_answers: string[];
 }

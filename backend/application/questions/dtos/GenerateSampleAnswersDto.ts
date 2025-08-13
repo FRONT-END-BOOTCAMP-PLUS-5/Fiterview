@@ -1,5 +1,5 @@
 export interface GenerateSampleAnswersDto {
-  questions_report_id: number;
+  reportId: number;
   model: string;
   instructions: string;
   input: string;

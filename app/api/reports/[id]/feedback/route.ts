@@ -24,7 +24,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       const feedback = await getFeedbackUsecase.execute(reportId);
 
       const outputDto: DeliverFeedbackDto = {
-        feedback_report_id: feedback.feedback_report_id,
+        reportId: feedback.feedback_report_id,
         score: feedback.score,
         strength: feedback.strength,
         improvement: feedback.improvement,
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const feedback = await usecase.execute(dto);
 
     const outputDto: DeliverFeedbackDto = {
-      feedback_report_id: feedback.feedback_report_id,
+      reportId: feedback.feedback_report_id,
       score: feedback.score,
       strength: feedback.strength,
       improvement: feedback.improvement,

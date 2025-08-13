@@ -16,7 +16,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
     // Create input DTO
     const inputDto: GenerateSampleAnswersDto = {
-      questions_report_id: questions_report_idNumber,
+      reportId: questions_report_idNumber,
       model: 'gpt-4o',
       instructions:
         'Return a JSON array of best answers to each question. Format: ["Best answer 1", "Best answer 2", "Best answer 3"]. Each answer should be a string that provides a comprehensive and well-structured response to the corresponding question.',
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     const sampleAnswers = await usecase.execute(inputDto);
 
     const outputDto: DeliverSampleAnswersDto = {
-      sample_answers_report_id: sampleAnswers.sample_answers_report_id,
+      reportId: sampleAnswers.reportId,
       sample_answers: sampleAnswers.sample_answers,
     };
 
