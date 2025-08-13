@@ -73,7 +73,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     };
 
     const llmRepo = new GPTFeedbackRepositoryImpl(dto);
-    const usecase = new GenerateFeedbackUsecase(llmRepo, persistenceRepository, reportRepository);
+    const updateReportStatusUsecase = new UpdateReportStatusUsecase(reportRepository);
+    const usecase = new GenerateFeedbackUsecase(
+      llmRepo,
+      persistenceRepository,
+      updateReportStatusUsecase
+    );
     const feedback = await usecase.execute(dto);
 
     const outputDto: DeliverFeedbackDto = {
