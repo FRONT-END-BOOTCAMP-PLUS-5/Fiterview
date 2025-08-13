@@ -1,5 +1,5 @@
 export interface DeliverFeedbackDto {
-  feedback_report_id: number;
+  reportId: number;
   score: number;
   strength: string[];
   improvement: string[];
