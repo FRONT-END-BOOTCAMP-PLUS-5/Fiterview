@@ -1,6 +1,6 @@
 import { QuestionsRequest } from '@/backend/domain/dtos/QuestionsRequest';
 import { SavedQuestionsDto } from '@/backend/application/questions/dtos/SavedQuestionsDto';
-import { LlmAI } from '@/backend/domain/ai/LlmAI';
+import { LlmAI } from '@/backend/domain/AI/LlmAI';
 export class GenerateQuestionsUseCase {
   constructor(private llmAI: LlmAI) {}
 

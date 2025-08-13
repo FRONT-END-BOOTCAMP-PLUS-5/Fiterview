@@ -1,5 +1,5 @@
 import { GenerateQuestionsTTSUsecase } from '@/backend/application/questions/usecases/GenerateQuestionsTTSUsecase';
-import { GoogleCloudTtsAI } from '@/backend/infrastructure/ai/GoogleCloudTtsAI';
+import { GoogleCloudTtsAI } from '@/backend/infrastructure/AI/GoogleCloudTtsAI';
 import { QuestionTTSResponse } from '@/backend/application/questions/dtos/QuestionTTSResponse';
 import { QuestionRepositoryImpl } from '@/backend/infrastructure/repositories/QuestionRepositoryImpl';
 

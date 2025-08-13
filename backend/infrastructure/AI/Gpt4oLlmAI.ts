@@ -2,7 +2,7 @@ import getOpenAIClient from '@/utils/AIs/OpenAI';
 import { toFeedback } from '@/backend/infrastructure/mappers/FeedbackMapper';
 import { RequestFeedbackDto } from '@/backend/application/feedbacks/dtos/RequestFeedbackDto';
 import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/GenerateSampleAnswerDto';
-import type { Gpt4oLlmAI as Gpt4oLlmAIInterface } from '@/backend/domain/ai/LlmAI';
+import type { Gpt4oLlmAI as Gpt4oLlmAIInterface } from '@/backend/domain/AI/LlmAI';
 import type { Feedback } from '@/backend/domain/entities/Feedback';
 
 export class Gpt4oLlmAI implements Gpt4oLlmAIInterface {

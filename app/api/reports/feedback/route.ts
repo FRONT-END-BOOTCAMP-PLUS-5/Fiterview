@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GenerateFeedbackUsecase } from '@/backend/application/feedbacks/usecases/GenerateFeedbackUsecase';
-import { GPTFeedbackRepositoryImpl } from '@/backend/infrastructure/ai/openAI/GPTFeedbackRepositoryImpl';
+import { Gpt4oLlmAI } from '@/backend/infrastructure/AI/Gpt4oLlmAI';
+
 import { RequestFeedbackDto } from '@/backend/application/feedbacks/dtos/RequestFeedbackDto';
 import { DeliverFeedbackDto } from '@/backend/application/feedbacks/dtos/DeliverFeedbackDto';
 import { FeedbackRepositoryImpl } from '@/backend/infrastructure/repositories/FeedbackRepositoryImpl';
+import { UpdateReportStatusUsecase } from '@/backend/application/reports/usecases/UpdateReportStatusUsecase';
+import { ReportRepositoryImpl } from '@/backend/infrastructure/repositories/ReportRepositoryImpl';
 
 export async function GET(request: NextRequest) {
   try {
@@ -47,12 +50,18 @@ export async function GET(request: NextRequest) {
       maxOutputTokens: 1000,
     };
 
-    const llmRepo = new GPTFeedbackRepositoryImpl(dto);
-    const usecase = new GenerateFeedbackUsecase(llmRepo, persistenceRepository);
+    const llmRepo = new Gpt4oLlmAI();
+    const reportRepository = new ReportRepositoryImpl();
+    const updateReportStatusUsecase = new UpdateReportStatusUsecase(reportRepository);
+    const usecase = new GenerateFeedbackUsecase(
+      llmRepo,
+      persistenceRepository,
+      updateReportStatusUsecase
+    );
     const feedback = await usecase.execute(dto);
 
     const outputDto: DeliverFeedbackDto = {
-      feedback_report_id: feedback.feedback_report_id,
+      reportId: feedback.feedback_report_id,
       score: feedback.score,
       strength: feedback.strength,
       improvement: feedback.improvement,

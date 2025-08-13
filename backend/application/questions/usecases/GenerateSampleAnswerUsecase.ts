@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/GenerateSampleAnswerDto';
 import { DeliverSampleAnswersDto } from '@/backend/application/questions/dtos/DeliverSampleAnswersDto';
-import { Gpt4oLlmAI } from '@/backend/infrastructure/ai/Gpt4oLlmAI';
+import { Gpt4oLlmAI } from '@/backend/infrastructure/AI/Gpt4oLlmAI';
 
 export class GenerateSampleAnswerUsecase {
   constructor(

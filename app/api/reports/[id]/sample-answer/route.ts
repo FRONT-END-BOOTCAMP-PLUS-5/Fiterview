@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GenerateSampleAnswerUsecase } from '@/backend/application/questions/usecases/GenerateSampleAnswerUsecase';
-import { Gpt4oLlmAI } from '@/backend/infrastructure/ai/Gpt4oLlmAI';
+import { Gpt4oLlmAI } from '@/backend/infrastructure/AI/Gpt4oLlmAI';
 
 import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/GenerateSampleAnswerDto';
 import { DeliverSampleAnswersDto } from '@/backend/application/questions/dtos/DeliverSampleAnswersDto';

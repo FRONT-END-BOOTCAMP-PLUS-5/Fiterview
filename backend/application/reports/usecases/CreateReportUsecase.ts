@@ -1,5 +1,5 @@
 import { QuestionsRequest } from '@/backend/domain/dtos/QuestionsRequest';
-import { LlmAI } from '@/backend/domain/ai/LlmAI';
+import { LlmAI } from '@/backend/domain/AI/LlmAI';
 import { ReportRepository } from '@/backend/domain/repositories/ReportRepository';
 
 export interface CreateReportInput {

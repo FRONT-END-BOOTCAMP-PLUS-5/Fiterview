@@ -2,7 +2,7 @@ import { Feedback } from '@/backend/domain/entities/Feedback';
 import { FeedbackRepository } from '@/backend/domain/repositories/FeedbackRepository';
 import { RequestFeedbackDto } from '@/backend/application/feedbacks/dtos/RequestFeedbackDto';
 import { UpdateReportStatusUsecase } from '@/backend/application/reports/usecases/UpdateReportStatusUsecase';
-import { Gpt4oLlmAI } from '@/backend/domain/ai/LlmAI';
+import { Gpt4oLlmAI } from '@/backend/domain/AI/LlmAI';
 
 export class GenerateFeedbackUsecase {
   constructor(

@@ -1,6 +1,6 @@
 import { TTSRequest } from '@/backend/domain/dtos/TTSRequest';
 import { TTSResponse } from '@/backend/domain/dtos/TTSResponse';
-import { TtsAI } from '@/backend/domain/ai/TtsAI';
+import { TtsAI } from '@/backend/domain/AI/TtsAI';
 import client from '@/utils/AIs/TTSAI';
 
 export class GoogleCloudTtsAI implements TtsAI {
