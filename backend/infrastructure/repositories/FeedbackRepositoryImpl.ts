@@ -64,10 +64,10 @@ export class FeedbackRepositoryImpl implements FeedbackRepository {
       take: 10,
     });
 
-    return rows.map((r: Pick<Question, 'question' | 'sampleAnswer' | 'userAnswer'>) => ({
+    return rows.map((r) => ({
       question: r.question,
-      sampleAnswer: r.sampleAnswer,
-      userAnswer: r.userAnswer,
+      sampleAnswer: r.sampleAnswer ?? undefined,
+      userAnswer: r.userAnswer ?? undefined,
     }));
   }
 }

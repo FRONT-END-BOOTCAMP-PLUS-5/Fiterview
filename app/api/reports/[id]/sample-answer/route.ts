@@ -7,7 +7,8 @@ import { PrismaClient } from '@prisma/client';
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const questions_report_idNumber = parseInt(params.id, 10);
+    const resolvedParams = await params;
+    const questions_report_idNumber = parseInt(resolvedParams.id, 10);
 
     if (isNaN(questions_report_idNumber)) {
       return NextResponse.json({ error: 'Invalid report ID' }, { status: 400 });
