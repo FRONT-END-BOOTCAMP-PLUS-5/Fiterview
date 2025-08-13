@@ -6,10 +6,12 @@ import { RequestFeedbackDto } from '@/backend/application/feedbacks/dtos/Request
 import { DeliverFeedbackDto } from '@/backend/application/feedbacks/dtos/DeliverFeedbackDto';
 import { FeedbackRepositoryImpl } from '@/backend/infrastructure/repositories/FeedbackRepositoryImpl';
 import { FEEDBACK_GENERATION_INSTRUCTIONS } from '@/constants/feedback';
+import { ReportRepositoryImpl } from '@/backend/infrastructure/repositories/ReportRepositoryImpl';
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const reportId = parseInt(params.id, 10);
+    const { id } = await params;
+    const reportId = parseInt(id, 10);
 
     if (isNaN(reportId)) {
       return NextResponse.json({ error: 'Invalid report ID' }, { status: 400 });
@@ -41,11 +43,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const reportId = parseInt(params.id, 10);
-
-    console.log('questions_report_id', reportId);
+    const { id } = await params;
+    const reportId = parseInt(id, 10);
 
     if (isNaN(reportId)) {
       return NextResponse.json({ error: 'Invalid report ID' }, { status: 400 });
@@ -53,6 +54,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
     // Fetch questions and answers from the database
     const persistenceRepository = new FeedbackRepositoryImpl();
+    const reportRepository = new ReportRepositoryImpl();
     const questionsAndAnswers = await persistenceRepository.getQuestionsAndAnswers(reportId);
 
     if (questionsAndAnswers.length === 0) {
@@ -71,7 +73,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     };
 
     const llmRepo = new GPTFeedbackRepositoryImpl(dto);
-    const usecase = new GenerateFeedbackUsecase(llmRepo, persistenceRepository);
+    const usecase = new GenerateFeedbackUsecase(llmRepo, persistenceRepository, reportRepository);
     const feedback = await usecase.execute(dto);
 
     const outputDto: DeliverFeedbackDto = {
