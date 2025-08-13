@@ -23,5 +23,16 @@ export class GenerateFeedbackUsecase {
       await this.updateReportStatusUsecase.execute(dto.reportId, 'ANALYZING');
       throw error;
     }
+    try {
+      await this.updateReportStatusUsecase.execute(dto.reportId, 'ANALYZING');
+      const evaluation = await this.llmRepository.generateFeedback(dto);
+      await this.persistenceRepository.saveFeedback(evaluation);
+      await this.updateReportStatusUsecase.execute(dto.reportId, 'COMPLETED');
+
+      return evaluation;
+    } catch (error) {
+      await this.updateReportStatusUsecase.execute(dto.reportId, 'ANALYZING');
+      throw error;
+    }
   }
 }
