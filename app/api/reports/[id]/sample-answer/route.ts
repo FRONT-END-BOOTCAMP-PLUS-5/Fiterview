@@ -5,7 +5,7 @@ import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/G
 import { DeliverSampleAnswersDto } from '@/backend/application/questions/dtos/DeliverSampleAnswersDto';
 import { PrismaClient } from '@prisma/client';
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const resolvedParams = await params;
     const questions_report_idNumber = parseInt(resolvedParams.id, 10);
