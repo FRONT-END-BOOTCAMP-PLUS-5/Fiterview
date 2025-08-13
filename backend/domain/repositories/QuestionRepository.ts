@@ -1,4 +1,5 @@
 import { Question } from '@/backend/domain/entities/Question';
+import { QuestionsResponse } from '@/backend/domain/dtos/QuestionsResponse';
 export interface QuestionRepository {
   // questions테이블의 질문만 조회(TTS 요청 시 사용)
   getQuestionsByReportId(reportId: number): Promise<Question[]>;
