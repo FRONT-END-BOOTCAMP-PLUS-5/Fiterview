@@ -3,11 +3,13 @@ import { CreateReportUsecase } from '@/backend/application/reports/usecases/Crea
 import { ReportRepositoryImpl } from '@/backend/infrastructure/repositories/ReportRepositoryImpl';
 import { QuestionRepositoryImpl } from '@/backend/infrastructure/repositories/QuestionRepositoryImpl';
 import { GetUserReportsUsecase } from '@/backend/application/reports/usecases/GetUserReportsUsecase';
+import { GetReportsByStatusUsecase } from '@/backend/application/reports/usecases/GetReportsByStatusUsecase';
 import { ReportDto } from '@/backend/application/reports/dtos/ReportDto';
 
 const reportsRepository = new ReportRepositoryImpl();
 const questionRepository = new QuestionRepositoryImpl();
 const getUserReportsUsecase = new GetUserReportsUsecase(reportsRepository);
+const getReportsByStatusUsecase = new GetReportsByStatusUsecase(reportsRepository);
 const createReportUsecase = new CreateReportUsecase(reportsRepository, questionRepository);
 
 // userId 검증
@@ -23,12 +25,30 @@ const badRequest = (message: string) =>
 //조회
 export async function GET(request: NextRequest) {
   try {
+    // status 검증
+    const parseStatus = (value: string | null): ReportDto['status'] | undefined => {
+      if (!value) return undefined;
+      const upperValue = value.toUpperCase();
+      if (['PENDING', 'ANALYZING', 'COMPLETED'].includes(upperValue)) {
+        return upperValue as ReportDto['status'];
+      }
+      return undefined;
+    };
+
     const { searchParams } = new URL(request.url);
     const userId = parseUserId(searchParams.get('userId'));
+    const status = parseStatus(searchParams.get('status'));
 
     if (userId === null) return badRequest('userId가 필요합니다.');
 
-    const reports = await getUserReportsUsecase.execute(userId);
+    let reports;
+    if (status) {
+      // status 리포트만 조회
+      reports = await getReportsByStatusUsecase.execute(userId, status);
+    } else {
+      // 전체 리포트 조회
+      reports = await getUserReportsUsecase.execute(userId);
+    }
     const data: ReportDto[] = reports.map((r) => ({
       id: r.id,
       title: r.title,
@@ -43,7 +63,6 @@ export async function GET(request: NextRequest) {
       data,
     });
   } catch (error) {
-    console.error('리포트 조회 오류:', error);
     return NextResponse.json(
       { success: false, message: '서버 오류가 발생했습니다.' },
       { status: 500 }
@@ -78,7 +97,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
-    console.error('리포트 생성 API 오류:', error);
     return NextResponse.json(
       {
         success: false,
