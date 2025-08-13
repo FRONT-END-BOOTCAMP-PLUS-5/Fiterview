@@ -1,12 +1,12 @@
 import { PrismaClient } from '@prisma/client';
 import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/GenerateSampleAnswerDto';
 import { DeliverSampleAnswersDto } from '@/backend/application/questions/dtos/DeliverSampleAnswersDto';
-import { GPTSampleAnswerRepositoryImpl } from '@/backend/infrastructure/AI/openAI/GPTSampleAnswerRepositoryImpl';
+import { Gpt4oLlmAI } from '@/backend/infrastructure/ai/Gpt4oLlmAI';
 
 export class GenerateSampleAnswerUsecase {
   constructor(
     private readonly prisma: PrismaClient,
-    private readonly llmRepository: GPTSampleAnswerRepositoryImpl
+    private readonly llmRepository: Gpt4oLlmAI
   ) {}
 
   async execute(dto: GenerateSampleAnswersDto): Promise<DeliverSampleAnswersDto> {

@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GenerateFeedbackUsecase } from '@/backend/application/feedbacks/usecases/GenerateFeedbackUsecase';
-import { GPTFeedbackRepositoryImpl } from '@/backend/infrastructure/AI/openAI/GPTFeedbackRepositoryImpl';
 import { GetFeedbackUsecase } from '@/backend/application/feedbacks/usecases/GetFeedbackUsecase';
+import { UpdateReportStatusUsecase } from '@/backend/application/reports/usecases/UpdateReportStatusUsecase';
+// import { GPTFeedbackRepositoryImpl } from '@/backend/infrastructure/repositories/GPTFeedbackRepositoryImpl';
+import { Gpt4oLlmAI } from '@/backend/infrastructure/ai/Gpt4oLlmAI';
 import { RequestFeedbackDto } from '@/backend/application/feedbacks/dtos/RequestFeedbackDto';
 import { DeliverFeedbackDto } from '@/backend/application/feedbacks/dtos/DeliverFeedbackDto';
 import { FeedbackRepositoryImpl } from '@/backend/infrastructure/repositories/FeedbackRepositoryImpl';
@@ -72,7 +74,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       maxOutputTokens: 1000,
     };
 
-    const llmRepo = new GPTFeedbackRepositoryImpl(dto);
+    const llmRepo = new Gpt4oLlmAI();
     const updateReportStatusUsecase = new UpdateReportStatusUsecase(reportRepository);
     const usecase = new GenerateFeedbackUsecase(
       llmRepo,

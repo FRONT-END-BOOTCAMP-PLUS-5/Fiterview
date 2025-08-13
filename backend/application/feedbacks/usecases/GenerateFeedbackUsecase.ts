@@ -1,12 +1,12 @@
 import { Feedback } from '@/backend/domain/entities/Feedback';
 import { FeedbackRepository } from '@/backend/domain/repositories/FeedbackRepository';
 import { RequestFeedbackDto } from '@/backend/application/feedbacks/dtos/RequestFeedbackDto';
-import { FeedbackLLMRepository } from '@/backend/domain/AI/openAI/FeedbackLLMRepository';
 import { UpdateReportStatusUsecase } from '@/backend/application/reports/usecases/UpdateReportStatusUsecase';
+import { Gpt4oLlmAI } from '@/backend/domain/ai/LlmAI';
 
 export class GenerateFeedbackUsecase {
   constructor(
-    private readonly llmRepository: FeedbackLLMRepository,
+    private readonly llmRepository: Gpt4oLlmAI,
     private readonly persistenceRepository: FeedbackRepository,
     private readonly updateReportStatusUsecase: UpdateReportStatusUsecase
   ) {}
