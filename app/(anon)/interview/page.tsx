@@ -1,19 +1,14 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import Image from 'next/image';
-// import Header from '@/app/components/ex'; // 임시로 주석 처리
-// import { DUMMY_QUESTIONS } from '@/constants/index'; // 임시로 주석 처리
+import { useState, useRef } from 'react';
 
 // Icons
-import PlayIcon from '@/public/assets/icons/play.svg';
-import PauseIcon from '@/public/assets/icons/pause.svg';
 import MicIcon from '@/public/assets/icons/mic.svg';
 import NextIcon from '@/public/assets/icons/skip-forward.svg';
 import StopIcon from '@/public/assets/icons/square.svg';
+import MicRecorder from 'mic-recorder-to-mp3';
 
 type Question = {
-  questionId: number;
   question: string;
   order: number;
 };
@@ -22,34 +17,28 @@ type RecordingStatus = 'not_started' | 'recording' | 'completed' | 'uploading';
 
 // 테스트를 위한 더미 데이터
 const DUMMY_QUESTIONS_FOR_TEST: Question[] = [
-  { questionId: 1, question: '첫 번째 질문입니다. 자기소개를 해보세요.', order: 1 },
-  { questionId: 2, question: '두 번째 질문입니다. 지원 동기는 무엇인가요?', order: 2 },
-  { questionId: 3, question: '세 번째 질문입니다. 프로젝트 경험에 대해 설명해주세요.', order: 3 },
+  { question: '첫 번째 질문입니다. 자기소개를 해보세요.', order: 4 },
+  { question: '두 번째 질문입니다. 지원 동기는 무엇인가요?', order: 2 },
+  { question: '세 번째 질문입니다. 프로젝트 경험에 대해 설명해주세요.', order: 3 },
 ];
 
 export default function InterviewPage() {
   const [questions, setQuestions] = useState<Question[]>(DUMMY_QUESTIONS_FOR_TEST);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [recordingStatus, setRecordingStatus] = useState<RecordingStatus>('not_started');
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
+  const recorderRef = useRef<any | null>(null);
 
   // TODO: 실제로는 reportId를 props나 URL에서 가져와야 합니다.
-  const reportId = 6;
+  const reportId = 1;
 
   const currentQuestion = questions[currentQuestionIndex];
 
   const startRecording = async () => {
-    setRecordingStatus('recording');
-    audioChunksRef.current = []; // 이전 녹음 데이터 초기화
-
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-      mediaRecorderRef.current.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
-      };
-      mediaRecorderRef.current.start();
+      // 권한 요청 + 녹음 시작
+      recorderRef.current = new (MicRecorder as any)({ bitRate: 128 });
+      await recorderRef.current.start();
+      setRecordingStatus('recording');
     } catch (error) {
       console.error('마이크 접근에 실패했습니다.', error);
       setRecordingStatus('not_started');
@@ -57,38 +46,44 @@ export default function InterviewPage() {
   };
 
   const stopRecordingAndUpload = async () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-      mediaRecorderRef.current.onstop = async () => {
-        setRecordingStatus('uploading');
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+    if (!recorderRef.current || recordingStatus !== 'recording') return;
 
-        const formData = new FormData();
-        formData.append('audio', audioBlob, `recording_${reportId}_${currentQuestion.order}.webm`);
+    try {
+      setRecordingStatus('uploading');
+      const [buffer, blob] = await recorderRef.current.stop().getMp3();
 
-        try {
-          console.log(`Uploading: reportId=${reportId}, order=${currentQuestion.order}`);
-          const response = await fetch(
-            `/api/reports/${reportId}/recording?order=${currentQuestion.order}`,
-            {
-              method: 'POST',
-              body: formData,
-            }
-          );
+      const file = new File(buffer, `recording_${reportId}_${currentQuestion.order}.mp3`, {
+        type: blob.type || 'audio/mpeg',
+        lastModified: Date.now(),
+      });
 
-          if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`녹음 파일 업로드에 실패했습니다: ${response.status} ${errorText}`);
-          }
+      if (!file.size) throw new Error('MP3 파일이 비어있습니다.');
 
-          const result = await response.json();
-          console.log('업로드 성공:', result);
-          setRecordingStatus('completed');
-        } catch (error) {
-          console.error(error);
-          setRecordingStatus('not_started'); // 실패 시 상태 초기화
+      const formData = new FormData();
+      formData.append('audio', file);
+
+      console.log(`Uploading: reportId=${reportId}, order=${currentQuestion.order}`);
+      const response = await fetch(
+        `/api/reports/${reportId}/recording?order=${currentQuestion.order}`,
+        {
+          method: 'POST',
+          body: formData,
         }
-      };
-      mediaRecorderRef.current.stop();
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`녹음 파일 업로드에 실패했습니다: ${response.status} ${errorText}`);
+      }
+
+      const result = await response.json();
+      console.log('업로드 성공:', result);
+      setRecordingStatus('completed');
+    } catch (error) {
+      console.error(error);
+      setRecordingStatus('not_started');
+    } finally {
+      recorderRef.current = null;
     }
   };
 
