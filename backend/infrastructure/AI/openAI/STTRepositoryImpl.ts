@@ -1,7 +1,7 @@
 import { SttAI } from '@/backend/domain/ai/SttAI';
 import { STTRequest } from '@/backend/domain/dtos/STTRequest';
 import { STTResponse } from '@/backend/domain/dtos/STTResponse';
-import getOpenAIClient from '@/utils/AI/OpenAI';
+import getOpenAIClient from '@/utils/AIs/OpenAI';
 
 export class STTRepositoryImpl implements SttAI {
   async transcribeToText(audioRequest: STTRequest): Promise<STTResponse> {

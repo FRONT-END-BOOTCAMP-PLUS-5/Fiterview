@@ -1,4 +1,4 @@
-import getOpenAIClient from '@/utils/AI/OpenAI';
+import getOpenAIClient from '@/utils/AIs/OpenAI';
 import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/GenerateSampleAnswerDto';
 
 export class GPTSampleAnswerRepositoryImpl {

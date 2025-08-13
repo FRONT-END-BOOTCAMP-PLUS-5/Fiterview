@@ -1,7 +1,7 @@
 import { TTSRequest } from '@/backend/domain/dtos/TTSRequest';
 import { TTSResponse } from '@/backend/domain/dtos/TTSResponse';
 import { TtsAI } from '@/backend/domain/ai/TtsAI';
-import client from '@/utils/AI/TTSAI';
+import client from '@/utils/AIs/TTSAI';
 
 export class PrTTSRepository implements TtsAI {
   // 텍스트를 음성으로 변환

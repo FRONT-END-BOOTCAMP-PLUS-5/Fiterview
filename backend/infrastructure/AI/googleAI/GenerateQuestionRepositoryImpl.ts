@@ -1,6 +1,6 @@
 import { QuestionsRequest } from '@/backend/domain/dtos/QuestionsRequest';
 import { QuestionsResponse } from '@/backend/domain/dtos/QuestionsResponse';
-import { GoogleAI } from '@/utils/AI/GoogleAI';
+import { GoogleAI } from '@/utils/AIs/GoogleAI';
 import { DEFAULT_GENERATED_QUESTIONS, QUESTIONS_GENERATION_PROMPT } from '@/constants/questions';
 import mime from 'mime-types';
 
