@@ -6,66 +6,58 @@ import { useSearchParams, useRouter } from 'next/navigation';
 function QuestionsPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [audioFile, setAudioFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // 테스트용 reportId (실제로는 백엔드에서 질문 ID로 조회)
-  const testReportId = 7;
+  // URL 쿼리 파라미터에서 값 가져오기
+  const [testReportId, setTestReportId] = useState(searchParams.get('reportId') || '7');
+  const [currentQuestionId, setCurrentQuestionId] = useState(searchParams.get('order') || '1');
 
-  // URL 쿼리 파라미터에서 questionId 가져오기
-  const currentQuestionId = searchParams.get('id') || '1';
+  // URL 파라미터 변경 시 state 동기화
+  useEffect(() => {
+    const reportId = searchParams.get('reportId');
+    const order = searchParams.get('order');
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.type.startsWith('audio/')) {
-      setAudioFile(file);
-      setError(null);
-    } else {
-      setError('오디오 파일을 선택해주세요.');
-      setAudioFile(null);
+    if (reportId && reportId !== testReportId) {
+      setTestReportId(reportId);
     }
+    if (order && order !== currentQuestionId) {
+      setCurrentQuestionId(order);
+    }
+  }, [searchParams, testReportId, currentQuestionId]);
+
+  // Report ID 변경 시 URL 업데이트
+  const handleReportIdChange = (newReportId: string) => {
+    setTestReportId(newReportId);
+    const newUrl = `/interview/questions?reportId=${newReportId}&order=${currentQuestionId}`;
+    router.push(newUrl);
   };
 
   // 질문 변경 시 URL 업데이트
   const handleQuestionChange = (newQuestionId: string) => {
-    router.push(`/interview/questions?id=${newQuestionId}`);
+    setCurrentQuestionId(newQuestionId);
+    const newUrl = `/interview/questions?reportId=${testReportId}&order=${newQuestionId}`;
+    router.push(newUrl);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!audioFile) {
-      setError('오디오 파일을 선택해주세요.');
-      return;
-    }
-
     setIsLoading(true);
     setError(null);
     setResult(null);
 
     try {
-      // 오디오 파일을 base64로 변환
-      const arrayBuffer = await audioFile.arrayBuffer();
-      const base64Audio = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-
       const response = await fetch(
         `/api/reports/${testReportId}/questions/${currentQuestionId}/transcribe`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            audio: base64Audio,
-            language: 'ko',
-          }),
         }
       );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'API 요청 실패');
+        throw new Error(errorData.error || 'API 요청 실패');
       }
 
       const data = await response.json();
@@ -83,6 +75,19 @@ function QuestionsPageContent() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
+          <label className="block text-sm font-medium mb-2">Report ID:</label>
+          <input
+            type="number"
+            value={testReportId}
+            onChange={(e) => handleReportIdChange(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded"
+            min="1"
+            placeholder="Report ID를 입력하세요"
+          />
+          <p className="text-sm text-gray-500 mt-1">현재 선택된 Report ID: {testReportId}</p>
+        </div>
+
+        <div>
           <label className="block text-sm font-medium mb-2">질문 번호:</label>
           <input
             type="number"
@@ -91,27 +96,27 @@ function QuestionsPageContent() {
             className="w-full p-2 border border-gray-300 rounded"
             min="1"
             max="10"
+            placeholder="질문 번호를 입력하세요 (1-10)"
           />
-          <p className="text-sm text-gray-500 mt-1">
-            현재 선택된 질문: {currentQuestionId}번 (URL: /interview/questions?id=
-            {currentQuestionId})
-          </p>
+          <p className="text-sm text-gray-500 mt-1">현재 선택된 질문: {currentQuestionId}번</p>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-2">음성 파일:</label>
-          <input
-            type="file"
-            accept="audio/*"
-            onChange={handleFileChange}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-          <p className="text-sm text-gray-500 mt-1">지원 형식: m4a, mp3, wav 등</p>
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded">
+          <p className="text-sm text-blue-700">
+            📁 <strong>음성 파일 정보:</strong>
+          </p>
+          <p className="text-sm text-blue-600 mt-1">
+            • Report ID: {testReportId}의 {currentQuestionId}번 질문
+          </p>
+          <p className="text-sm text-blue-600">• DB에서 녹음된 음성 파일을 자동으로 조회합니다</p>
+          <p className="text-sm text-blue-600">
+            • 파일 경로: assets/audios/{testReportId}/{currentQuestionId}.mp3
+          </p>
         </div>
 
         <button
           type="submit"
-          disabled={!audioFile || isLoading}
+          disabled={isLoading}
           className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           {isLoading ? '처리 중...' : '음성-텍스트 변환 시작'}
@@ -129,10 +134,13 @@ function QuestionsPageContent() {
           <h3 className="font-bold mb-2">변환 결과:</h3>
           <div className="space-y-2">
             <p>
-              <strong>메시지:</strong> {result.message}
+              <strong>메시지:</strong> {result.data.message}
             </p>
             <p>
-              <strong>질문 번호:</strong> {currentQuestionId}
+              <strong>Report ID:</strong> {result.data.reportId}
+            </p>
+            <p>
+              <strong>질문 번호:</strong> {result.data.order}번
             </p>
             <p>
               <strong>변환된 텍스트:</strong> {result.data.transcription.text}
@@ -144,11 +152,21 @@ function QuestionsPageContent() {
               <strong>모델:</strong> {result.data.transcription.model}
             </p>
             <p>
-              <strong>시간:</strong> {result.timestamp}
+              <strong>시간:</strong> {result.data.timestamp}
             </p>
           </div>
         </div>
       )}
+
+      <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded">
+        <h3 className="font-bold mb-2 text-blue-800">현재 URL:</h3>
+        <p className="text-sm text-blue-600 font-mono">
+          /interview/questions?reportId={testReportId}&order={currentQuestionId}
+        </p>
+        <p className="text-sm text-gray-600 mt-2">
+          URL이 자동으로 업데이트됩니다. 북마크하거나 공유할 수 있습니다.
+        </p>
+      </div>
     </div>
   );
 }
