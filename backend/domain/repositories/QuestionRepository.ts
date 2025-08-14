@@ -10,8 +10,4 @@ export interface QuestionRepository {
   getAudioFileByQuestion(reportId: number, questionOrder: number): Promise<AudioFileInfo>;
   // 질문 생성
   generateQuestions(files: QuestionsRequest[]): Promise<QuestionsResponse[]>;
-  // 생성된 질문 -> DB에 저장
-  saveQuestions(generatedQuestions: QuestionsResponse[], reportId: number): Promise<Question[]>;
-  // 녹음본 생성
-  generateRecording(reportId: number, order: number, fileName: string): Promise<Question>;
 }
