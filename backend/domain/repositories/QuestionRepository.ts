@@ -6,13 +6,8 @@ export interface QuestionRepository {
   getQuestionsByReportId(reportId: number): Promise<Question[]>;
   // questions테이블 조회(report 조회 시 사용)
   findAllByReportId(reportId: number): Promise<Question[]>;
-
   // audio 관련 메서드
   getAudioFileByQuestion(reportId: number, questionOrder: number): Promise<AudioFileInfo>;
-  // questions테이블의 사용자 답변만 조회(STT 요청 시 사용)
-  // 사용자 답변 수정
-  // getUserAnswer():
-  // updateUserAnswer():
   // 질문 생성
   generateQuestions(files: QuestionsRequest[]): Promise<QuestionsResponse[]>;
   // 생성된 질문 -> DB에 저장
