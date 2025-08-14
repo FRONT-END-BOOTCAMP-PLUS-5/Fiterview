@@ -43,7 +43,7 @@ export async function POST(
       orderNumber
     );
 
-    // 파일 크기 검증 (FileProcessingService 사용)
+    // 파일 크기 검증
     const validationResult = FileProcessingService.validateFileSize(
       audioFileInfo.fileBuffer.length
     );
