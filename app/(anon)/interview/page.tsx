@@ -28,7 +28,7 @@ export default function InterviewPage() {
   const [recordingStatus, setRecordingStatus] = useState<RecordingStatus>('not_started');
   const recorderRef = useRef<any | null>(null);
 
-  // TODO: 실제로는 reportId를 props나 URL에서 가져와야 합니다.
+  // TODO: 실제로는 reportId를 props나 URL에서 가져와야 함
   const reportId = 1;
 
   const currentQuestion = questions[currentQuestionIndex];
