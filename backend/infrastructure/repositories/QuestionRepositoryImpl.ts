@@ -137,6 +137,27 @@ export class QuestionRepositoryImpl implements QuestionRepository {
     return mimeTypes[extension || ''] || 'audio/mpeg';
   }
 
+  // 녹음본 생성
+  async updateRecording(reportId: number, order: number, filePath: string): Promise<Question> {
+    try {
+      const target = await prisma.question.findFirst({
+        where: { reportId, order },
+        select: { id: true },
+      });
+      if (!target)
+        throw new Error(`해당 reportId(${reportId}), order(${order}) 질문을 찾을 수 없습니다.`);
+
+      const updated = await prisma.question.update({
+        where: { id: target.id },
+        data: { recording: filePath },
+      });
+      return updated as Question;
+    } catch (e) {
+      console.error('녹음본 파일 경로 업데이트 실패:', e);
+      throw new Error('녹음본 파일 경로 업데이트에 실패했습니다.');
+    }
+  }
+
   // 질문 생성
   async generateQuestions(files: QuestionsRequest[]) {
     return this.generator.generate(files);
