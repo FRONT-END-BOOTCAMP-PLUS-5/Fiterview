@@ -64,7 +64,7 @@ export default function InterviewPage() {
 
       console.log(`Uploading: reportId=${reportId}, order=${currentQuestion.order}`);
       const response = await fetch(
-        `/api/reports/${reportId}/recording?order=${currentQuestion.order}`,
+        `/api/reports/${reportId}/questions/${currentQuestion.order}/recording`,
         {
           method: 'POST',
           body: formData,

@@ -1,9 +1,14 @@
 import { GenerateRecordingUsecase } from '@/backend/application/questions/usecases/GenerateRecordingUsecase';
 import { QuestionRepositoryImpl } from '@/backend/infrastructure/repositories/QuestionRepositoryImpl';
 
-export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(
+  request: Request,
+  { params }: { params: Promise<{ id: string; order: string }> }
+) {
   try {
-    const reportId = parseInt((await params).id, 10);
+    const { id, order: orderParam } = await params;
+
+    const reportId = parseInt(id, 10);
     if (Number.isNaN(reportId)) {
       return Response.json(
         { success: false, error: '유효하지 않은 reportId입니다.' },
@@ -11,15 +16,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       );
     }
 
-    const url = new URL(request.url);
-    const orderRaw = url.searchParams.get('order');
-    if (!orderRaw) {
-      return Response.json(
-        { success: false, error: 'order 쿼리스트링이 필요합니다.' },
-        { status: 400 }
-      );
-    }
-    const order = parseInt(orderRaw, 10);
+    const order = parseInt(orderParam, 10);
     if (Number.isNaN(order)) {
       return Response.json(
         { success: false, error: '유효하지 않은 order 입니다.' },
