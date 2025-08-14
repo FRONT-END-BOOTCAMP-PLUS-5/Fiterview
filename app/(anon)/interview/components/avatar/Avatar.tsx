@@ -175,7 +175,7 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
-    const GAIN = 8.0;
+    const GAIN = 0.8; //벌리는 입 크기
     const OPEN_TH = 0.08;
     const CLOSE_TH = 0.04;
     const ATTACK = 0.3;
@@ -235,17 +235,17 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
     const nod = Math.sin(t * 1.1 + idleSeed.current) * THREE.MathUtils.degToRad(1.2);
     const tilt = Math.sin(t * 0.8 + 1.7 + idleSeed.current) * THREE.MathUtils.degToRad(0.8);
     if (head) {
-      head.rotation.x = (head.rotation.x || 0) * 0.9 + nod * 0.1;
-      head.rotation.z = (head.rotation.z || 0) * 0.9 + tilt * 0.1;
+      head.rotation.x = (head.rotation.x || 0) * 0.9 + nod * 0.1; // 고개 끄덕임
+      head.rotation.z = (head.rotation.z || 0) * 0.9 + tilt * 0.1; // 고개 기울임
     }
     if (spine) {
       const sway = Math.sin(t * 0.6 + 0.5 + idleSeed.current) * THREE.MathUtils.degToRad(0.6);
-      spine.rotation.y = (spine.rotation.y || 0) * 0.9 + sway * 0.1;
+      spine.rotation.y = (spine.rotation.y || 0) * 0.9 + sway * 0.1; // 몸통 흔들림
       spine.position.z = (spine.position.z || 0) * 0.9 + Math.sin(t * 0.7) * 0.002;
     }
 
     // --- 5) 눈 깜박임 ---
-    const BLINK_SPEED = 300;
+    const BLINK_SPEED = 1;
     const bs = blinkState.current;
     bs.tNow += state.clock.getDelta();
 
@@ -284,8 +284,8 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
 
   return (
     <group>
-      <primitive object={gltf.scene} position={[0, -1.56, -1]} scale={[2, 2, 2]} />
-      {/* 디버그용: 아바타 위치에 작은 구 표시 */}
+      <primitive object={gltf.scene} position={[0, -1.59, -1]} scale={[2, 2, 2]} />
+      {/* 디버그용 */}
       <mesh position={[0, 0, 0]}>
         <sphereGeometry args={[0.1, 16, 16]} />
         <meshBasicMaterial color="green" />

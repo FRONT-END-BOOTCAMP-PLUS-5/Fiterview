@@ -20,7 +20,6 @@ export default function AvatarSettings({
         className="px-3 py-2 rounded bg-neutral-800 border border-neutral-700 outline-none"
         value={avatarInput}
         onChange={(e) => onAvatarInputChange(e.target.value)}
-        placeholder="https://models.readyplayer.me/<id>.glb"
       />
       <span className="text-xs text-neutral-500 break-all">Using: {modelUrl}</span>
     </label>

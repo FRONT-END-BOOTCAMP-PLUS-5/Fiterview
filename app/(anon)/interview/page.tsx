@@ -13,9 +13,9 @@ import InterviewLayout from './components/InterviewLayout';
  * + 줌 면접 레이아웃(상반신 고정) + HDR 배경 + idle(끄덕임/스웨이/깜박임)
  */
 export default function Page() {
-  // Ready Player Me GLB (필수: morphTargets 쿼리로 입/눈 모프 포함)
+  // Ready Player Me GLB
   const [avatarInput, setAvatarInput] = useState(
-    'https://models.readyplayer.me/689bfc8a7c6c17df66adf1c9.glb'
+    'https://models.readyplayer.me/689d3904c911aabc2eba50a6.glb'
   );
 
   const modelUrl = useMemo(() => {
@@ -25,7 +25,6 @@ export default function Page() {
     const hasQuery = base.includes('?');
     const q = 'morphTargets=ARKit,Oculus%20Visemes';
     const finalUrl = base + (hasQuery ? (base.includes('morphTargets=') ? '' : `&${q}`) : `?${q}`);
-    console.log('🔗 Model URL:', finalUrl);
     return finalUrl;
   }, [avatarInput]);
 
@@ -77,11 +76,11 @@ export default function Page() {
   const handleEnded = () => setPlaying(false);
 
   // 메모리 정리
-  useEffect(() => {
-    return () => {
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
-    };
-  }, [objectUrl]);
+  // useEffect(() => {
+  //   return () => {
+  //     if (objectUrl) URL.revokeObjectURL(objectUrl);
+  //   };
+  // }, [objectUrl]);
 
   return (
     <div className="min-h-screen w-full flex flex-col gap-4 p-6 bg-neutral-950 text-white">
@@ -114,7 +113,7 @@ export default function Page() {
       {/* 인터뷰 레이아웃 */}
       <InterviewLayout objectUrl={objectUrl} ctxReady={ctxReady}>
         <Canvas
-          camera={{ fov: 22, position: [0, 1.55, 1.05] /* 상반신 클로즈업 */ }}
+          camera={{ fov: 24, position: [0, 1.5, 1.5] /* 상반신 클로즈업 */ }}
           shadows
           onCreated={(state) => {
             console.log('🎨 Canvas created:', state);
@@ -146,7 +145,7 @@ export default function Page() {
 
           {/* 화면/카메라 고정 */}
           <OrbitControls
-            target={[0, 1.5, 0]}
+            target={[0, 1.55, 0]}
             enableDamping
             enableZoom={false}
             enablePan={false}
