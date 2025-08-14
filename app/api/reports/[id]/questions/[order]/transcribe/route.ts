@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { TranscribeAudioUseCase } from '@/backend/application/questions/usecases/TranscribeAudioUseCase';
 import { SaveUserAnswerUseCase } from '@/backend/application/questions/usecases/SaveUserAnswerUseCase';
-import { AudioFileService } from '@/backend/infrastructure/services/AudioFileService';
-import { FileProcessingService } from '@/backend/infrastructure/services/FileProcessingService';
+import { GetAudioByQuestionUseCase } from '@/backend/application/questions/usecases/GetAudioByQuestionUseCase';
 import { TranscribeSttAI } from '@/backend/infrastructure/AI/TranscribeSttAI';
+import { QuestionRepositoryImpl } from '@/backend/infrastructure/repositories/QuestionRepositoryImpl';
+import { FileProcessingService } from '@/backend/infrastructure/services/FileProcessingService';
 import { PrismaClient } from '@prisma/client';
 
 export async function POST(
@@ -32,15 +33,14 @@ export async function POST(
     // 의존성 주입
     const prisma = new PrismaClient();
     const sttRepository = new TranscribeSttAI();
+    const questionRepository = new QuestionRepositoryImpl();
+
     const transcribeAudioUseCase = new TranscribeAudioUseCase(sttRepository);
     const saveUserAnswerUseCase = new SaveUserAnswerUseCase(prisma);
+    const getAudioByQuestionUseCase = new GetAudioByQuestionUseCase(questionRepository);
 
     // DB에서 음성 파일 조회
-    const audioFileInfo = await AudioFileService.getAudioFileFromDB(
-      prisma,
-      reportIdNumber,
-      orderNumber
-    );
+    const audioFileInfo = await getAudioByQuestionUseCase.execute(reportIdNumber, orderNumber);
 
     // 파일 크기 검증
     const validationResult = FileProcessingService.validateFileSize(
