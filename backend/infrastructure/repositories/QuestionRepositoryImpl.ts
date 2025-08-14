@@ -15,6 +15,43 @@ export class QuestionRepositoryImpl implements QuestionRepository {
     this.generator = new QuestionGenerator();
   }
 
+  // 질문 생성
+  async generateQuestions(files: QuestionsRequest[]) {
+    return this.generator.generate(files);
+  }
+
+  // 질문 저장
+  async saveQuestions(
+    generatedQuestions: QuestionsResponse[],
+    reportId: number
+  ): Promise<Question[]> {
+    //order순으로 정렬
+    const sortedQuestions = [...generatedQuestions].sort((a, b) => a.order - b.order);
+
+    const saved = await prisma.$transaction(
+      sortedQuestions.map((gen) =>
+        prisma.question.create({
+          data: {
+            question: gen.question,
+            order: gen.order,
+            reportId,
+          },
+        })
+      )
+    );
+
+    // 저장 결과에 정렬된 order를 매칭하여 반환
+    return saved.map((q, idx) => ({
+      id: q.id,
+      order: (q as any).order ?? sortedQuestions[idx].order,
+      question: q.question,
+      sampleAnswer: q.sampleAnswer || undefined,
+      userAnswer: q.userAnswer || undefined,
+      recording: q.recording || undefined,
+      reportId: q.reportId,
+    }));
+  }
+
   // questions테이블의 질문만 조회(TTS 요청 시 사용)
   async getQuestionsByReportId(reportId: number): Promise<Question[]> {
     try {
@@ -137,39 +174,24 @@ export class QuestionRepositoryImpl implements QuestionRepository {
     return mimeTypes[extension || ''] || 'audio/mpeg';
   }
 
-  // 질문 생성
-  async generateQuestions(files: QuestionsRequest[]) {
-    return this.generator.generate(files);
-  }
-  // 질문 저장
-  async saveQuestions(
-    generatedQuestions: QuestionsResponse[],
-    reportId: number
-  ): Promise<Question[]> {
-    //order순으로 정렬
-    const sortedQuestions = [...generatedQuestions].sort((a, b) => a.order - b.order);
+  // 녹음본 생성
+  async generateRecording(reportId: number, order: number, fileName: string): Promise<Question> {
+    try {
+      const target = await prisma.question.findFirst({
+        where: { reportId, order },
+        select: { id: true },
+      });
+      if (!target)
+        throw new Error(`해당 reportId(${reportId}), order(${order}) 질문을 찾을 수 없습니다.`);
 
-    const saved = await prisma.$transaction(
-      sortedQuestions.map((gen) =>
-        prisma.question.create({
-          data: {
-            question: gen.question,
-            order: gen.order,
-            reportId,
-          },
-        })
-      )
-    );
-
-    // 저장 결과에 정렬된 order를 매칭하여 반환
-    return saved.map((q, idx) => ({
-      id: q.id,
-      order: (q as any).order ?? sortedQuestions[idx].order,
-      question: q.question,
-      reportId: q.reportId,
-      sampleAnswer: q.sampleAnswer || undefined,
-      userAnswer: q.userAnswer || undefined,
-      recording: q.recording || undefined,
-    }));
+      const updated = await prisma.question.update({
+        where: { id: target.id },
+        data: { recording: fileName },
+      });
+      return updated as Question;
+    } catch (e) {
+      console.error('녹음본 파일 경로 업데이트 실패:', e);
+      throw new Error('녹음본 파일 경로 업데이트에 실패했습니다.');
+    }
   }
 }
