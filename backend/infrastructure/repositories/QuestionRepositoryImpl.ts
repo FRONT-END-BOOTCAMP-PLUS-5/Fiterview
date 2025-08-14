@@ -1,12 +1,15 @@
 import { QuestionRepository } from '@/backend/domain/repositories/QuestionRepository';
-import { Question } from '@/backend/domain/entities/Question';
+import { Question, AudioFileInfo } from '@/backend/domain/entities/Question';
 import { QuestionsResponse } from '@/backend/domain/dtos/QuestionsResponse';
 import { QuestionsRequest } from '@/backend/domain/dtos/QuestionsRequest';
 import { QuestionGenerator } from '../AI/GeminiLlmAI';
+import { readFileSync, existsSync } from 'fs';
+import { join } from 'path';
 import prisma from '@/utils/prisma';
 
 export class QuestionRepositoryImpl implements QuestionRepository {
   private generator: QuestionGenerator;
+  private static readonly AUDIO_BASE_PATH = 'public/assets/audios';
 
   constructor() {
     this.generator = new QuestionGenerator();
@@ -68,6 +71,72 @@ export class QuestionRepositoryImpl implements QuestionRepository {
     }
   }
 
+  // audio 관련 메서드
+  async getAudioFileByQuestion(reportId: number, questionOrder: number): Promise<AudioFileInfo> {
+    try {
+      // 1. DB에서 해당 질문의 녹음 파일명 조회
+      const question = await prisma.question.findFirst({
+        where: {
+          reportId: reportId,
+          order: questionOrder,
+        },
+        select: {
+          recording: true,
+        },
+      });
+
+      if (!question || !question.recording) {
+        throw new Error(`질문 ${questionOrder}번의 녹음 파일을 찾을 수 없습니다.`);
+      }
+
+      // 2. 파일 경로 구성
+      const filePath = join(
+        QuestionRepositoryImpl.AUDIO_BASE_PATH,
+        reportId.toString(),
+        question.recording
+      );
+
+      // 3. 파일 존재 여부 확인
+      if (!existsSync(filePath)) {
+        throw new Error(`파일이 존재하지 않습니다: ${filePath}`);
+      }
+
+      // 4. 파일 읽기
+      const fileBuffer = readFileSync(filePath);
+
+      // 5. MIME 타입 추정
+      const mimeType = this.getMimeTypeFromFileName(question.recording);
+
+      return {
+        filePath,
+        fileName: question.recording,
+        fileBuffer,
+        mimeType,
+      };
+    } catch (error) {
+      console.error('음성 파일 조회 실패:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 파일명에서 MIME 타입 추정
+   */
+  private getMimeTypeFromFileName(fileName: string): string {
+    const extension = fileName.split('.').pop()?.toLowerCase();
+
+    const mimeTypes: Record<string, string> = {
+      mp3: 'audio/mpeg',
+      wav: 'audio/wav',
+      webm: 'audio/webm',
+      ogg: 'audio/ogg',
+      m4a: 'audio/mp4',
+      aac: 'audio/aac',
+    };
+
+    return mimeTypes[extension || ''] || 'audio/mpeg';
+  }
+
   // 질문 생성
   async generateQuestions(files: QuestionsRequest[]) {
     return this.generator.generate(files);
@@ -103,38 +172,4 @@ export class QuestionRepositoryImpl implements QuestionRepository {
       recording: q.recording || undefined,
     }));
   }
-  // async getQuestion(questions_report_id: number): Promise<string> {
-  //   try {
-  //     const questions: QuestionsModel[] = await prisma.question.findMany({
-  //       where: { reportId: questions_report_id },
-  //       take: 10,
-  //       select: { id: true, question: true, order: true },
-  //       orderBy: { id: 'asc' },
-  //     });
-
-  //     if (questions.length === 0) {
-  //       throw new Error(`No questions found for report ID: ${questions_report_id}`);
-  //     }
-  //     return questions[0].question;
-  //   } catch (error) {
-  //     throw new Error(`Failed to get question for report ${questions_report_id}: ${error}`);
-  //   }
-  // }
-
-  // async getSampleAnswer(questions_report_id: number): Promise<string> {
-  //   try {
-  //     const answers: SampleAnswersModel[] = await prisma.question.findMany({
-  //       where: { reportId: questions_report_id },
-  //       take: 10,
-  //       select: { id: true, sampleAnswer: true },
-  //       orderBy: { id: 'asc' },
-  //     });
-
-  //     if (answers.length === 0) {
-  //       throw new Error(`No answers found for report ID: ${questions_report_id}`);
-  //     }
-  //     return answers[0].sampleAnswer ?? '';
-  //   } catch (error) {
-  //     throw new Error(`Failed to get answer for report ${questions_report_id}: ${error}`);
-  //   }
 }
