@@ -9,8 +9,6 @@ export interface QuestionRepository {
 
   // audio 관련 메서드
   getAudioFileByQuestion(reportId: number, questionOrder: number): Promise<AudioFileInfo>;
-  // 녹음본 생성
-  updateRecording(reportId: number, order: number, filePath: string): Promise<Question>;
   // questions테이블의 사용자 답변만 조회(STT 요청 시 사용)
   // 사용자 답변 수정
   // getUserAnswer():
@@ -19,4 +17,6 @@ export interface QuestionRepository {
   generateQuestions(files: QuestionsRequest[]): Promise<QuestionsResponse[]>;
   // 생성된 질문 -> DB에 저장
   saveQuestions(generatedQuestions: QuestionsResponse[], reportId: number): Promise<Question[]>;
+  // 녹음본 생성
+  generateRecording(reportId: number, order: number, filePath: string): Promise<Question>;
 }
