@@ -8,6 +8,8 @@ export interface QuestionRepository {
   findAllByReportId(reportId: number): Promise<Question[]>;
   // audio 관련 메서드
   getAudioFileByQuestion(reportId: number, questionOrder: number): Promise<AudioFileInfo>;
+  // 녹음본 경로 저장
+  generateRecording(reportId: number, order: number, fileName: string): Promise<Question>;
   // 질문 생성
   generateQuestions(files: QuestionsRequest[]): Promise<QuestionsResponse[]>;
 }
