@@ -17,7 +17,7 @@ type RecordingStatus = 'not_started' | 'recording' | 'completed' | 'uploading';
 
 // 테스트를 위한 더미 데이터
 const DUMMY_QUESTIONS_FOR_TEST: Question[] = [
-  { question: '첫 번째 질문입니다. 자기소개를 해보세요.', order: 4 },
+  { question: '첫 번째 질문입니다. 자기소개를 해보세요.', order: 6 },
   { question: '두 번째 질문입니다. 지원 동기는 무엇인가요?', order: 2 },
   { question: '세 번째 질문입니다. 프로젝트 경험에 대해 설명해주세요.', order: 3 },
 ];
@@ -29,7 +29,7 @@ export default function InterviewPage() {
   const recorderRef = useRef<any | null>(null);
 
   // TODO: 실제로는 reportId를 props나 URL에서 가져와야 함
-  const reportId = 1;
+  const reportId = 2;
 
   const currentQuestion = questions[currentQuestionIndex];
 
