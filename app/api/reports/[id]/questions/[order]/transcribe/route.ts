@@ -1,13 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { TranscribeAudioUseCase } from '@/backend/application/questions/usecases/TranscribeAudioUseCase';
 import { SaveUserAnswerUseCase } from '@/backend/application/questions/usecases/SaveUserAnswerUseCase';
-import { STTRepositoryImpl } from '@/backend/infrastructure/repositories/STTRepositoryImpl';
 import { AudioFileService } from '@/backend/infrastructure/services/AudioFileService';
 import { FileProcessingService } from '@/backend/infrastructure/services/FileProcessingService';
 import { TranscribeSttAI } from '@/backend/infrastructure/AI/TranscribeSttAI';
-import { STTRequest } from '@/backend/domain/dtos/STTRequest';
-import { STTResponse } from '@/backend/domain/dtos/STTResponse';
-import { TranscribeQuestionResponse } from '@/backend/application/questions/dtos/TranscribeQuestionResponse';
 import { PrismaClient } from '@prisma/client';
 
 export async function POST(

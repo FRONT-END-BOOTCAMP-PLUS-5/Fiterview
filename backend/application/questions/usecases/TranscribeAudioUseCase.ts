@@ -1,9 +1,9 @@
-import { STTRepository } from '@/backend/domain/repositories/STTRepository';
+import { SttAI } from '@/backend/domain/AI/SttAI';
 import { STTRequest } from '@/backend/domain/dtos/STTRequest';
 import { STTResponse } from '@/backend/domain/dtos/STTResponse';
 
 export class TranscribeAudioUseCase {
-  constructor(private readonly sttRepository: STTRepository) {}
+  constructor(private readonly sttRepository: SttAI) {}
 
   async execute(audioFile: Buffer, fileName: string, language: string): Promise<STTResponse> {
     try {
