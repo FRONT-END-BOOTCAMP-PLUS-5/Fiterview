@@ -1,5 +1,5 @@
 import { GenerateQuestionsTTSUsecase } from '@/backend/application/questions/usecases/GenerateQuestionsTTSUsecase';
-import { PrTTSRepository } from '@/backend/infrastructure/repositories/TTSRepositoryImpl';
+import { GoogleCloudTtsAI } from '@/backend/infrastructure/AI/GoogleCloudTtsAI';
 import { QuestionTTSResponse } from '@/backend/application/questions/dtos/QuestionTTSResponse';
 import { QuestionRepositoryImpl } from '@/backend/infrastructure/repositories/QuestionRepositoryImpl';
 
@@ -19,7 +19,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
     const useCase = new GenerateQuestionsTTSUsecase(
       new QuestionRepositoryImpl(),
-      new PrTTSRepository()
+      new GoogleCloudTtsAI()
     );
 
     const questionsWithTTS: QuestionTTSResponse[] = await useCase.execute(reportId);

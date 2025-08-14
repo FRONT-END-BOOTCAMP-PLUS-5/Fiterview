@@ -4,6 +4,9 @@ import { SaveUserAnswerUseCase } from '@/backend/application/questions/usecases/
 import { STTRepositoryImpl } from '@/backend/infrastructure/repositories/STTRepositoryImpl';
 import { AudioFileService } from '@/backend/infrastructure/services/AudioFileService';
 import { FileProcessingService } from '@/backend/infrastructure/services/FileProcessingService';
+import { TranscribeSttAI } from '@/backend/infrastructure/AI/TranscribeSttAI';
+import { STTRequest } from '@/backend/domain/dtos/STTRequest';
+import { STTResponse } from '@/backend/domain/dtos/STTResponse';
 import { TranscribeQuestionResponse } from '@/backend/application/questions/dtos/TranscribeQuestionResponse';
 import { PrismaClient } from '@prisma/client';
 
@@ -32,7 +35,7 @@ export async function POST(
 
     // 의존성 주입
     const prisma = new PrismaClient();
-    const sttRepository = new STTRepositoryImpl();
+    const sttRepository = new TranscribeSttAI();
     const transcribeAudioUseCase = new TranscribeAudioUseCase(sttRepository);
     const saveUserAnswerUseCase = new SaveUserAnswerUseCase(prisma);
 

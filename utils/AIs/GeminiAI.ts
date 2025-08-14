@@ -1,6 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 
-export class GoogleAIProvider {
+export class GeminiAI {
   private genAI: GoogleGenAI | null = null;
 
   getClient(): GoogleGenAI {

@@ -1,8 +1,8 @@
 import { QuestionsRequest } from '@/backend/domain/dtos/QuestionsRequest';
 import { SavedQuestionsDto } from '@/backend/application/questions/dtos/SavedQuestionsDto';
-import { QuestionRepository } from '@/backend/domain/repositories/QuestionRepository';
+import { LlmAI } from '@/backend/domain/AI/LlmAI';
 export class GenerateQuestionsUseCase {
-  constructor(private questionRepository: QuestionRepository) {}
+  constructor(private llmAI: LlmAI) {}
 
   async execute(files: QuestionsRequest[], reportId: number): Promise<SavedQuestionsDto> {
     if (!files || files.length === 0) {
@@ -23,12 +23,9 @@ export class GenerateQuestionsUseCase {
       }
     }
 
-    const generatedQuestions = await this.questionRepository.generateQuestions(files);
+    const generatedQuestions = await this.llmAI.generateQuestions(files);
 
-    const savedQuestions = await this.questionRepository.saveQuestions(
-      generatedQuestions,
-      reportId
-    );
+    const savedQuestions = await this.llmAI.saveQuestions(generatedQuestions, reportId);
 
     return { questions: savedQuestions, reportId };
   }

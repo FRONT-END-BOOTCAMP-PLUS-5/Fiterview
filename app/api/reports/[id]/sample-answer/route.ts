@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GenerateSampleAnswerUsecase } from '@/backend/application/questions/usecases/GenerateSampleAnswerUsecase';
-import { GPTSampleAnswerRepositoryImpl } from '@/backend/infrastructure/repositories/GPTSampleAnswerRepositoryImpl';
+import { Gpt4oLlmAI } from '@/backend/infrastructure/AI/Gpt4oLlmAI';
+
 import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/GenerateSampleAnswerDto';
 import { DeliverSampleAnswersDto } from '@/backend/application/questions/dtos/DeliverSampleAnswersDto';
 import { PrismaClient } from '@prisma/client';
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const resolvedParams = await params;
     const questions_report_idNumber = parseInt(resolvedParams.id, 10);
@@ -25,7 +26,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     };
 
     const prisma = new PrismaClient();
-    const llm = new GPTSampleAnswerRepositoryImpl(inputDto);
+    const llm = new Gpt4oLlmAI();
     const usecase = new GenerateSampleAnswerUsecase(prisma, llm);
     const sampleAnswers = await usecase.execute(inputDto);
 

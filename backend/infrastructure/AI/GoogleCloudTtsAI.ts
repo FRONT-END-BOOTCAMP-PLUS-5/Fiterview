@@ -1,9 +1,9 @@
 import { TTSRequest } from '@/backend/domain/dtos/TTSRequest';
 import { TTSResponse } from '@/backend/domain/dtos/TTSResponse';
-import { TTSRepository } from '../../domain/repositories/TTSRepository';
-import client from '../providers/TTSProvider';
+import { TtsAI } from '@/backend/domain/AI/TtsAI';
+import client from '@/utils/AIs/TTSAI';
 
-export class PrTTSRepository implements TTSRepository {
+export class GoogleCloudTtsAI implements TtsAI {
   // 텍스트를 음성으로 변환
   async synthesizeSpeech(speechRequest: TTSRequest): Promise<TTSResponse> {
     try {

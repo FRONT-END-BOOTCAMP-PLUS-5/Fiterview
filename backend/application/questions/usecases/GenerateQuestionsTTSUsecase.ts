@@ -1,13 +1,13 @@
 import { TTSRequest } from '@/backend/domain/dtos/TTSRequest';
 import { TTSResponse } from '@/backend/domain/dtos/TTSResponse';
-import { TTSRepository } from '@/backend/domain/repositories/TTSRepository';
+import { TtsAI } from '@/backend/domain/AI/TtsAI';
 import { QuestionTTSResponse } from '@/backend/application/questions/dtos/QuestionTTSResponse';
 import { QuestionRepository } from '@/backend/domain/repositories/QuestionRepository';
 
 export class GenerateQuestionsTTSUsecase {
   constructor(
     private questionRepository: QuestionRepository,
-    private ttsRepository: TTSRepository
+    private ttsAI: TtsAI
   ) {}
 
   async execute(reportId: number): Promise<QuestionTTSResponse[]> {
@@ -26,7 +26,7 @@ export class GenerateQuestionsTTSUsecase {
           voice: 'ko-KR-Neural2-A',
         };
 
-        const ttsResponse: TTSResponse = await this.ttsRepository.synthesizeSpeech(ttsRequest);
+        const ttsResponse: TTSResponse = await this.ttsAI.synthesizeSpeech(ttsRequest);
 
         return {
           questionId: question.id,
