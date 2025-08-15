@@ -1,12 +1,11 @@
-import { Reports, ReportStatus } from '../entities/Report';
+import { Report, ReportStatus } from '../entities/Report';
 
 export interface ReportRepository {
-  createReport(userId: number): Promise<Reports>;
-  updateReport(reportId: number, updateData: Partial<Reports>): Promise<Reports>;
+  createReport(userId: number): Promise<Report>;
+  updateReport(reportId: number, updateData: Partial<Report>): Promise<Report>;
   updateReportStatus(reportId: number, status: ReportStatus): Promise<void>;
-  findAllReports(): Promise<Reports[]>;
-  findReportsByUserId(userId: number): Promise<Reports[]>;
-  findReportsByStatus(userId: number, status: ReportStatus): Promise<Reports[]>;
-  findReportById(reportId: number): Promise<Reports | null>;
-  deleteReport(reportId: number): Promise<void>;
+  findAllReports(): Promise<Report[]>;
+  findReportsByUserId(userId: number): Promise<Report[]>;
+  findReportsByStatus(userId: number, status: ReportStatus): Promise<Report[]>;
+  findReportById(reportId: number): Promise<Report | null>;
 }
