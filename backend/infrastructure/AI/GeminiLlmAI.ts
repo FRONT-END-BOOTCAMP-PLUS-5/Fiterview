@@ -50,11 +50,17 @@ export class QuestionGenerator {
     }
 
     try {
-      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
+      // 1) 코드 펜스 ```json ... ``` 내 JSON을 우선 추출
+      const fenced = responseText.match(/```(?:json)?\s*([\s\S]*?)```/i);
+      const candidate = fenced ? fenced[1] : (responseText.match(/\{[\s\S]*\}/)?.[0] ?? null);
+      if (!candidate) {
         throw new Error('JSON 응답을 찾을 수 없습니다');
       }
-      const parsed = JSON.parse(jsonMatch[0]);
+
+      // 2) 후행 콤마 제거: 객체/배열 닫힘 앞의 , 제거
+      const sanitized = candidate.replace(/^\uFEFF/, '').replace(/,\s*([}\]])/g, '$1');
+
+      const parsed = JSON.parse(sanitized);
       const questions = (parsed.questions || []) as QuestionsResponse[];
       // ai가 order를 주지 않으면 index순 처리
       return questions.map((q, idx) => ({
