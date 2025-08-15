@@ -4,6 +4,18 @@ import { useEffect, useState } from 'react';
 
 type Status = 'checking' | 'ok' | 'blocked' | 'not-found' | 'offline' | 'error';
 
+type DeviceInfo = {
+  deviceId: string;
+  label: string;
+};
+
+interface CheckDeviceStatusProps {
+  availableCameras: DeviceInfo[];
+  availableMicrophones: DeviceInfo[];
+  selectedCamera: string;
+  selectedMicrophone: string;
+}
+
 function stopStream(stream: MediaStream | null) {
   if (!stream) return;
   for (const track of stream.getTracks()) {
@@ -12,7 +24,12 @@ function stopStream(stream: MediaStream | null) {
 }
 
 // MediaDevices API를 사용하여 마이크,카메라,네트워크 연결 상태를 확인
-export default function CheckDeviceStatus() {
+export default function CheckDeviceStatus({
+  availableCameras,
+  availableMicrophones,
+  selectedCamera,
+  selectedMicrophone,
+}: CheckDeviceStatusProps) {
   const [micStatus, setMicStatus] = useState<Status>('checking');
   const [camStatus, setCamStatus] = useState<Status>('checking');
   const [netStatus, setNetStatus] = useState<Status>('checking');
@@ -24,22 +41,17 @@ export default function CheckDeviceStatus() {
         return;
       }
 
-      /*
-      enumerateDevices : 사용 가능한 미디어 장치 목록 반환 
-      */
-      const devices = await navigator.mediaDevices.enumerateDevices(); // 반환값 : device.kind, device.label, device.deviceId
-      const hasMic = devices.some((d) => d.kind === 'audioinput'); // d.kind에는 audioinput(마이크), videoinput(카메라) 있음
-      if (!hasMic) {
+      // 선택된 마이크가 있는지 확인
+      if (!selectedMicrophone || availableMicrophones.length === 0) {
         setMicStatus('not-found');
         return;
       }
 
-      /* 
-      getUserMedia : 미디어 장치 접근 권한 요청 및 미디어 스트림 반환
-      */
       let stream: MediaStream | null = null;
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: { deviceId: selectedMicrophone },
+        });
         setMicStatus('ok');
       } catch (err: unknown) {
         const message = (err as Error)?.name || '';
@@ -48,7 +60,7 @@ export default function CheckDeviceStatus() {
           setMicStatus('not-found');
         else setMicStatus('error');
       } finally {
-        stopStream(stream); //스트림은 즉시 track.stop() 호출하여 종료
+        stopStream(stream);
       }
     } catch {
       setMicStatus('error');
@@ -62,16 +74,17 @@ export default function CheckDeviceStatus() {
         return;
       }
 
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const hasCam = devices.some((d) => d.kind === 'videoinput');
-      if (!hasCam) {
+      // 선택된 카메라가 있는지 확인
+      if (!selectedCamera || availableCameras.length === 0) {
         setCamStatus('not-found');
         return;
       }
 
       let stream: MediaStream | null = null;
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { deviceId: selectedCamera },
+        });
         setCamStatus('ok');
       } catch (err: unknown) {
         const message = (err as Error)?.name || '';
@@ -139,7 +152,7 @@ export default function CheckDeviceStatus() {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, []);
+  }, [selectedCamera, selectedMicrophone]); // 선택된 장치가 변경될 때마다 재확인
 
   function statusColor(s: Status) {
     switch (s) {
