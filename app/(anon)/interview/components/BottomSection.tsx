@@ -1,20 +1,20 @@
 'use client';
 
 export default function BottomSection({
-  current,
-  total,
+  currentQuestion,
+  totalQuestions,
   onNext,
   isDisabled = false,
 }: {
-  current: number;
-  total: number;
+  currentQuestion: number;
+  totalQuestions: number;
   onNext: () => void;
   isDisabled?: boolean;
 }) {
   return (
     <section className="relative flex items-center px-[24px] py-[16px] border-t border-slate-200 bg-[#F8FAFC]">
       <p className="absolute left-1/2 -translate-x-1/2 text-[#64748B] text-[12px] font-medium">
-        질문 {current}/{total}
+        질문 {currentQuestion}/{totalQuestions}
       </p>
       <button
         onClick={onNext}
