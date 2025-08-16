@@ -14,6 +14,7 @@ import {
 import { scanMorphs } from './morphScanner';
 import { getEnergy } from './audio';
 import { collectMouthControlIndices, applyMouthMorphs, adjustJawBone } from './mouth';
+import { applyIdleMotion } from './idle';
 
 export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = false }: AvatarProps) {
   const gltf = useGLTF(url);
@@ -134,20 +135,12 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
     adjustJawBone(jawBoneRef.current, mouth.current);
 
     // --- 4) Idle 모션 ---
-    const head = headBoneRef.current || neckBoneRef.current;
-    const spine = spineBoneRef.current;
-
-    const nod = Math.sin(t * 1.1 + idleSeed.current) * THREE.MathUtils.degToRad(1.2);
-    const tilt = Math.sin(t * 0.8 + 1.7 + idleSeed.current) * THREE.MathUtils.degToRad(0.8);
-    if (head) {
-      head.rotation.x = (head.rotation.x || 0) * 0.9 + nod * 0.1; // 고개 끄덕임
-      head.rotation.z = (head.rotation.z || 0) * 0.9 + tilt * 0.1; // 고개 기울임
-    }
-    if (spine) {
-      const sway = Math.sin(t * 0.6 + 0.5 + idleSeed.current) * THREE.MathUtils.degToRad(0.6);
-      spine.rotation.y = (spine.rotation.y || 0) * 0.9 + sway * 0.1; // 몸통 흔들림
-      spine.position.z = (spine.position.z || 0) * 0.9 + Math.sin(t * 0.7) * 0.002;
-    }
+    applyIdleMotion(
+      headBoneRef.current || neckBoneRef.current,
+      spineBoneRef.current,
+      t,
+      idleSeed.current
+    );
 
     // --- 5) 눈 깜박임 ---
     const bs = blinkState.current; //깜박임 추적
