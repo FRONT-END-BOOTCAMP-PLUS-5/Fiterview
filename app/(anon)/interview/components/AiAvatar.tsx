@@ -10,7 +10,7 @@ export default function AiAvatar({
   size?: number;
 }) {
   return (
-    <div className={`flex h-[500px] items-center justify-center ${className}`}>
+    <div className={`flex h-[400px] items-center justify-center ${className}`}>
       <Character width={size} height={(size * 90) / 140} />
     </div>
   );
