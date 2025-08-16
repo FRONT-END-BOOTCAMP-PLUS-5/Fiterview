@@ -4,44 +4,41 @@ const nextConfig: NextConfig = {
   turbopack: {
     rules: {
       '*.svg': {
-        loaders: ['@svgr/webpack'],
-        as: '*.js',
-      },
-    },
-  },
-  webpack: (config) => {
-    // @ts-expect-error 타입 에러 무시
-    const fileLoaderRule = config.module.rules.find((rule) => rule.test?.test?.('.svg'));
-
-    config.module.rules.push(
-      {
-        ...fileLoaderRule,
-        test: /\.svg$/i,
-        resourceQuery: /url/,
-      },
-      {
-        test: /\.svg$/i,
-        issuer: fileLoaderRule.issuer,
-        resourceQuery: { not: [...fileLoaderRule.resourceQuery.not, /url/] },
-        use: [
+        loaders: [
           {
             loader: '@svgr/webpack',
             options: {
               typescript: true,
-              icon: true,
-              ext: 'tsx',
+              expandProps: 'end',
+              icon: false,
+              dimensions: false,
               svgProps: {
-                fill: 'currentColor',
+                strokeWidth: '2',
+                stroke: 'currentColor',
+              },
+              replaceAttrValues: {
+                '#303030': 'currentColor',
+              },
+              svgo: true,
+              svgoConfig: {
+                plugins: [
+                  'preset-default',
+                  { name: 'removeViewBox', active: false },
+                  { name: 'removeDimensions', active: true },
+                  {
+                    name: 'removeAttrs',
+                    params: {
+                      attrs: '(stroke|stroke-width|width|height)',
+                    },
+                  },
+                ],
               },
             },
           },
         ],
-      }
-    );
-
-    fileLoaderRule.exclude = /\.svg$/i;
-
-    return config;
+        as: '*.js',
+      },
+    },
   },
 };
 
