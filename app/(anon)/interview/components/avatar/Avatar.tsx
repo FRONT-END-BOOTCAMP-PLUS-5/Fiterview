@@ -28,18 +28,15 @@ type BlinkParams = {
   closeDur: number;
   holdDur: number;
   openDur: number;
-  ampL: number;
-  ampR: number;
-  leftOffset: number; // seconds (+ delays left eye)
-  rightOffset: number; // seconds (+ delays right eye)
-  isDouble: boolean; // whether to perform a quick second blink
-  secondQueued: boolean; // internal flag to indicate second blink in progress
+  amp: number;
+  isDouble: boolean;
+  secondQueued: boolean;
 };
 
 type BlinkState = {
   tNext: number;
   tNow: number;
-  phase: number; // 0 wait, 1 close, 2 hold, 3 open
+  phase: number;
   params: BlinkParams;
 };
 
@@ -73,10 +70,7 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
       closeDur: 0.12,
       holdDur: 0.06,
       openDur: 0.18,
-      ampL: 1,
-      ampR: 1,
-      leftOffset: 0,
-      rightOffset: 0,
+      amp: 1,
       isDouble: false,
       secondQueued: false,
     },
@@ -94,54 +88,36 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
     // 제어 키: 입 & viseme + 눈 깜박임
     const mouthKeys = [
       'jawOpen',
-      'mouthOpen',
-      'viseme_aa',
-      'viseme_oh',
-      'viseme_ih',
-      'viseme_uh',
+      'viseme_CH',
+      'viseme_DD',
       'viseme_E',
+      'viseme_FF',
       'viseme_I',
       'viseme_O',
+      'viseme_PP',
+      'viseme_RR',
+      'viseme_SS',
+      'viseme_TH',
       'viseme_U',
-      'A',
-      'aa',
+      'viseme_aa',
+      'viseme_kk',
+      'viseme_nn',
+      'viseme_sil',
     ];
     // 다양한 모델에서의 블링크 키 대응 (대소문자/언더스코어/하이픈 무시)
     const normalize = (s: string) => s.toLowerCase().replace(/[\s_\-]/g, '');
-    const blinkNamesLeft = new Set([
-      'eyeblinkleft',
-      'eyeblinkl',
-      'blinkleft',
-      'blinkl',
-      'eyesclosedleft',
-      'eyesclosedl',
-      'eyecloseleft',
-      'eyeclosel',
-      'eyesquintleft',
-      'eyesquintl',
-      'eyeBlinkLeft',
-    ]);
-    const blinkNamesRight = new Set([
-      'eyeblinkright',
-      'eyeblinkr',
-      'blinkright',
-      'blinkr',
-      'eyesclosedright',
-      'eyesclosedr',
-      'eyecloseright',
-      'eyecloser',
-      'eyesquintright',
-      'eyesquintr',
-      'eyeBlinkRight',
-    ]);
 
     // 이전 스캔 결과 초기화
     blinkIdxRef.current.eyes = [];
     blinkIdxRef.current.openers = [];
 
     const candidateBothEyes: Array<{ t: Target; i: number }> = [];
+    const blinkCandidates = new Set<string>();
 
     const seenMorphKeys = new Set<string>();
+    // 모델에서 확인한 정확한 키 이름 기준 매핑
+    const exactBlinkKeys = new Set<string>(['eyeBlinkLeft', 'eyeBlinkRight']);
+    const exactOpenKeys = new Set<string>(['eyeWideLeft', 'eyeWideRight']);
 
     gltf.scene.traverse((obj: any) => {
       // 본 탐색
@@ -174,15 +150,19 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
           if (i !== undefined) target.controlIdx.push(i);
         });
 
-        // 눈 깜박임 인덱스 수집(유연한 이름 매칭)
+        // 눈 깜빡임 인덱스 수집(정확한 키 우선, 그 다음 정규식 후보)
         Object.entries(dict).forEach(([key, idx]) => {
           const nk = normalize(key);
           seenMorphKeys.add(key);
-          if (blinkNamesLeft.has(nk) || blinkNamesRight.has(nk)) {
+          if (exactBlinkKeys.has(key)) {
             blinkIdxRef.current.eyes.push({ t: target, i: idx });
           } else if (/(blink|eyesclosed|eyeclose|eyelidclose)/.test(nk)) {
             candidateBothEyes.push({ t: target, i: idx });
-          } else if (/(eyeopen|eyewide|lidup|upperlid(up|raise)?|openeye|eyeup)/.test(nk)) {
+            blinkCandidates.add(key);
+          } else if (
+            exactOpenKeys.has(key) ||
+            /(eyeopen|eyewide|lidup|upperlid(up|raise)?|openeye|eyeup)/.test(nk)
+          ) {
             blinkIdxRef.current.openers.push({ t: target, i: idx });
           }
         });
@@ -208,9 +188,13 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
     headBoneRef.current = headBone;
     neckBoneRef.current = neckBone;
     spineBoneRef.current = spineBone;
-    console.log('[Avatar] Blink indices:', {
-      eyes: blinkIdxRef.current.eyes.length,
-    });
+    const allKeys = Array.from(seenMorphKeys).sort();
+    const blinkKeys = Array.from(blinkCandidates).sort();
+    console.group('[Avatar] Morph discovery');
+    console.log('All morph keys (unique):', allKeys);
+    console.log('Blink candidate keys (regex):', blinkKeys);
+    console.log('Blink indices (collected):', { eyes: blinkIdxRef.current.eyes.length });
+    console.groupEnd();
     // 모델/모프 스캔 직후 첫 깜빡임 트리거
     blinkState.current.tNow = 0;
     blinkState.current.phase = 0;
@@ -257,9 +241,9 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
-    const GAIN = 0.5; //벌리는 입 크기
-    const OPEN_TH = 0.08;
-    const CLOSE_TH = 0.04;
+    const GAIN = 0.2; //벌리는 입 크기
+    const OPEN_TH = 0.02;
+    const CLOSE_TH = 0.015;
     const ATTACK = 0.3;
     const RELEASE = 0.15;
 
@@ -276,6 +260,7 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
       mouth.current += (0 - mouth.current) * RELEASE;
     }
     mouth.current = Math.max(0, Math.min(1, mouth.current));
+    if (playing) mouth.current = Math.max(0.02, mouth.current);
 
     if (onEnergy) onEnergy(mouth.current);
 
@@ -295,7 +280,7 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
           key === 'jawOpen'
             ? 0.45
             : key === 'mouthOpen'
-              ? 0.05
+              ? 0.08
               : key.startsWith('viseme_')
                 ? 1.0
                 : 1.0;
@@ -340,12 +325,7 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
       // 부분 깜빡임(약 20%). 양쪽 동일 강도로 적용
       const isPartial = Math.random() < 0.2;
       const baseAmp = isPartial ? 0.4 + Math.random() * 0.45 : 1.0;
-      const ampL = THREE.MathUtils.clamp(baseAmp, 0, 1);
-      const ampR = THREE.MathUtils.clamp(baseAmp, 0, 1);
-
-      // 좌우 비동기 제거(동일하게 움직이도록 0)
-      const leftOffset = 0;
-      const rightOffset = 0;
+      const amp = THREE.MathUtils.clamp(baseAmp, 0, 1);
 
       // 더블 블링크(약 12%)
       const isDouble = Math.random() < 0.03; // 더블 확률 크게 감소
@@ -354,10 +334,7 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
         closeDur,
         holdDur,
         openDur,
-        ampL,
-        ampR,
-        leftOffset,
-        rightOffset,
+        amp,
         isDouble,
         secondQueued: false,
       };
@@ -408,28 +385,28 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
     //깜박임 시작
     if (bs.phase === 1) {
       // 닫기 단계
-      const { closeDur, ampL } = bs.params;
+      const { closeDur, amp } = bs.params;
       const p = THREE.MathUtils.clamp(bs.tNow / closeDur, 0, 1);
-      const amt = THREE.MathUtils.clamp(p * ampL, 0, 1);
+      const amt = THREE.MathUtils.clamp(p * amp, 0, 1);
       setBlinkAmountLR(amt, amt);
 
-      if (amt >= ampL) {
+      if (amt >= amp) {
         bs.phase = 2; // 감긴 상태 유지
         bs.tNow = 0;
       }
     } else if (bs.phase === 2) {
       // 감긴 상태 유지
-      const { holdDur, ampL } = bs.params;
-      setBlinkAmountLR(ampL, ampL);
+      const { holdDur, amp } = bs.params;
+      setBlinkAmountLR(amp, amp);
       if (bs.tNow >= holdDur) {
         bs.phase = 3; // 열기 단계로 전환
         bs.tNow = 0;
       }
     } else if (bs.phase === 3) {
       // 열기 단계
-      const { openDur, ampL, isDouble, secondQueued } = bs.params;
+      const { openDur, amp, isDouble, secondQueued } = bs.params;
       const p = THREE.MathUtils.clamp(bs.tNow / openDur, 0, 1);
-      const amt = Math.max(0, ampL * (1 - p));
+      const amt = Math.max(0, amp * (1 - p));
       setBlinkAmountLR(amt, amt);
 
       if (amt <= 0.001) {
@@ -440,10 +417,7 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
             closeDur: Math.max(0.04, bs.params.closeDur * 0.6),
             holdDur: Math.max(0.01, bs.params.holdDur * 0.6),
             openDur: Math.max(0.06, bs.params.openDur * 0.7),
-            ampL: Math.min(1, bs.params.ampL * 0.8),
-            ampR: Math.min(1, bs.params.ampL * 0.8),
-            leftOffset: 0,
-            rightOffset: 0,
+            amp: Math.min(1, bs.params.amp * 0.8),
             isDouble: true,
             secondQueued: true,
           };
