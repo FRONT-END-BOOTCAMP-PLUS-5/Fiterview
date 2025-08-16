@@ -5,6 +5,9 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 
+const CONTINUOUS_SLOW_BLINK = false;
+const BLINK_MAX = 1;
+
 interface AvatarProps {
   url: string;
   analyser: React.MutableRefObject<AnalyserNode | null>;
@@ -21,6 +24,25 @@ type Target = {
   controlIdx: number[];
 };
 
+type BlinkParams = {
+  closeDur: number;
+  holdDur: number;
+  openDur: number;
+  ampL: number;
+  ampR: number;
+  leftOffset: number; // seconds (+ delays left eye)
+  rightOffset: number; // seconds (+ delays right eye)
+  isDouble: boolean; // whether to perform a quick second blink
+  secondQueued: boolean; // internal flag to indicate second blink in progress
+};
+
+type BlinkState = {
+  tNext: number;
+  tNow: number;
+  phase: number; // 0 wait, 1 close, 2 hold, 3 open
+  params: BlinkParams;
+};
+
 export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = false }: AvatarProps) {
   const gltf = useGLTF(url);
 
@@ -30,33 +52,37 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
   const neckBoneRef = useRef<THREE.Object3D | null>(null);
   const spineBoneRef = useRef<THREE.Object3D | null>(null);
 
-  // 눈 깜박임용 인덱스
+  // 눈 깜박임용 인덱스 (좌우 통합)
   const blinkIdxRef = useRef<{
-    left: Array<{ t: Target; i: number }>;
-    right: Array<{ t: Target; i: number }>;
+    eyes: Array<{ t: Target; i: number }>;
+    openers: Array<{ t: Target; i: number }>;
   }>({
-    left: [],
-    right: [],
+    eyes: [],
+    openers: [],
   });
 
   const prevPlaying = useRef<boolean>(false);
   const mouth = useRef(0);
 
   // --- 깜박임/idle용 상태 ---
-  const blinkState = useRef({
-    tNext: 2 + Math.random() * 4,
+  const blinkState = useRef<BlinkState>({
+    tNext: 0.8 + Math.random() * 0.8, // 0.8~1.6초 사이
     tNow: 0,
     phase: 0,
+    params: {
+      closeDur: 0.12,
+      holdDur: 0.06,
+      openDur: 0.18,
+      ampL: 1,
+      ampR: 1,
+      leftOffset: 0,
+      rightOffset: 0,
+      isDouble: false,
+      secondQueued: false,
+    },
   });
 
   const idleSeed = useRef(Math.random() * 1000);
-
-  // 모델 로딩 상태 로그
-  useEffect(() => {
-    console.log('🔄 GLTF Loading:', url);
-    console.log('✅ GLTF Loaded:', gltf.scene);
-    console.log('📊 Scene children:', gltf.scene.children.length);
-  }, [url, gltf.scene]);
 
   useEffect(() => {
     const found: Target[] = [];
@@ -80,8 +106,42 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
       'A',
       'aa',
     ];
-    const blinkKeysLeft = ['eyeBlinkLeft', 'blink_left', 'eyeBlink_L'];
-    const blinkKeysRight = ['eyeBlinkRight', 'blink_right', 'eyeBlink_R'];
+    // 다양한 모델에서의 블링크 키 대응 (대소문자/언더스코어/하이픈 무시)
+    const normalize = (s: string) => s.toLowerCase().replace(/[\s_\-]/g, '');
+    const blinkNamesLeft = new Set([
+      'eyeblinkleft',
+      'eyeblinkl',
+      'blinkleft',
+      'blinkl',
+      'eyesclosedleft',
+      'eyesclosedl',
+      'eyecloseleft',
+      'eyeclosel',
+      'eyesquintleft',
+      'eyesquintl',
+      'eyeBlinkLeft',
+    ]);
+    const blinkNamesRight = new Set([
+      'eyeblinkright',
+      'eyeblinkr',
+      'blinkright',
+      'blinkr',
+      'eyesclosedright',
+      'eyesclosedr',
+      'eyecloseright',
+      'eyecloser',
+      'eyesquintright',
+      'eyesquintr',
+      'eyeBlinkRight',
+    ]);
+
+    // 이전 스캔 결과 초기화
+    blinkIdxRef.current.eyes = [];
+    blinkIdxRef.current.openers = [];
+
+    const candidateBothEyes: Array<{ t: Target; i: number }> = [];
+
+    const seenMorphKeys = new Set<string>();
 
     gltf.scene.traverse((obj: any) => {
       // 본 탐색
@@ -114,15 +174,30 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
           if (i !== undefined) target.controlIdx.push(i);
         });
 
-        // 눈 깜박임 인덱스 수집
-        blinkKeysLeft.forEach((k) => {
-          const i = dict[k];
-          if (i !== undefined) blinkIdxRef.current.left.push({ t: target, i });
+        // 눈 깜박임 인덱스 수집(유연한 이름 매칭)
+        Object.entries(dict).forEach(([key, idx]) => {
+          const nk = normalize(key);
+          seenMorphKeys.add(key);
+          if (blinkNamesLeft.has(nk) || blinkNamesRight.has(nk)) {
+            blinkIdxRef.current.eyes.push({ t: target, i: idx });
+          } else if (/(blink|eyesclosed|eyeclose|eyelidclose)/.test(nk)) {
+            candidateBothEyes.push({ t: target, i: idx });
+          } else if (/(eyeopen|eyewide|lidup|upperlid(up|raise)?|openeye|eyeup)/.test(nk)) {
+            blinkIdxRef.current.openers.push({ t: target, i: idx });
+          }
         });
-        blinkKeysRight.forEach((k) => {
-          const i = dict[k];
-          if (i !== undefined) blinkIdxRef.current.right.push({ t: target, i });
-        });
+        // Fallback: 눈 블링크 키를 못 찾은 경우 공통 후보 사용
+        if (blinkIdxRef.current.eyes.length === 0) {
+          candidateBothEyes.forEach((entry) => {
+            blinkIdxRef.current.eyes.push(entry);
+          });
+          if (candidateBothEyes.length === 0) {
+            console.warn(
+              '[Avatar] Blink morph not found. Available morph keys:',
+              Array.from(seenMorphKeys)
+            );
+          }
+        }
 
         if (target.controlIdx.length > 0) found.push(target);
       }
@@ -133,6 +208,13 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
     headBoneRef.current = headBone;
     neckBoneRef.current = neckBone;
     spineBoneRef.current = spineBone;
+    console.log('[Avatar] Blink indices:', {
+      eyes: blinkIdxRef.current.eyes.length,
+    });
+    // 모델/모프 스캔 직후 첫 깜빡임 트리거
+    blinkState.current.tNow = 0;
+    blinkState.current.phase = 0;
+    blinkState.current.tNext = 0.01;
   }, [gltf.scene]);
 
   // 오디오 에너지 계산
@@ -175,7 +257,7 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
-    const GAIN = 0.8; //벌리는 입 크기
+    const GAIN = 0.5; //벌리는 입 크기
     const OPEN_TH = 0.08;
     const CLOSE_TH = 0.04;
     const ATTACK = 0.3;
@@ -245,39 +327,137 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
     }
 
     // --- 5) 눈 깜박임 ---
-    const BLINK_SPEED = 1;
-    const bs = blinkState.current;
-    bs.tNow += state.clock.getDelta();
+    const bs = blinkState.current; //깜박임 추적
+    bs.tNow += state.clock.getDelta(); //시간계산
 
+    // 사람다운 깜박임 파라미터 샘플링
+    const sampleBlinkParams = (isPlaying: boolean, mouthAmt: number): BlinkParams => {
+      // 기본 지속시간(초)
+      const closeDur = THREE.MathUtils.clamp(0.003 + Math.random() * 0.002, 0.003, 0.005); // 매우 빠른 닫힘
+      const holdDur = THREE.MathUtils.clamp(0.0 + Math.random() * 0.005, 0.0, 0.006); // 거의 유지 없음
+      const openDur = THREE.MathUtils.clamp(0.005 + Math.random() * 0.003, 0.005, 0.008); // 매우 빠른 열림
+
+      // 부분 깜빡임(약 20%). 양쪽 동일 강도로 적용
+      const isPartial = Math.random() < 0.2;
+      const baseAmp = isPartial ? 0.4 + Math.random() * 0.45 : 1.0;
+      const ampL = THREE.MathUtils.clamp(baseAmp, 0, 1);
+      const ampR = THREE.MathUtils.clamp(baseAmp, 0, 1);
+
+      // 좌우 비동기 제거(동일하게 움직이도록 0)
+      const leftOffset = 0;
+      const rightOffset = 0;
+
+      // 더블 블링크(약 12%)
+      const isDouble = Math.random() < 0.03; // 더블 확률 크게 감소
+
+      return {
+        closeDur,
+        holdDur,
+        openDur,
+        ampL,
+        ampR,
+        leftOffset,
+        rightOffset,
+        isDouble,
+        secondQueued: false,
+      };
+    };
+
+    const setBlinkAmountLR = (amtL: number, amtR: number) => {
+      if (!blinkIdxRef.current) {
+        console.error('blinkIdxRef.current is not defined');
+        return;
+      }
+
+      if (CONTINUOUS_SLOW_BLINK) {
+        const phase = 0.5 + 0.5 * Math.sin(t * 10.5 + idleSeed.current);
+        const minAmt = 0.05; // 거의 다 뜬 상태
+        const maxAmt = 0.95; // 느리게 꽤 많이 감김
+        const contAmt = minAmt + (maxAmt - minAmt) * phase;
+        setBlinkAmountLR(contAmt, contAmt);
+        return;
+      }
+
+      //easeAmt: 깜박임 효과를 부드럽게 하는 함수
+      const smoothAmt = amtL * amtL * (3 - 2 * amtL); // 좌우 동일
+      // 양쪽 눈을 통합 목록으로 동일 적용
+      blinkIdxRef.current.eyes.forEach(({ t, i }) => {
+        if (t.mesh.morphTargetInfluences) {
+          t.mesh.morphTargetInfluences[i] = THREE.MathUtils.lerp(
+            t.baseline[i],
+            BLINK_MAX,
+            smoothAmt
+          );
+        }
+      });
+      // 눈을 여는 계열 모프 억제
+      blinkIdxRef.current.openers.forEach(({ t, i }) => {
+        if (t.mesh.morphTargetInfluences) {
+          t.mesh.morphTargetInfluences[i] = THREE.MathUtils.lerp(t.baseline[i], 0, smoothAmt);
+        }
+      });
+    };
+
+    // 대기 → 깜박임 시작 트리거(무작위 간격, 발화 시 약간 딜레이)
     if (bs.phase === 0 && bs.tNow >= bs.tNext) {
+      bs.params = sampleBlinkParams(playing, mouth.current);
       bs.phase = 1;
       bs.tNow = 0;
     }
 
-    const setBlinkAmount = (amt: number) => {
-      const easeAmt = amt < 0.5 ? 2 * amt * amt : 1 - Math.pow(-2 * amt + 2, 3) / 2;
-      blinkIdxRef.current.left.forEach(({ t, i }) => {
-        t.infl[i] = THREE.MathUtils.lerp(t.baseline[i] || 0, 1, easeAmt);
-      });
-      blinkIdxRef.current.right.forEach(({ t, i }) => {
-        t.infl[i] = THREE.MathUtils.lerp(t.baseline[i] || 0, 1, easeAmt);
-      });
-    };
-
+    //깜박임 시작
     if (bs.phase === 1) {
-      const amt = Math.min(1, bs.tNow * BLINK_SPEED * 0.01);
-      setBlinkAmount(amt);
-      if (amt >= 1) {
-        bs.phase = 2;
+      // 닫기 단계
+      const { closeDur, ampL } = bs.params;
+      const p = THREE.MathUtils.clamp(bs.tNow / closeDur, 0, 1);
+      const amt = THREE.MathUtils.clamp(p * ampL, 0, 1);
+      setBlinkAmountLR(amt, amt);
+
+      if (amt >= ampL) {
+        bs.phase = 2; // 감긴 상태 유지
         bs.tNow = 0;
       }
     } else if (bs.phase === 2) {
-      const amt = Math.max(0, 1 - bs.tNow * BLINK_SPEED * 0.015);
-      setBlinkAmount(amt);
-      if (amt <= 0) {
-        bs.phase = 0;
+      // 감긴 상태 유지
+      const { holdDur, ampL } = bs.params;
+      setBlinkAmountLR(ampL, ampL);
+      if (bs.tNow >= holdDur) {
+        bs.phase = 3; // 열기 단계로 전환
         bs.tNow = 0;
-        bs.tNext = 2.5 + Math.random() * 5.0;
+      }
+    } else if (bs.phase === 3) {
+      // 열기 단계
+      const { openDur, ampL, isDouble, secondQueued } = bs.params;
+      const p = THREE.MathUtils.clamp(bs.tNow / openDur, 0, 1);
+      const amt = Math.max(0, ampL * (1 - p));
+      setBlinkAmountLR(amt, amt);
+
+      if (amt <= 0.001) {
+        // 더블 블링크 처리
+        if (isDouble && !secondQueued) {
+          const second: BlinkParams = {
+            ...bs.params,
+            closeDur: Math.max(0.04, bs.params.closeDur * 0.6),
+            holdDur: Math.max(0.01, bs.params.holdDur * 0.6),
+            openDur: Math.max(0.06, bs.params.openDur * 0.7),
+            ampL: Math.min(1, bs.params.ampL * 0.8),
+            ampR: Math.min(1, bs.params.ampL * 0.8),
+            leftOffset: 0,
+            rightOffset: 0,
+            isDouble: true,
+            secondQueued: true,
+          };
+          bs.params = second;
+          bs.phase = 1;
+          bs.tNow = 0;
+        } else {
+          bs.phase = 0;
+          bs.tNow = 0;
+          // 다음 깜박임 시점(짧은 주기 + 발화 시 소폭 지연)
+          const base = 0.08 + Math.random() * 0.4; // 0.8 ~ 1.6s
+          const speakingDelay = playing && mouth.current > 0.2 ? 0.1 + Math.random() * 0.2 : 0;
+          bs.tNext = base + speakingDelay;
+        }
       }
     }
   });
