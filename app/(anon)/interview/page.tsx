@@ -1,153 +1,201 @@
 'use client';
 
-import { useState, useRef } from 'react';
-
-// Icons
-import MicIcon from '@/public/assets/icons/mic.svg';
-import NextIcon from '@/public/assets/icons/skip-forward.svg';
-import StopIcon from '@/public/assets/icons/square.svg';
-import MicRecorder from 'mic-recorder-to-mp3';
-
-type Question = {
-  question: string;
-  order: number;
-};
-
-type RecordingStatus = 'not_started' | 'recording' | 'completed' | 'uploading';
-
-// 테스트를 위한 더미 데이터
-const DUMMY_QUESTIONS_FOR_TEST: Question[] = [
-  { question: '첫 번째 질문입니다. 자기소개를 해보세요.', order: 6 },
-  { question: '두 번째 질문입니다. 지원 동기는 무엇인가요?', order: 2 },
-  { question: '세 번째 질문입니다. 프로젝트 경험에 대해 설명해주세요.', order: 3 },
-];
+import Upload from '@/public/assets/icons/upload.svg';
+import Picture from '@/public/assets/icons/image.svg';
+import Del from '@/public/assets/icons/x.svg';
 
 export default function InterviewPage() {
-  const [questions, setQuestions] = useState<Question[]>(DUMMY_QUESTIONS_FOR_TEST);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [recordingStatus, setRecordingStatus] = useState<RecordingStatus>('not_started');
-  const recorderRef = useRef<any | null>(null);
-
-  // TODO: 실제로는 reportId를 props나 URL에서 가져와야 함
-  const reportId = 2;
-
-  const currentQuestion = questions[currentQuestionIndex];
-
-  const startRecording = async () => {
-    try {
-      // 권한 요청 + 녹음 시작
-      recorderRef.current = new (MicRecorder as any)({ bitRate: 128 });
-      await recorderRef.current.start();
-      setRecordingStatus('recording');
-    } catch (error) {
-      console.error('마이크 접근에 실패했습니다.', error);
-      setRecordingStatus('not_started');
-    }
-  };
-
-  const stopRecordingAndUpload = async () => {
-    if (!recorderRef.current || recordingStatus !== 'recording') return;
-
-    try {
-      setRecordingStatus('uploading');
-      const [buffer, blob] = await recorderRef.current.stop().getMp3();
-
-      const file = new File(buffer, `recording_${reportId}_${currentQuestion.order}.mp3`, {
-        type: blob.type || 'audio/mpeg',
-        lastModified: Date.now(),
-      });
-
-      if (!file.size) throw new Error('MP3 파일이 비어있습니다.');
-
-      const formData = new FormData();
-      formData.append('audio', file);
-
-      console.log(`Uploading: reportId=${reportId}, order=${currentQuestion.order}`);
-      const response = await fetch(
-        `/api/reports/${reportId}/questions/${currentQuestion.order}/recording`,
-        {
-          method: 'POST',
-          body: formData,
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`녹음 파일 업로드에 실패했습니다: ${response.status} ${errorText}`);
-      }
-
-      const result = await response.json();
-      console.log('업로드 성공:', result);
-      setRecordingStatus('completed');
-    } catch (error) {
-      console.error(error);
-      setRecordingStatus('not_started');
-    } finally {
-      recorderRef.current = null;
-    }
-  };
-
-  const handleNextQuestion = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex((prev) => prev + 1);
-      setRecordingStatus('not_started');
-    } else {
-      // 면접 종료 처리
-      alert('모든 질문에 대한 답변이 완료되었습니다.');
-    }
-  };
-
-  const handleRecordingButtonClick = () => {
-    if (recordingStatus === 'not_started') {
-      startRecording();
-    } else if (recordingStatus === 'recording') {
-      stopRecordingAndUpload();
-    }
-  };
-
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      {/* <Header /> */}
-      <main className="flex-1 flex items-center justify-center">
-        <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-lg text-center">
-          <div className="mb-6">
-            <span className="text-lg font-semibold text-gray-500">
-              질문 {currentQuestionIndex + 1} / {questions.length}
-            </span>
-            <h2 className="text-2xl font-bold text-gray-800 mt-2">
-              {currentQuestion?.question || '질문을 불러오는 중입니다...'}
-            </h2>
+    <div>
+      <div className="px-16 pt-10 flex justify-start items-start gap-10">
+        <div className="flex-1 inline-flex flex-col justify-start items-start gap-10">
+          <div className="self-stretch flex flex-col justify-start items-start gap-8">
+            <div className="flex flex-col justify-start items-start gap-2">
+              <div className="justify-start text-slate-800 text-3xl font-semibold">
+                빠른 AI 면접
+              </div>
+              <p className="text-slate-500 text-sm">포트폴리오나 채용공고를 업로드해보세요</p>
+            </div>
+            <div className="self-stretch inline-flex justify-start items-start gap-8">
+              <div className="flex-1 h-48 bg-white rounded-xl outline-2 outline-offset-[-2px] outline-slate-300 inline-flex flex-col justify-center items-center gap-4">
+                <div className="flex flex-col justify-start items-center gap-2">
+                  <Upload width={48} height={48} strokeWidth={30} />
+                  <p className="text-center justify-start text-slate-600 text-base font-semibold  leading-tight">
+                    포트폴리오 업로드
+                  </p>
+                  <p className="text-center justify-start text-slate-400 text-sm font-normal  leading-none">
+                    PDF 파일
+                  </p>
+                </div>
+              </div>
+              <div className="flex-1 h-48 bg-sky-50 rounded-xl outline outline-2 outline-offset-[-2px] outline-sky-500 inline-flex flex-col justify-center items-center gap-4">
+                <div className="flex flex-col justify-start items-center gap-2">
+                  <Picture width={48} height={48} strokeWidth={1} />
+                  <p className="text-center justify-start text-sky-900 text-base font-semibold  leading-tight">
+                    채용공고 업로드
+                  </p>
+                  <p className="text-center justify-start text-sky-700 text-sm font-normal  leading-none">
+                    캡처 이미지 (선택사항)
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-
-          <div className="flex items-center justify-center space-x-4 my-8">
-            <button
-              onClick={handleRecordingButtonClick}
-              disabled={recordingStatus === 'uploading' || recordingStatus === 'completed'}
-              className="p-6 rounded-full bg-red-500 text-white disabled:bg-gray-300 hover:bg-red-600 transition-colors data-[recording=true]:animate-pulse"
-              data-recording={recordingStatus === 'recording'}
-            >
-              {recordingStatus === 'recording' ? (
-                <StopIcon className="w-8 h-8" />
-              ) : (
-                <MicIcon className="w-8 h-8" />
-              )}
-            </button>
-          </div>
-
-          <div className="mt-8">
-            <button
-              onClick={handleNextQuestion}
-              disabled={recordingStatus === 'recording' || recordingStatus === 'uploading'}
-              className="w-full py-3 px-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-            >
-              {recordingStatus === 'uploading' ? '답변을 저장하는 중...' : '다음 질문'}
-              {recordingStatus !== 'uploading' && (
-                <NextIcon className="inline-block w-5 h-5 ml-2" />
-              )}
-            </button>
+          <div className="self-stretch flex-1 flex flex-col justify-start items-start gap-6">
+            <div className="self-stretch flex flex-col justify-start items-start gap-6">
+              <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                <div className="self-stretch justify-start text-slate-800 text-xl font-semibold  leading-normal">
+                  업로드된 파일
+                </div>
+              </div>
+              <div className="self-stretch flex flex-col justify-start items-start gap-3">
+                <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                  <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                    <div className="self-stretch p-3 bg-slate-100 rounded-lg inline-flex justify-start items-center gap-3">
+                      <div className="flex-1 flex justify-start items-start gap-0.5">
+                        <div className="justify-start text-slate-800 text-sm font-medium  leading-none">
+                          김개발_포트폴리오.pdf
+                        </div>
+                        <Del />
+                      </div>
+                    </div>
+                    <div className="self-stretch p-3 bg-slate-100 rounded-lg inline-flex justify-start items-center gap-3">
+                      <div className="flex-1 inline-flex flex-col justify-start items-start gap-0.5">
+                        <div className="justify-start text-slate-800 text-sm font-medium  leading-none">
+                          네이버_프론트엔드_채용공고.png
+                        </div>
+                      </div>
+                      <div className="flex justify-start items-center gap-2">
+                        <div className="w-4 h-4 relative border-emerald-500" />
+                        <div className="w-4 h-4 relative border-red-500 overflow-hidden">
+                          <div className="w-2 h-2 left-[4px] top-[4px] absolute outline outline-[1.33px] outline-offset-[-0.67px] outline-zinc-500" />
+                          <div className="w-2 h-2 left-[4px] top-[4px] absolute outline outline-[1.33px] outline-offset-[-0.67px] outline-zinc-500" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="self-stretch h-14 bg-blue-500 rounded-xl inline-flex justify-center items-center gap-3">
+              <div className="w-5 h-5 relative border-white overflow-hidden">
+                <div className="w-4 h-4 left-[1.67px] top-[1.67px] absolute outline outline-[1.67px] outline-offset-[-0.83px] outline-white" />
+                <div className="w-0 h-[3.33px] left-[16.67px] top-[2.50px] absolute outline outline-[1.67px] outline-offset-[-0.83px] outline-white" />
+                <div className="w-[3.33px] h-0 left-[15px] top-[4.17px] absolute outline outline-[1.67px] outline-offset-[-0.83px] outline-white" />
+                <div className="w-0 h-[1.67px] left-[3.33px] top-[14.17px] absolute outline outline-[1.67px] outline-offset-[-0.83px] outline-white" />
+                <div className="w-[1.67px] h-0 left-[2.50px] top-[15px] absolute outline outline-[1.67px] outline-offset-[-0.83px] outline-white" />
+              </div>
+              <div className="justify-start text-white text-base font-semibold  leading-tight">
+                맞춤 면접 질문 생성하기
+              </div>
+            </div>
           </div>
         </div>
-      </main>
+        <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-8">
+          <div className="self-stretch flex flex-col justify-start items-start gap-2">
+            <div className="self-stretch justify-start text-slate-800 text-3xl font-semibold  leading-loose">
+              나의 대기 면접
+            </div>
+            <div className="self-stretch justify-start text-slate-500 text-sm font-normal  leading-none">
+              생성된 면접 중 아직 응시하지 않은 면접을 시작해보세요.
+            </div>
+          </div>
+          <div className="self-stretch flex flex-col justify-start items-start gap-4">
+            <div className="self-stretch h-16 flex flex-col justify-start items-start gap-6">
+              <div className="self-stretch h-20 p-6 bg-gradient-to-l from-white/30 via-blue-300/10 to-blue-500/25 rounded-xl outline outline-1 outline-offset-[-1px] outline-slate-200 inline-flex justify-between items-center">
+                <div className="flex-1 flex justify-start items-center gap-4">
+                  <div className="flex-1 inline-flex flex-col justify-start items-start gap-1.5">
+                    <div className="justify-start text-slate-800 text-base font-semibold  leading-tight">
+                      네이버 프론트엔드 개발자 면접
+                    </div>
+                  </div>
+                </div>
+                <div className="w-20 h-9 rounded-[10px] flex justify-end items-center gap-2">
+                  <div className="w-4 h-4 relative border-blue-500 overflow-hidden">
+                    <div className="w-2.5 h-0 left-[3.75px] top-[9px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-blue-500" />
+                    <div className="w-1.5 h-2.5 left-[9px] top-[3.75px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-blue-500" />
+                  </div>
+                  <div className="justify-start text-blue-500 text-sm font-semibold  leading-none">
+                    시작
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="self-stretch h-16 p-6 bg-gradient-to-l from-white/30 via-blue-300/10 to-blue-500/25 rounded-xl outline outline-1 outline-offset-[-1px] outline-slate-200 inline-flex justify-between items-center">
+              <div className="flex-1 flex justify-start items-center gap-4">
+                <div className="flex-1 inline-flex flex-col justify-start items-start gap-1.5">
+                  <div className="justify-start text-slate-800 text-base font-semibold  leading-tight">
+                    네이버 프론트엔드 개발자 면접
+                  </div>
+                </div>
+              </div>
+              <div className="w-20 h-9 rounded-[10px] flex justify-end items-center gap-2">
+                <div className="w-4 h-4 relative border-blue-500 overflow-hidden">
+                  <div className="w-2.5 h-0 left-[3.75px] top-[9px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-blue-500" />
+                  <div className="w-1.5 h-2.5 left-[9px] top-[3.75px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-blue-500" />
+                </div>
+                <div className="justify-start text-blue-500 text-sm font-semibold  leading-none">
+                  시작
+                </div>
+              </div>
+            </div>
+            <div className="self-stretch h-16 p-6 bg-gradient-to-l from-white/30 via-blue-300/10 to-blue-500/25 rounded-xl outline outline-1 outline-offset-[-1px] outline-slate-200 inline-flex justify-between items-center">
+              <div className="flex-1 flex justify-start items-center gap-4">
+                <div className="flex-1 inline-flex flex-col justify-start items-start gap-1.5">
+                  <div className="justify-start text-slate-800 text-base font-semibold  leading-tight">
+                    네이버 프론트엔드 개발자 면접
+                  </div>
+                </div>
+              </div>
+              <div className="w-20 h-9 rounded-[10px] flex justify-end items-center gap-2">
+                <div className="w-4 h-4 relative border-blue-500 overflow-hidden">
+                  <div className="w-2.5 h-0 left-[3.75px] top-[9px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-blue-500" />
+                  <div className="w-1.5 h-2.5 left-[9px] top-[3.75px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-blue-500" />
+                </div>
+                <div className="justify-start text-blue-500 text-sm font-semibold  leading-none">
+                  시작
+                </div>
+              </div>
+            </div>
+            <div className="self-stretch h-16 p-6 bg-gradient-to-l from-white/30 via-blue-300/10 to-blue-500/25 rounded-xl outline outline-1 outline-offset-[-1px] outline-slate-200 inline-flex justify-between items-center">
+              <div className="flex-1 flex justify-start items-center gap-4">
+                <div className="flex-1 inline-flex flex-col justify-start items-start gap-1.5">
+                  <div className="justify-start text-slate-800 text-base font-semibold  leading-tight">
+                    네이버 프론트엔드 개발자 면접
+                  </div>
+                </div>
+              </div>
+              <div className="w-20 h-9 rounded-[10px] flex justify-end items-center gap-2">
+                <div className="w-4 h-4 relative border-blue-500 overflow-hidden">
+                  <div className="w-2.5 h-0 left-[3.75px] top-[9px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-blue-500" />
+                  <div className="w-1.5 h-2.5 left-[9px] top-[3.75px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-blue-500" />
+                </div>
+                <div className="justify-start text-blue-500 text-sm font-semibold  leading-none">
+                  시작
+                </div>
+              </div>
+            </div>
+            <div className="self-stretch h-16 p-6 bg-gradient-to-l from-white/30 via-blue-300/10 to-blue-500/25 rounded-xl outline outline-1 outline-offset-[-1px] outline-slate-200 inline-flex justify-between items-center">
+              <div className="flex-1 flex justify-start items-center gap-4">
+                <div className="flex-1 inline-flex flex-col justify-start items-start gap-1.5">
+                  <div className="justify-start text-slate-800 text-base font-semibold  leading-tight">
+                    네이버 프론트엔드 개발자 면접
+                  </div>
+                </div>
+              </div>
+              <div className="rounded-[10px] flex justify-end items-center gap-2">
+                <div className="w-4 h-4 relative border-blue-500 overflow-hidden">
+                  <div className="w-2.5 h-0 left-[3.75px] top-[9px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-blue-500" />
+                  <div className="w-1.5 h-2.5 left-[9px] top-[3.75px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-blue-500" />
+                </div>
+                <div className="justify-start text-blue-500 text-sm font-semibold  leading-none">
+                  시작
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
