@@ -6,9 +6,10 @@ export const CONTINUOUS_SLOW_BLINK = false;
 
 //깜빡임 파라미터 샘플링 및 적용 유틸
 export function sampleBlinkParams(isPlaying: boolean, mouthAmt: number): BlinkParams {
-  const closeDur = THREE.MathUtils.clamp(0.03 + Math.random() * 0.02, 0.03, 0.05);
-  const holdDur = THREE.MathUtils.clamp(0.0 + Math.random() * 0.005, 0.0, 0.006);
-  const openDur = THREE.MathUtils.clamp(0.05 + Math.random() * 0.03, 0.05, 0.08);
+  // Faster blink timings (close/open significantly quicker)
+  const closeDur = THREE.MathUtils.clamp(0.4 + Math.random() * 0.02, 0.08, 0.01);
+  const holdDur = THREE.MathUtils.clamp(0.0 + Math.random() * 0.03, 0.0, 0.003);
+  const openDur = THREE.MathUtils.clamp(0.04 + Math.random() * 0.07, 0.08, 0.15);
 
   const isPartial = Math.random() < 0.2;
   const baseAmp = isPartial ? 0.4 + Math.random() * 0.45 : 1.0;
