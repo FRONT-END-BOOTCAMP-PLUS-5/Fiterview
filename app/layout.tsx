@@ -37,8 +37,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${pretendard.variable} ${gmarket.variable} antialiased`}>
-        <AuthSessionProvider>{children}</AuthSessionProvider>
+      <body className={`min-h-dvh ${pretendard.variable} ${gmarket.variable} antialiased`}>
+        {children}
       </body>
     </html>
   );
