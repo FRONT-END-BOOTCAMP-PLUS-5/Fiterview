@@ -11,6 +11,7 @@ import UserAudio from './components/UserAudio';
 import { useCreateRecording } from '@/hooks/useCreateRecording';
 import { useGetTtsQuestions } from '@/hooks/useGetTtsQuestions';
 import { QuestionTTSResponse } from '@/backend/application/questions/dtos/QuestionTTSResponse';
+import { useTtsAutoPlay } from '@/hooks/useTtsAutoPlay';
 
 export default function InterviewClient() {
   const { id } = useParams<{ id: string }>();
@@ -32,7 +33,12 @@ export default function InterviewClient() {
   const currentQuestionText = current?.question ?? '질문을 불러오는 중입니다...';
   const currentAudioSrc = current ? `data:audio/mpeg;base64,${current.audioBuffer}` : undefined;
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  // TTS 자동 재생 훅
+  const { audioRef } = useTtsAutoPlay(currentAudioSrc, () => {
+    setIsNextBtnDisabled(false);
+    setPhase('recording');
+  });
+
   const lastAdvancedOrderRef = useRef(0);
 
   // 업로드 훅
@@ -69,37 +75,6 @@ export default function InterviewClient() {
   const goNext = () => {
     stopAndAdvance();
   };
-
-  // 현재 질문의 TTS 자동 재생 + 종료/에러 핸들링
-  useEffect(() => {
-    if (!currentAudioSrc) return;
-    setPhase('tts');
-    setIsNextBtnDisabled(true);
-
-    const el = audioRef.current;
-    if (!el) return;
-
-    el.src = currentAudioSrc;
-    const handleEnded = () => {
-      setIsNextBtnDisabled(false); // 다음 버튼 활성화
-      setPhase('recording'); // 타이머 시작 (Timer 컴포넌트에서 running=true로 감지)
-    };
-    const handleError = () => {
-      setIsNextBtnDisabled(false);
-      setPhase('recording');
-    };
-
-    el.addEventListener('ended', handleEnded);
-    el.addEventListener('error', handleError);
-    el.play().catch(() => handleError());
-
-    return () => {
-      el.pause();
-      el.currentTime = 0;
-      el.removeEventListener('ended', handleEnded);
-      el.removeEventListener('error', handleError);
-    };
-  }, [currentAudioSrc, currentOrder]);
 
   return (
     <div className="h-screen overflow-hidden flex flex-col">
