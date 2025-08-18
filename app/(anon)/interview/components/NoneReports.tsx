@@ -5,8 +5,8 @@ import CalendarX from '@/public/assets/icons/calendarX.svg';
 export function NoneReports() {
   return (
     <div className="h-dvh w-full bg-white rounded-xl outline-1 outline-offset-[-1px] outline-gray-100 inline-flex flex-col justify-center items-center gap-5">
-      <div className="w-20 h-20 bg-slate-200 rounded-[100px] inline-flex justify-center items-center">
-        <CalendarX width={40} height={40} strokeWidth={3} stroke="#94A3B8" />
+      <div className="w-20 h-20 bg-[#F8FAFC] rounded-[100px] flex justify-center items-center">
+        <CalendarX width={40} height={40} strokeWidth={3} stroke="#CBD5E1" />
       </div>
       <div className="flex flex-col justify-start items-center gap-3">
         <p className="text-center justify-start text-slate-800 text-lg font-semibold">
