@@ -1,7 +1,11 @@
 'use client';
 import MessageCircle from '@/public/assets/icons/message-circle.svg';
 
-export default function Question({ text }: { text: string }) {
+interface QuestionProps {
+  text: string;
+}
+
+export default function Question({ text }: QuestionProps) {
   return (
     <div className="w-full p-4 rounded-[8px] bg-white border border-[#E2E8F0] gap-[8px] flex flex-col">
       <div className="flex items-center gap-[8px]">

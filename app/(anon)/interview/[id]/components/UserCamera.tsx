@@ -3,13 +3,12 @@
 import { useEffect, useRef, useState } from 'react';
 import Frame from '@/public/assets/icons/frame.svg';
 
-export default function UserCamera({
-  message = '카메라 연결 실패',
-  deviceId,
-}: {
+interface UserCameraProps {
   message?: string;
   deviceId?: string;
-}) {
+}
+
+export default function UserCamera({ message = '카메라 연결 실패', deviceId }: UserCameraProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [errorText, setErrorText] = useState<string | null>(null);

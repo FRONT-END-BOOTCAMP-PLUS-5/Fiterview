@@ -2,22 +2,22 @@
 
 import { useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
-import TopSection from './components/TopSection';
-import BottomSection from './components/BottomSection';
-import AiAvatar from './components/AiAvatar';
-import Question from './components/Question';
-import UserCamera from './components/UserCamera';
-import UserAudio from './components/UserAudio';
+import TopSection from '@/app/(anon)/interview/[id]/components/TopSection';
+import BottomSection from '@/app/(anon)/interview/[id]/components/BottomSection';
+import AiAvatar from '@/app/(anon)/interview/[id]/components/AiAvatar';
+import Question from '@/app/(anon)/interview/[id]/components/Question';
+import UserCamera from '@/app/(anon)/interview/[id]/components/UserCamera';
+import UserAudio from '@/app/(anon)/interview/[id]/components/UserAudio';
 import { useTtsAutoPlay } from '@/hooks/useTtsAutoPlay';
 import { useGetTtsQuestions } from '@/hooks/useGetTtsQuestions';
 import { QuestionTTSResponse } from '@/backend/application/questions/dtos/QuestionTTSResponse';
+import type { InterviewPhase } from '@/types/interview';
 
 export default function InterviewClient() {
   const { id } = useParams<{ id: string }>();
   const reportId = Number(id);
 
-  // FSM + 진행 상태 (타이머는 Timer 컴포넌트가 관리)
-  const [phase, setPhase] = useState<'idle' | 'tts' | 'recording'>('idle');
+  const [phase, setPhase] = useState<InterviewPhase>('idle');
   const [currentOrder, setCurrentOrder] = useState(1);
   const [isNextBtnDisabled, setIsNextBtnDisabled] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
@@ -42,21 +42,16 @@ export default function InterviewClient() {
     stopAndAdvance();
   };
 
+  // 녹음 중지
   const stopAndAdvance = () => {
     setIsNextBtnDisabled(true);
     if (running) {
       // 녹음만 멈춤 → onFinish에서 업로드 후 다음으로
       setPhase('idle');
-    } else {
-      // 녹음 중이 아니면 바로 다음으로 (중복 방지)
-      if (lastAdvancedOrderRef.current !== currentOrder) {
-        lastAdvancedOrderRef.current = currentOrder;
-        setCurrentOrder((o) => Math.min(10, o + 1));
-      }
     }
   };
 
-  // 업로드 함수
+  // 녹음본 업로드 함수
   const uploadRecording = async (params: { reportId: number; order: number; blob: Blob }) => {
     const { reportId, order, blob } = params;
     const extension = blob.type.includes('webm') ? 'webm' : 'mp3';
@@ -73,16 +68,15 @@ export default function InterviewClient() {
     return json as { success: boolean; fileName?: string };
   };
 
-  // UserAudio에서 녹음이 끝나면 업로드 → 다음 질문으로 이동 (단일 경로)
+  // UserAudio에서 녹음이 끝나면 업로드 → 다음 질문으로 이동
   const handleFinishRecording = async (blob: Blob) => {
     setIsNextBtnDisabled(true);
     setIsUploading(true);
     try {
-      if (lastAdvancedOrderRef.current === currentOrder) return; // 이미 처리됨 중복 방지
+      if (lastAdvancedOrderRef.current === currentOrder) return; // 이미 처리된 거 중복 방지
       lastAdvancedOrderRef.current = currentOrder;
-      if (Number.isFinite(reportId) && reportId > 0) {
-        await uploadRecording({ reportId, order: currentOrder, blob });
-      }
+      if (!reportId) return;
+      await uploadRecording({ reportId, order: currentOrder, blob });
     } finally {
       setIsUploading(false);
       setCurrentOrder((o) => Math.min(10, o + 1));

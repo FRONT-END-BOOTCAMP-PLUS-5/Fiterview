@@ -1,16 +1,18 @@
 'use client';
 
+interface BottomSectionProps {
+  currentQuestion: number;
+  totalQuestions: number;
+  onNext: () => void;
+  isDisabled?: boolean;
+}
+
 export default function BottomSection({
   currentQuestion,
   totalQuestions,
   onNext,
   isDisabled,
-}: {
-  currentQuestion: number;
-  totalQuestions: number;
-  onNext: () => void;
-  isDisabled?: boolean;
-}) {
+}: BottomSectionProps) {
   return (
     <section className="relative flex items-center px-[24px] py-[16px] border-t border-slate-200 bg-[#F8FAFC]">
       <p className="absolute left-1/2 -translate-x-1/2 text-[#64748B] text-[12px] font-medium">
