@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import TopSection from './components/TopSection';
 import BottomSection from './components/BottomSection';
@@ -8,27 +8,26 @@ import AiAvatar from './components/AiAvatar';
 import Question from './components/Question';
 import UserCamera from './components/UserCamera';
 import UserAudio from './components/UserAudio';
-import { useCreateRecording } from '@/hooks/useCreateRecording';
+import { useTtsAutoPlay } from '@/hooks/useTtsAutoPlay';
 import { useGetTtsQuestions } from '@/hooks/useGetTtsQuestions';
 import { QuestionTTSResponse } from '@/backend/application/questions/dtos/QuestionTTSResponse';
-import { useTtsAutoPlay } from '@/hooks/useTtsAutoPlay';
 
 export default function InterviewClient() {
   const { id } = useParams<{ id: string }>();
   const reportId = Number(id);
 
   // FSM + 진행 상태 (타이머는 Timer 컴포넌트가 관리)
-  // idle: 대기 상태, tts: tts 재생 중, recording: 녹음 중
   const [phase, setPhase] = useState<'idle' | 'tts' | 'recording'>('idle');
-  const running = phase === 'recording';
-
   const [currentOrder, setCurrentOrder] = useState(1);
   const [isNextBtnDisabled, setIsNextBtnDisabled] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
+  const lastAdvancedOrderRef = useRef(0);
 
-  // 클라이언트에서 질문 TTS 조회
+  const running = phase === 'recording';
+
+  // 질문 TTS 조회 (훅 사용)
   const { data /*, isLoading, isError */ } = useGetTtsQuestions(reportId);
   const items = (data as any)?.data as QuestionTTSResponse[] | undefined;
-
   const current = items?.[currentOrder - 1];
   const currentQuestionText = current?.question ?? '질문을 불러오는 중입니다...';
   const currentAudioSrc = current ? `data:audio/mpeg;base64,${current.audioBuffer}` : undefined;
@@ -39,10 +38,9 @@ export default function InterviewClient() {
     setPhase('recording');
   });
 
-  const lastAdvancedOrderRef = useRef(0);
-
-  // 업로드 훅
-  const createRecording = useCreateRecording();
+  const goNext = () => {
+    stopAndAdvance();
+  };
 
   const stopAndAdvance = () => {
     setIsNextBtnDisabled(true);
@@ -58,34 +56,42 @@ export default function InterviewClient() {
     }
   };
 
+  // 업로드 함수
+  const uploadRecording = async (params: { reportId: number; order: number; blob: Blob }) => {
+    const { reportId, order, blob } = params;
+    const extension = blob.type.includes('webm') ? 'webm' : 'mp3';
+    const file = new File([blob], `recording_${reportId}_${order}.${extension}`, {
+      type: blob.type || 'audio/mpeg',
+    });
+    const formData = new FormData();
+    formData.append('audio', file);
+    const url = `/api/reports/${reportId}/questions/${order}/recording`;
+    const res = await fetch(url, { method: 'POST', body: formData });
+    if (!res.ok) throw new Error('녹음 업로드 실패');
+    const json = await res.json();
+    if (!json?.success) throw new Error(json?.error || '녹음 업로드 실패');
+    return json as { success: boolean; fileName?: string };
+  };
+
   // UserAudio에서 녹음이 끝나면 업로드 → 다음 질문으로 이동 (단일 경로)
   const handleFinishRecording = async (blob: Blob) => {
     setIsNextBtnDisabled(true);
+    setIsUploading(true);
     try {
       if (lastAdvancedOrderRef.current === currentOrder) return; // 이미 처리됨 중복 방지
       lastAdvancedOrderRef.current = currentOrder;
       if (Number.isFinite(reportId) && reportId > 0) {
-        await createRecording.mutateAsync({ reportId, order: currentOrder, blob });
+        await uploadRecording({ reportId, order: currentOrder, blob });
       }
     } finally {
+      setIsUploading(false);
       setCurrentOrder((o) => Math.min(10, o + 1));
     }
   };
 
-  const goNext = () => {
-    stopAndAdvance();
-  };
-
   return (
     <div className="h-screen overflow-hidden flex flex-col">
-      <TopSection
-        running={running}
-        duration={60}
-        onComplete={() => {
-          // 타임아웃도 동일한 경로로 처리
-          stopAndAdvance();
-        }}
-      />
+      <TopSection running={running} duration={60} onComplete={goNext} />
       <main className="flex-1 flex overflow-hidden">
         {/* Left: 아바타 면접관 영역 */}
         <section className="flex-1 min-w-0 h-full bg-[#F1F5F9] flex flex-col items-center justify-between p-[52px]">
@@ -103,7 +109,7 @@ export default function InterviewClient() {
         currentQuestion={currentOrder}
         totalQuestions={10}
         onNext={goNext}
-        isDisabled={isNextBtnDisabled || createRecording.isPending}
+        isDisabled={isNextBtnDisabled || isUploading}
       />
     </div>
   );
