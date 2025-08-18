@@ -5,6 +5,9 @@ import UploadedFiles from './UploadedFiles';
 import Sparkles from '@/public/assets/icons/sparkles.svg';
 import { useState } from 'react';
 import axios from 'axios';
+import GenerateQuestionModal from './GenerateQuestionModal';
+import LoginModal from '../../components/LoginModal';
+import { useModalStore } from '@/stores/useModalStore';
 
 type SourceType = 'portfolio' | 'job';
 type UploadedItem = {
@@ -20,6 +23,9 @@ export default function QuickInterviewForm() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedItem[]>([]);
   const [limitExceeded, setLimitExceeded] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [reportId, setReportId] = useState<string | null>(null);
+  const [modalType, setModalType] = useState<'generateQuestion' | 'login' | null>(null);
+  const { openModal } = useModalStore();
 
   const handleAddFiles = (files: File[], source: SourceType) => {
     setUploadedFiles((prev) => {
@@ -63,18 +69,18 @@ export default function QuickInterviewForm() {
       if (response.data.success) {
         setUploadedFiles([]);
         setLimitExceeded(false);
+        setReportId(response.data.reportId);
+        setModalType('generateQuestion');
 
-        // 모달로대체
-        alert('면접 질문이 성공적으로 생성되었습니다!');
-        window.location.reload();
+        openModal();
       }
     } catch (error) {
       console.error('면접 생성 실패:', error);
 
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
-          alert('로그인이 필요합니다.');
-          window.location.href = '/login';
+          setModalType('login');
+          openModal();
         } else if (error.response?.status === 403) {
           alert('권한이 없습니다.');
         } else {
@@ -131,6 +137,8 @@ export default function QuickInterviewForm() {
           </p>
         </button>
       </div>
+      {modalType === 'generateQuestion' && <GenerateQuestionModal reportId={reportId} />}
+      {modalType === 'login' && <LoginModal />}
     </section>
   );
 }
