@@ -7,6 +7,7 @@ import { DeliverFeedbackDto } from '@/backend/application/feedbacks/dtos/Deliver
 import { FeedbackRepositoryImpl } from '@/backend/infrastructure/repositories/FeedbackRepositoryImpl';
 import { UpdateReportStatusUsecase } from '@/backend/application/reports/usecases/UpdateReportStatusUsecase';
 import { ReportRepositoryImpl } from '@/backend/infrastructure/repositories/ReportRepositoryImpl';
+import { FEEDBACK_GENERATION_INSTRUCTIONS } from '@/constants/feedback';
 
 export async function GET(request: NextRequest) {
   try {
@@ -34,6 +35,8 @@ export async function GET(request: NextRequest) {
     const persistenceRepository = new FeedbackRepositoryImpl();
     const questionsAndAnswers = await persistenceRepository.getQuestionsAndAnswers(reportId);
 
+    console.log('Questions and answers fetched:', questionsAndAnswers);
+
     if (questionsAndAnswers.length === 0) {
       return NextResponse.json(
         { error: 'No questions with answers found for this report' },
@@ -45,10 +48,11 @@ export async function GET(request: NextRequest) {
       reportId,
       pairs: questionsAndAnswers,
       model: 'gpt-4o',
-      instructions:
-        'Return a JSON object: {"score": number 0-100, "strength": [string, string], "improvement": [string, string]}. Use Korean for text fields. Consider both sampleAnswer and userAnswer when evaluating.',
+      instructions: FEEDBACK_GENERATION_INSTRUCTIONS,
       maxOutputTokens: 1000,
     };
+
+    console.log('DTO created:', dto);
 
     const llmRepo = new Gpt4oLlmAI();
     const reportRepository = new ReportRepositoryImpl();
@@ -60,12 +64,16 @@ export async function GET(request: NextRequest) {
     );
     const feedback = await usecase.execute(dto);
 
+    console.log('Feedback generated:', feedback);
+
     const outputDto: DeliverFeedbackDto = {
       reportId: feedback.feedback_report_id,
       score: feedback.score,
       strength: feedback.strength,
       improvement: feedback.improvement,
     };
+
+    console.log('Output DTO:', outputDto);
 
     return NextResponse.json(outputDto, { status: 200 });
   } catch (error) {
