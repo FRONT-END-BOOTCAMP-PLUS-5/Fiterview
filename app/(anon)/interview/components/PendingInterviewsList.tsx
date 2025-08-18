@@ -4,6 +4,7 @@ import Arrow from '@/public/assets/icons/arrow-right.svg';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { NoneReports } from './NoneReports';
+import { LoadingSpinner } from '@/app/components/LoadingSpinner';
 
 type PendingReport = {
   id: number;
@@ -22,7 +23,7 @@ export default function PendingInterviewsList() {
           setReports(response.data.data || []);
         }
       } catch (error) {
-        console.error('Failed to fetch pending reports:', error);
+        console.error('pending reports 불러오기 실패:', error);
       } finally {
         setLoading(false);
       }
@@ -43,13 +44,17 @@ export default function PendingInterviewsList() {
 
       <div className="mt-8 self-stretch flex flex-col justify-start items-start gap-4 overflow-y-auto max-h-[calc(100vh)]">
         {loading ? (
-          <div className="self-stretch text-center py-8 text-slate-500">로딩 중...</div>
+          <LoadingSpinner
+            size="medium"
+            message="대기 면접을 불러오는 중..."
+            className="self-stretch justify-center items-center h-dvh"
+          />
         ) : reports.length === 0 ? (
           <NoneReports />
         ) : (
           reports.map((report) => (
             <div
-              key={report.id}
+              key={`pending-report-${report.id}`}
               className="self-stretch h-20 p-6 bg-gradient-to-r from-blue-500/25 via-blue-300/10 to-white/30 hover:bg-gradient-to-r hover:from-white/30 hover:via-blue-300/10 hover:to-blue-500/25 rounded-xl outline-1 outline-offset-[-1px] outline-slate-200 flex justify-between items-center transition-all duration-1000 ease-in-out cursor-pointer"
             >
               <div className="flex-1 inline-flex flex-col justify-start items-start gap-1.5">

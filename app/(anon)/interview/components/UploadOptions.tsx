@@ -3,9 +3,7 @@
 import Upload from '@/public/assets/icons/upload.svg';
 import Picture from '@/public/assets/icons/image.svg';
 import { useRef, useState } from 'react';
-
-type SourceType = 'portfolio' | 'job';
-
+import { SourceType } from '@/types/file';
 interface UploadOptionsProps {
   onAddFiles: (files: File[], source: SourceType) => void;
 }
@@ -15,6 +13,7 @@ export default function UploadOptions({ onAddFiles }: UploadOptionsProps) {
   const portfolioInputRef = useRef<HTMLInputElement | null>(null);
   const jobInputRef = useRef<HTMLInputElement | null>(null);
 
+  //css
   const baseClasses =
     'group flex-1 h-full justify-center rounded-xl outline-2 outline-offset-[-2px] inline-flex flex-col transition-colors duration-200 cursor-pointer';
   const unselectedClasses =
@@ -29,7 +28,7 @@ export default function UploadOptions({ onAddFiles }: UploadOptionsProps) {
     }`;
 
   return (
-    <div className="self-stretch flex gap-8 w-full h-[200px]">
+    <div className="self-stretch flex gap-8 w-full h-[302px]">
       <input
         ref={portfolioInputRef}
         type="file"
@@ -48,7 +47,7 @@ export default function UploadOptions({ onAddFiles }: UploadOptionsProps) {
       <input
         ref={jobInputRef}
         type="file"
-        accept="image/png,image/jpeg"
+        accept="image/png,image/jpeg,image/jpg"
         multiple
         className="hidden"
         onChange={(e) => {
@@ -62,7 +61,6 @@ export default function UploadOptions({ onAddFiles }: UploadOptionsProps) {
       />
       <button
         type="button"
-        aria-pressed={selected === 'portfolio'}
         onClick={() => {
           setSelected('portfolio');
           portfolioInputRef.current?.click();
@@ -77,7 +75,6 @@ export default function UploadOptions({ onAddFiles }: UploadOptionsProps) {
       </button>
       <button
         type="button"
-        aria-pressed={selected === 'job'}
         onClick={() => {
           setSelected('job');
           jobInputRef.current?.click();

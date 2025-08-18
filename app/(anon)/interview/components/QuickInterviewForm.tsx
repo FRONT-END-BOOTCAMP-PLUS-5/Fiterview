@@ -51,14 +51,13 @@ export default function QuickInterviewForm() {
     try {
       setIsSubmitting(true);
       const formData = new FormData();
-      formData.append('userId', '1');
       uploadedFiles.forEach((item) => {
         formData.append('files', item.file, item.name);
       });
       await axios.post('/api/reports?userId=1', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      // success: clear list and warning
+
       setUploadedFiles([]);
       setLimitExceeded(false);
     } catch (error) {
@@ -77,7 +76,7 @@ export default function QuickInterviewForm() {
 
       <UploadOptions onAddFiles={handleAddFiles} />
 
-      <div className="h-full">
+      <div className="flex flex-col h-full">
         <UploadedFiles
           files={uploadedFiles}
           limitExceeded={limitExceeded}
@@ -88,14 +87,13 @@ export default function QuickInterviewForm() {
         />
 
         <button
-          className={`w-full h-14 rounded-xl inline-flex justify-center items-center gap-3 mt-6 relative bottom-10 ${
+          className={`w-full h-12 py-[14px] rounded-xl flex justify-center items-center gap-3 mt-6 ${
             uploadedFiles.length === 0 || isSubmitting
               ? 'bg-slate-100 cursor-not-allowed'
               : 'bg-blue-500 hover:bg-blue-600'
           }`}
           onClick={submitFiles}
           disabled={uploadedFiles.length === 0 || isSubmitting}
-          aria-busy={isSubmitting}
         >
           <Sparkles
             width={20}
