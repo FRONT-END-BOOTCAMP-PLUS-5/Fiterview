@@ -12,7 +12,7 @@ export default function GenerateQuestionModal({ reportId }: { reportId: string |
   const ModalButtons = () => {
     return (
       <div className="self-stretch inline-flex justify-center items-center gap-3">
-        <div
+        <button
           className="flex-1 h-11 px-5 bg-white rounded-lg outline-1 outline-offset-[-1px] outline-[#CBD5E1] flex justify-center items-center cursor-pointer"
           onClick={() => {
             closeModal();
@@ -21,9 +21,9 @@ export default function GenerateQuestionModal({ reportId }: { reportId: string |
             }
           }}
         >
-          <div className="text-[#64748B] text-sm font-semibold">질문지만 볼래요</div>
-        </div>
-        <div
+          <p className="text-[#64748B] text-sm font-semibold">질문지만 볼래요</p>
+        </button>
+        <button
           className="flex-1 h-11 px-5 bg-[#3B82F6] rounded-lg flex justify-center items-center cursor-pointer"
           onClick={() => {
             closeModal();
@@ -32,8 +32,8 @@ export default function GenerateQuestionModal({ reportId }: { reportId: string |
             }
           }}
         >
-          <div className="text-white text-sm font-semibold">면접장으로 이동하기</div>
-        </div>
+          <p className="text-white text-sm font-semibold">면접장으로 이동하기</p>
+        </button>
       </div>
     );
   };

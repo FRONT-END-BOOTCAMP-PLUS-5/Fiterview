@@ -6,6 +6,7 @@ import UploadOptions from './UploadOptions';
 import UploadedFiles from './UploadedFiles';
 import GenerateQuestionModal from './GenerateQuestionModal';
 import LoginModal from '../../components/LoginModal';
+import FileAnalysisErrorModal from './FileAnalysisErrorModal';
 import { useModalStore } from '@/stores/useModalStore';
 import Sparkles from '@/public/assets/icons/sparkles.svg';
 
@@ -24,7 +25,9 @@ export default function QuickInterviewForm() {
   const [limitExceeded, setLimitExceeded] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reportId, setReportId] = useState<string | null>(null);
-  const [modalType, setModalType] = useState<'generateQuestion' | 'login' | null>(null);
+  const [modalType, setModalType] = useState<'generateQuestion' | 'login' | 'fileError' | null>(
+    null
+  );
   const { openModal } = useModalStore();
 
   const handleAddFiles = (files: File[], source: SourceType) => {
@@ -83,6 +86,15 @@ export default function QuickInterviewForm() {
           openModal();
         } else if (error.response?.status === 403) {
           alert('권한이 없습니다.');
+        } else if (error.response?.status === 400) {
+          // AI 응답 파싱 오류 또는 파일 내용 부족
+          const errorMessage = error.response?.data?.message || '파일 분석에 실패했습니다.';
+          if (errorMessage.includes('JSON 응답을 찾을 수 없습니다')) {
+            setModalType('fileError');
+            openModal();
+          } else {
+            alert(errorMessage);
+          }
         } else {
           alert(error.response?.data?.message || '면접 생성에 실패했습니다.');
         }
@@ -139,6 +151,7 @@ export default function QuickInterviewForm() {
       </div>
       {modalType === 'generateQuestion' && <GenerateQuestionModal reportId={reportId} />}
       {modalType === 'login' && <LoginModal />}
+      {modalType === 'fileError' && <FileAnalysisErrorModal />}
     </section>
   );
 }

@@ -10,7 +10,7 @@ export default function LoginModal() {
 
   const ModalButton = () => {
     return (
-      <div className="self-stretch h-11 bg-[#3B82F6] rounded-lg inline-flex justify-center items-center">
+      <button className="self-stretch h-11 bg-[#3B82F6] rounded-lg inline-flex justify-center items-center">
         <div
           className="text-white text-sm font-semibold cursor-pointer"
           onClick={() => {
@@ -20,7 +20,7 @@ export default function LoginModal() {
         >
           로그인하러 가기
         </div>
-      </div>
+      </button>
     );
   };
 
