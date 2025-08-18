@@ -2,9 +2,6 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/authOptions';
 import { ISessionUser } from '@/next-auth';
 
-/**
- * 세션에서 사용자 정보를 가져옵니다
- */
 export async function getUserFromSession(): Promise<ISessionUser | null> {
   // Dev-only bypass via env
   if (process.env.NODE_ENV !== 'production' && process.env.AUTH_BYPASS_USER_ID) {
@@ -21,7 +18,6 @@ export async function getUserFromSession(): Promise<ISessionUser | null> {
     return null;
   }
 
-  // ISessionUser 타입 그대로 반환
   return {
     id: session.user.id,
     username: session.user.username,
