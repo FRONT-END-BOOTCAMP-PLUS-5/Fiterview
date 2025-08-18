@@ -31,7 +31,7 @@ export default function PendingInterviewsList() {
     fetchPendingReports();
   }, []);
   return (
-    <section className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-8 min-h-0">
+    <section className="flex-1 self-stretch inline-flex flex-col justify-start items-start min-h-0">
       <div className="self-stretch flex flex-col justify-start items-start gap-2">
         <h2 className="self-stretch justify-start text-slate-800 text-3xl font-semibold">
           나의 대기 면접
@@ -41,7 +41,7 @@ export default function PendingInterviewsList() {
         </div>
       </div>
 
-      <div className="self-stretch flex flex-col justify-start items-start gap-4 overflow-y-auto max-h-[calc(100vh-220px)] pr-1 hide-scrollbar">
+      <div className="mt-8 self-stretch flex flex-col justify-start items-start gap-4 overflow-y-auto max-h-[calc(100vh)]">
         {loading ? (
           <div className="self-stretch text-center py-8 text-slate-500">로딩 중...</div>
         ) : reports.length === 0 ? (

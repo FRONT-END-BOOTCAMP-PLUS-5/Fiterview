@@ -22,7 +22,7 @@ interface UploadedFilesProps {
 export default function UploadedFiles({ files, onRemove, limitExceeded }: UploadedFilesProps) {
   if (files.length === 0) {
     return (
-      <div className="self-stretch flex flex-col justify-start items-start gap-6 mt-10">
+      <div className="h-full self-stretch flex flex-col justify-start items-start gap-6 mt-10">
         <h3 className="self-stretch justify-start text-slate-800 text-xl font-semibold">
           업로드된 파일
         </h3>
@@ -36,7 +36,7 @@ export default function UploadedFiles({ files, onRemove, limitExceeded }: Upload
       <h3 className="self-stretch justify-start text-slate-800 text-xl font-semibold">
         업로드된 파일
       </h3>
-      <div className="self-stretch flex flex-col justify-start items-start gap-2 h-70">
+      <div className="self-stretch flex flex-col justify-start items-start gap-2 h-full">
         {files.map((f, index) => (
           <div
             key={f.id}
@@ -44,9 +44,7 @@ export default function UploadedFiles({ files, onRemove, limitExceeded }: Upload
           >
             <div className="flex-1 flex justify-between items-start gap-0.5">
               <div className="flex-1 flex flex-col">
-                <span className="justify-start text-slate-800 text-sm font-medium  leading-none">
-                  {f.name}
-                </span>
+                <span className="justify-start text-slate-800 text-sm font-medium">{f.name}</span>
               </div>
               <button type="button" onClick={() => onRemove?.(f.id)} aria-label="remove">
                 <Del width={16} height={16} stroke="#A0A0A0" strokeWidth={1.33} />
