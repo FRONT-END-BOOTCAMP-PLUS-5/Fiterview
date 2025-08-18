@@ -1,5 +1,3 @@
-'use client';
-
 import QuickInterviewForm from './components/QuickInterviewForm';
 import PendingInterviewsList from './components/PendingInterviewsList';
 

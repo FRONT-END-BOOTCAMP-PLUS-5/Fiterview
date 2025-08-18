@@ -48,20 +48,41 @@ export default function QuickInterviewForm() {
 
   const submitFiles = async () => {
     if (uploadedFiles.length === 0 || isSubmitting) return;
+
     try {
       setIsSubmitting(true);
       const formData = new FormData();
       uploadedFiles.forEach((item) => {
         formData.append('files', item.file, item.name);
       });
-      await axios.post('/api/reports?userId=1', formData, {
+
+      const response = await axios.post('/api/reports', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      setUploadedFiles([]);
-      setLimitExceeded(false);
+      if (response.data.success) {
+        setUploadedFiles([]);
+        setLimitExceeded(false);
+
+        // 모달로대체
+        alert('면접 질문이 성공적으로 생성되었습니다!');
+        window.location.reload();
+      }
     } catch (error) {
-      console.error(error);
+      console.error('면접 생성 실패:', error);
+
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          alert('로그인이 필요합니다.');
+          window.location.href = '/login';
+        } else if (error.response?.status === 403) {
+          alert('권한이 없습니다.');
+        } else {
+          alert(error.response?.data?.message || '면접 생성에 실패했습니다.');
+        }
+      } else {
+        alert('네트워크 오류가 발생했습니다.');
+      }
     } finally {
       setIsSubmitting(false);
     }

@@ -5,6 +5,7 @@ import { QuestionRepositoryImpl } from '@/backend/infrastructure/repositories/Qu
 import { GetUserReportsUsecase } from '@/backend/application/reports/usecases/GetUserReportsUsecase';
 import { GetReportsByStatusUsecase } from '@/backend/application/reports/usecases/GetReportsByStatusUsecase';
 import { ReportDto } from '@/backend/application/reports/dtos/ReportDto';
+import { getUserFromSession } from '@/lib/auth/api-auth';
 
 const reportsRepository = new ReportRepositoryImpl();
 const questionRepository = new QuestionRepositoryImpl();
@@ -12,19 +13,17 @@ const getUserReportsUsecase = new GetUserReportsUsecase(reportsRepository);
 const getReportsByStatusUsecase = new GetReportsByStatusUsecase(reportsRepository);
 const createReportUsecase = new CreateReportUsecase(reportsRepository, questionRepository);
 
-// userId 검증
-const parseUserId = (value: string | null): number | null => {
-  if (!value) return null;
-  const parsed = parseInt(value, 10);
-  return Number.isNaN(parsed) ? null : parsed;
-};
-
-const badRequest = (message: string) =>
-  NextResponse.json({ success: false, message }, { status: 400 });
-
 //조회
 export async function GET(request: NextRequest) {
   try {
+    // 사용자 인증 확인
+    const user = await getUserFromSession();
+    if (!user) {
+      return NextResponse.json({ success: false, message: '인증이 필요합니다.' }, { status: 401 });
+    }
+
+    const userId = Number(user.id);
+
     // status 검증
     const parseStatus = (value: string | null): ReportDto['status'] | undefined => {
       if (!value) return undefined;
@@ -36,10 +35,7 @@ export async function GET(request: NextRequest) {
     };
 
     const { searchParams } = new URL(request.url);
-    const userId = parseUserId(searchParams.get('userId'));
     const status = parseStatus(searchParams.get('status'));
-
-    if (userId === null) return badRequest('userId가 필요합니다.');
 
     let reports;
     if (status) {
@@ -73,14 +69,17 @@ export async function GET(request: NextRequest) {
 //생성
 export async function POST(request: NextRequest) {
   try {
+    // 사용자 인증 확인
+    const user = await getUserFromSession();
+    if (!user) {
+      return NextResponse.json({ success: false, message: '인증이 필요합니다.' }, { status: 401 });
+    }
+
+    const userId = Number(user.id);
+
     const formData = await request.formData();
     const files = formData.getAll('files') as File[];
-    const userId = parseUserId(
-      typeof formData.get('userId') === 'string' ? (formData.get('userId') as string) : null
-    );
 
-    //로그인 유저 확인
-    if (userId === null) return badRequest('userId가 필요합니다.');
     if (!files || files.length === 0) {
       return NextResponse.json({ success: false, message: '파일이 필요합니다.' }, { status: 400 });
     }
