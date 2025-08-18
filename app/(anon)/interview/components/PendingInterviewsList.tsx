@@ -18,12 +18,20 @@ export default function PendingInterviewsList() {
   useEffect(() => {
     const fetchPendingReports = async () => {
       try {
-        const response = await axios.get('/api/reports?userId=3&status=PENDING');
+        const response = await axios.get('/api/reports?status=PENDING');
         if (response.data.success) {
           setReports(response.data.data || []);
         }
       } catch (error) {
         console.error('pending reports 불러오기 실패:', error);
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 401) {
+            // 인증 필요 - 로그인 페이지로 리다이렉트
+            window.location.href = '/login';
+          } else if (error.response?.status === 403) {
+            console.error('권한이 없습니다.');
+          }
+        }
       } finally {
         setLoading(false);
       }

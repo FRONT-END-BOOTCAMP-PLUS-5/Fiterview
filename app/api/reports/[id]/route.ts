@@ -7,6 +7,7 @@ import { GetReportByIdUsecase } from '@/backend/application/reports/usecases/Get
 import { GetQuestionsUsecase } from '@/backend/application/questions/usecases/GetQuestionsUsecase';
 import { ReportDto } from '@/backend/application/reports/dtos/ReportDto';
 import { QuestionDto } from '@/backend/application/questions/dtos/QuestionDto';
+import { getUserFromSession } from '@/lib/auth/api-auth';
 
 const reportsRepository = new ReportRepositoryImpl();
 const questionRepository = new QuestionRepositoryImpl();
@@ -18,6 +19,13 @@ const getQuestionsUsecase = new GetQuestionsUsecase(questionRepository);
 //수정 (제목, 회고)
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    // 사용자 인증 확인
+    const user = await getUserFromSession();
+    if (!user) {
+      return NextResponse.json({ success: false, message: '인증이 필요합니다.' }, { status: 401 });
+    }
+
+    const userId = Number(user.id);
     const { id } = await params;
     const reportId = parseInt(id, 10);
 
@@ -25,6 +33,22 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json(
         { success: false, message: '유효하지 않은 리포트 ID입니다.' },
         { status: 400 }
+      );
+    }
+
+    // 리포트 소유권 확인
+    const existingReport = await getReportByIdUsecase.execute(reportId);
+    if (!existingReport) {
+      return NextResponse.json(
+        { success: false, message: '리포트를 찾을 수 없습니다.' },
+        { status: 404 }
+      );
+    }
+
+    if (existingReport.userId !== userId) {
+      return NextResponse.json(
+        { success: false, message: '이 리포트에 대한 권한이 없습니다.' },
+        { status: 403 }
       );
     }
 
@@ -77,6 +101,13 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 //조회
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    // 사용자 인증 확인
+    const user = await getUserFromSession();
+    if (!user) {
+      return NextResponse.json({ success: false, message: '인증이 필요합니다.' }, { status: 401 });
+    }
+
+    const userId = Number(user.id);
     const { id } = await params;
     const reportId = parseInt(id, 10);
 
@@ -93,6 +124,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json(
         { success: false, message: '리포트를 찾을 수 없습니다.' },
         { status: 404 }
+      );
+    }
+
+    // 리포트 소유권 확인
+    if (report.userId !== userId) {
+      return NextResponse.json(
+        { success: false, message: '이 리포트에 대한 권한이 없습니다.' },
+        { status: 403 }
       );
     }
 
@@ -136,6 +175,13 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // 사용자 인증 확인
+    const user = await getUserFromSession();
+    if (!user) {
+      return NextResponse.json({ success: false, message: '인증이 필요합니다.' }, { status: 401 });
+    }
+
+    const userId = Number(user.id);
     const { id } = await params;
     const reportId = parseInt(id, 10);
 
@@ -143,6 +189,22 @@ export async function DELETE(
       return NextResponse.json(
         { success: false, message: '유효하지 않은 리포트 ID입니다.' },
         { status: 400 }
+      );
+    }
+
+    // 리포트 소유권 확인
+    const existingReport = await getReportByIdUsecase.execute(reportId);
+    if (!existingReport) {
+      return NextResponse.json(
+        { success: false, message: '리포트를 찾을 수 없습니다.' },
+        { status: 404 }
+      );
+    }
+
+    if (existingReport.userId !== userId) {
+      return NextResponse.json(
+        { success: false, message: '이 리포트에 대한 권한이 없습니다.' },
+        { status: 403 }
       );
     }
 
