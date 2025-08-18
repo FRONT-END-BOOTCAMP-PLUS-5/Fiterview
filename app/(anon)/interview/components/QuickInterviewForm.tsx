@@ -67,8 +67,9 @@ export default function QuickInterviewForm() {
       setIsSubmitting(false);
     }
   };
+
   return (
-    <section className="flex-1 inline-flex flex-col">
+    <section className="flex-1 inline-flex flex-col h-full">
       <div className="flex flex-col gap-2 mb-8">
         <h2 className="justify-start text-slate-800 text-3xl font-semibold">빠른 AI 면접</h2>
         <p className="text-slate-500 text-sm">포트폴리오나 채용공고를 업로드해보세요.</p>
@@ -76,39 +77,41 @@ export default function QuickInterviewForm() {
 
       <UploadOptions onAddFiles={handleAddFiles} />
 
-      <UploadedFiles
-        files={uploadedFiles}
-        limitExceeded={limitExceeded}
-        onRemove={(id) => {
-          setUploadedFiles((prev) => prev.filter((f) => f.id !== id));
-          setLimitExceeded(false);
-        }}
-      />
-
-      <button
-        className={`self-stretch h-14 rounded-xl inline-flex justify-center items-center gap-3 mt-6 ${
-          uploadedFiles.length === 0 || isSubmitting
-            ? 'bg-slate-100 cursor-not-allowed'
-            : 'bg-blue-500 hover:bg-blue-600'
-        }`}
-        onClick={submitFiles}
-        disabled={uploadedFiles.length === 0 || isSubmitting}
-        aria-busy={isSubmitting}
-      >
-        <Sparkles
-          width={20}
-          height={20}
-          strokeWidth={1.67}
-          stroke={uploadedFiles.length === 0 || isSubmitting ? '#CBD5E1' : '#ffffff'}
+      <div className="h-full">
+        <UploadedFiles
+          files={uploadedFiles}
+          limitExceeded={limitExceeded}
+          onRemove={(id) => {
+            setUploadedFiles((prev) => prev.filter((f) => f.id !== id));
+            setLimitExceeded(false);
+          }}
         />
-        <p
-          className={`justify-start text-base font-semibold ${
-            uploadedFiles.length === 0 || isSubmitting ? 'text-slate-400' : 'text-white'
+
+        <button
+          className={`w-full h-14 rounded-xl inline-flex justify-center items-center gap-3 mt-6 relative bottom-10 ${
+            uploadedFiles.length === 0 || isSubmitting
+              ? 'bg-slate-100 cursor-not-allowed'
+              : 'bg-blue-500 hover:bg-blue-600'
           }`}
+          onClick={submitFiles}
+          disabled={uploadedFiles.length === 0 || isSubmitting}
+          aria-busy={isSubmitting}
         >
-          {isSubmitting ? '면접 질문 생성 중...' : '맞춤 면접 질문 생성하기'}
-        </p>
-      </button>
+          <Sparkles
+            width={20}
+            height={20}
+            strokeWidth={1.67}
+            stroke={uploadedFiles.length === 0 || isSubmitting ? '#CBD5E1' : '#ffffff'}
+          />
+          <p
+            className={`justify-start text-base font-semibold ${
+              uploadedFiles.length === 0 || isSubmitting ? 'text-slate-400' : 'text-white'
+            }`}
+          >
+            {isSubmitting ? '면접 질문 생성 중...' : '맞춤 면접 질문 생성하기'}
+          </p>
+        </button>
+      </div>
     </section>
   );
 }

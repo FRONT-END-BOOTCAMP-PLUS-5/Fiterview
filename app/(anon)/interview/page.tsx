@@ -5,7 +5,7 @@ import PendingInterviewsList from './components/PendingInterviewsList';
 
 export default function InterviewPage() {
   return (
-    <div className="px-16 pt-10 flex justify-start items-start gap-10">
+    <div className="h-dvh px-16 py-10 flex justify-start items-start gap-10">
       <QuickInterviewForm />
       <PendingInterviewsList />
     </div>
