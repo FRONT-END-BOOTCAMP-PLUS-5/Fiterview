@@ -5,6 +5,9 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { NoneReports } from './NoneReports';
 import { LoadingSpinner } from '@/app/(anon)/components/LoadingSpinner';
+import { useRouter } from 'next/navigation';
+import LoginModal from '../../components/LoginModal';
+import { useModalStore } from '@/stores/useModalStore';
 
 type PendingReport = {
   id: number;
@@ -14,6 +17,9 @@ type PendingReport = {
 export default function PendingInterviewsList() {
   const [reports, setReports] = useState<PendingReport[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const router = useRouter();
+  const { openModal } = useModalStore();
 
   useEffect(() => {
     const fetchPendingReports = async () => {
@@ -26,8 +32,8 @@ export default function PendingInterviewsList() {
         console.error('pending reports 불러오기 실패:', error);
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 401) {
-            // 인증 필요 - 로그인 페이지로 리다이렉트
-            window.location.href = '/login';
+            setShowLoginModal(true);
+            openModal();
           } else if (error.response?.status === 403) {
             console.error('권한이 없습니다.');
           }
@@ -38,7 +44,7 @@ export default function PendingInterviewsList() {
     };
 
     fetchPendingReports();
-  }, []);
+  }, [openModal]);
   return (
     <section className="flex-1 self-stretch inline-flex flex-col justify-start items-start min-h-0">
       <div className="self-stretch flex flex-col justify-start items-start gap-2">
@@ -68,6 +74,7 @@ export default function PendingInterviewsList() {
                          bg-[length:150%_100%] bg-[position:0%_0%]
                          hover:bg-[position:100%_0%]
                          transition-[background-position] duration-700 ease-out"
+              onClick={() => router.push(`/interview/${report.id}`)}
             >
               <div className="flex-1 inline-flex flex-col justify-start items-start gap-1.5">
                 <span className="justify-start text-slate-800 text-base font-semibold">
@@ -82,6 +89,8 @@ export default function PendingInterviewsList() {
           ))
         )}
       </div>
+
+      {showLoginModal && <LoginModal />}
     </section>
   );
 }
