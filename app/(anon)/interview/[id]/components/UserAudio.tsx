@@ -3,11 +3,8 @@
 import Mic from '@/public/assets/icons/mic.svg';
 import { useRef, useEffect, useState } from 'react';
 import MicRecorder from 'mic-recorder-to-mp3';
+import type { RecordingStatus } from '@/types/interview';
 
-// 녹음 진행 상태를 표현하는 뷰 모델 값
-type RecordingStatus = 'not_started' | 'recording' | 'completed' | 'error';
-
-// 컴포넌트 Props 정의
 interface UserAudioProps {
   active?: boolean; // true면 자동 시작, false면 자동 정지
   onFinish?: (blob: Blob) => void; // 정지 시 생성된 오디오 Blob 전달
@@ -21,20 +18,15 @@ export default function UserAudio({
   onError,
   text = '음성 인식 중...',
 }: UserAudioProps) {
-  // 외부 라이브러리 인스턴스 보관
   const recorderRef = useRef<MicRecorder | null>(null);
-
   // onFinish의 중복 호출을 방지하기 위한 플래그
   const hasOnFinishFiredRef = useRef(false);
-
   // stop 로직의 동시/중복 진입을 막기 위한 플래그
   const isStoppingRef = useRef(false);
-
-  // 화면 표시 및 제어를 위한 상태
   const [recordingStatus, setRecordingStatus] = useState<RecordingStatus>('not_started');
   const [hasStarted, setHasStarted] = useState(false);
 
-  // 녹음을 시작한다
+  // 녹음 시작
   const startRecording = async () => {
     try {
       recorderRef.current = new MicRecorder({ bitRate: 128 }) as InstanceType<typeof MicRecorder>;
@@ -49,7 +41,7 @@ export default function UserAudio({
     }
   };
 
-  // 녹음을 정지하고, 결과를 한 번만 전달한다
+  // 녹음 정지
   const stopRecording = async () => {
     try {
       if (isStoppingRef.current) return; // 재진입 방지
@@ -59,7 +51,7 @@ export default function UserAudio({
         setRecordingStatus('completed');
         if (!hasOnFinishFiredRef.current) {
           hasOnFinishFiredRef.current = true;
-          onFinish?.(blob);
+          onFinish?.(blob); // 녹음 완료 시 blob 전달
         }
       }
     } catch (e) {
@@ -72,11 +64,13 @@ export default function UserAudio({
     }
   };
 
-  // active 변화에 맞춰 start/stop를 정확히 1회씩만 수행
   useEffect(() => {
+    // active가 true이고 아직 녹음 시작 안했을 경우 녹음 시작
     if (active && !hasStarted) {
       startRecording();
-    } else if (!active && hasStarted) {
+    }
+    // active가 false이고 녹음중인 경우 녹음 정지
+    else if (!active && hasStarted) {
       stopRecording();
     }
   }, [active]);

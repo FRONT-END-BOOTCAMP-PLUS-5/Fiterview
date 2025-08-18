@@ -3,15 +3,13 @@
 import Timer from '@/app/(anon)/interview/[id]/components/Timer';
 import WaveAnimation from '@/public/assets/icons/wave-animation.svg';
 
-export default function TopSection({
-  running,
-  duration,
-  onComplete,
-}: {
+interface TopSectionProps {
   running: boolean;
   duration: number;
   onComplete?: () => void;
-}) {
+}
+
+export default function TopSection({ running, duration, onComplete }: TopSectionProps) {
   return (
     <section className="flex px-[32px] flex-col justify-center items-center gap-[8px] border-b border-slate-200 bg-[#F8FAFC] py-[8px]">
       <Timer running={running} duration={duration} onComplete={onComplete} />

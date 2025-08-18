@@ -4,6 +4,7 @@ export function useTtsAutoPlay(src: string | undefined, onReadyToRecord: () => v
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const callbackRef = useRef(onReadyToRecord);
 
+  // 같은 질문에서 콜백이 변해도 재생은 1번만
   useEffect(() => {
     callbackRef.current = onReadyToRecord;
   }, [onReadyToRecord]);

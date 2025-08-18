@@ -2,15 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-export default function Timer({
-  running,
-  duration,
-  onComplete,
-}: {
+interface TimerProps {
   running: boolean;
   duration: number;
   onComplete?: () => void;
-}) {
+}
+
+export default function Timer({ running, duration, onComplete }: TimerProps) {
   // 남은 시간(초)
   const [remaining, setRemaining] = useState(duration);
   // 시작 시간
