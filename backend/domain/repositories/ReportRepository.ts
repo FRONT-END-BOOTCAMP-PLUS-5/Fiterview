@@ -8,4 +8,5 @@ export interface ReportRepository {
   findReportsByUserId(userId: number): Promise<Report[]>;
   findReportsByStatus(userId: number, status: ReportStatus): Promise<Report[]>;
   findReportById(reportId: number): Promise<Report | null>;
+  deleteReport(reportId: number): Promise<void>;
 }
