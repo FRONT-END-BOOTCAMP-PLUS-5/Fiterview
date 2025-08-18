@@ -9,6 +9,7 @@ import LoginModal from '../../components/LoginModal';
 import FileAnalysisErrorModal from './FileAnalysisErrorModal';
 import { useModalStore } from '@/stores/useModalStore';
 import Sparkles from '@/public/assets/icons/sparkles.svg';
+import { useReportStore } from '@/stores/useReportStore';
 
 type SourceType = 'portfolio' | 'job';
 type UploadedItem = {
@@ -24,11 +25,11 @@ export default function QuickInterviewForm() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedItem[]>([]);
   const [limitExceeded, setLimitExceeded] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [reportId, setReportId] = useState<string | null>(null);
   const [modalType, setModalType] = useState<'generateQuestion' | 'login' | 'fileError' | null>(
     null
   );
   const { openModal } = useModalStore();
+  const { reportId, setReportId } = useReportStore();
 
   const handleAddFiles = (files: File[], source: SourceType) => {
     setUploadedFiles((prev) => {
@@ -87,7 +88,6 @@ export default function QuickInterviewForm() {
         } else if (error.response?.status === 403) {
           alert('권한이 없습니다.');
         } else if (error.response?.status === 400) {
-          // AI 응답 파싱 오류 또는 파일 내용 부족
           const errorMessage = error.response?.data?.message || '파일 분석에 실패했습니다.';
           if (errorMessage.includes('JSON 응답을 찾을 수 없습니다')) {
             setModalType('fileError');
@@ -149,7 +149,7 @@ export default function QuickInterviewForm() {
           </p>
         </button>
       </div>
-      {modalType === 'generateQuestion' && <GenerateQuestionModal reportId={reportId} />}
+      {modalType === 'generateQuestion' && reportId && <GenerateQuestionModal />}
       {modalType === 'login' && <LoginModal />}
       {modalType === 'fileError' && <FileAnalysisErrorModal />}
     </section>
