@@ -4,10 +4,14 @@ import Modal from '../../components/Modal';
 import ModalOverlay from '../../components/ModalOverlay';
 import Check from '@/public/assets/icons/check-circle.svg';
 import { useModalStore } from '@/stores/useModalStore';
+import { useReportStore } from '@/stores/useReportStore';
 
-export default function GenerateQuestionModal({ reportId }: { reportId: string | null }) {
+export default function GenerateQuestionModal() {
   const { isOpen, closeModal } = useModalStore();
   const router = useRouter();
+  const { reportId } = useReportStore();
+
+  console.log('GenerateQuestionModal 렌더링, isOpen:', isOpen, 'reportId:', reportId);
 
   const ModalButtons = () => {
     return (
@@ -15,9 +19,13 @@ export default function GenerateQuestionModal({ reportId }: { reportId: string |
         <button
           className="flex-1 h-11 px-5 bg-white rounded-lg outline-1 outline-offset-[-1px] outline-[#CBD5E1] flex justify-center items-center cursor-pointer"
           onClick={() => {
+            console.log('질문지만 볼래요 클릭, reportId:', reportId);
             closeModal();
             if (reportId) {
+              console.log('router.push 호출:', `/reports/${reportId}`);
               router.push(`/reports/${reportId}`);
+            } else {
+              console.log('reportId가 없습니다');
             }
           }}
         >
@@ -26,9 +34,13 @@ export default function GenerateQuestionModal({ reportId }: { reportId: string |
         <button
           className="flex-1 h-11 px-5 bg-[#3B82F6] rounded-lg flex justify-center items-center cursor-pointer"
           onClick={() => {
+            console.log('면접장으로 이동하기 클릭, reportId:', reportId);
             closeModal();
             if (reportId) {
+              console.log('router.push 호출:', `/interview/${reportId}`);
               router.push(`/interview/${reportId}`);
+            } else {
+              console.log('reportId가 없습니다');
             }
           }}
         >
