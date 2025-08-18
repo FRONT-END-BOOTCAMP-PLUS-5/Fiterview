@@ -4,7 +4,7 @@ export default function BottomSection({
   currentQuestion,
   totalQuestions,
   onNext,
-  isDisabled = false,
+  isDisabled,
 }: {
   currentQuestion: number;
   totalQuestions: number;
