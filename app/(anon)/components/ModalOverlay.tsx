@@ -1,4 +1,5 @@
 'use client';
+
 import { ReactNode, MouseEvent, useEffect } from 'react';
 
 interface ModalOverlayProps {

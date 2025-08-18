@@ -1,9 +1,10 @@
 'use client';
 
-import Upload from '@/public/assets/icons/upload.svg';
-import Picture from '@/public/assets/icons/image.svg';
 import { useRef, useState } from 'react';
 import { SourceType } from '@/types/file';
+import Upload from '@/public/assets/icons/upload.svg';
+import Picture from '@/public/assets/icons/image.svg';
+
 interface UploadOptionsProps {
   onAddFiles: (files: File[], source: SourceType) => void;
 }

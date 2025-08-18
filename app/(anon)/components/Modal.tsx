@@ -1,5 +1,5 @@
-import Del from '@/public/assets/icons/x.svg';
 import { ReactNode } from 'react';
+import Del from '@/public/assets/icons/x.svg';
 
 type ModalSize = 'large' | 'small';
 

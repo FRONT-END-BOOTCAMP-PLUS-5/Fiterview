@@ -1,6 +1,6 @@
+import { UploadedItem } from '@/types/file';
 import { useTruncateText } from '@/hooks/useTruncateText';
 import Del from '@/public/assets/icons/x.svg';
-import { UploadedItem } from '@/types/file';
 
 interface FileItemProps {
   file: UploadedItem;
