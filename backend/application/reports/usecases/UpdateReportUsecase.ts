@@ -1,4 +1,4 @@
-import { Reports, ReportStatus } from '@/backend/domain/entities/Report';
+import { Report, ReportStatus } from '@/backend/domain/entities/Report';
 import { ReportRepository } from '@/backend/domain/repositories/ReportRepository';
 
 export interface UpdateReportInput {
@@ -9,8 +9,8 @@ export interface UpdateReportInput {
 export class UpdateReportUsecase {
   constructor(private reportsRepository: ReportRepository) {}
 
-  async execute(reportId: number, updateData: UpdateReportInput): Promise<Reports> {
-    const repoUpdate: Partial<Reports> = {
+  async execute(reportId: number, updateData: UpdateReportInput): Promise<Report> {
+    const repoUpdate: Partial<Report> = {
       title: updateData.title,
       reflection: updateData.reflection,
     };

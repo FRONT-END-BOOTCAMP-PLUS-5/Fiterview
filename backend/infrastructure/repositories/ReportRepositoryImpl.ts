@@ -1,11 +1,11 @@
-import { Reports, ReportStatus } from '@/backend/domain/entities/Report';
+import { Report, ReportStatus } from '@/backend/domain/entities/Report';
 import { ReportRepository } from '@/backend/domain/repositories/ReportRepository';
 import prisma from '@/utils/prisma';
 import { mapReportStatusToDb, mapReportStatusToDomain } from '../mappers/ReportStatusMapper';
 import { Prisma, ReportStatus as PrismaReportStatus } from '@prisma/client';
 
 export class ReportRepositoryImpl implements ReportRepository {
-  async createReport(userId: number): Promise<Reports> {
+  async createReport(userId: number): Promise<Report> {
     const now = new Date();
     const title = this.generateTitle(now);
 
@@ -38,7 +38,7 @@ export class ReportRepositoryImpl implements ReportRepository {
     return `${year}${month}${day}${hour}${minute}`;
   }
 
-  async updateReport(reportId: number, updateData: Partial<Reports>): Promise<Reports> {
+  async updateReport(reportId: number, updateData: Partial<Report>): Promise<Report> {
     const prismaUpdateData: any = {};
     if (updateData.title !== undefined) prismaUpdateData.title = updateData.title;
     if (updateData.reflection !== undefined) prismaUpdateData.reflection = updateData.reflection;
@@ -67,7 +67,7 @@ export class ReportRepositoryImpl implements ReportRepository {
     });
   }
 
-  async findReportById(reportId: number): Promise<Reports | null> {
+  async findReportById(reportId: number): Promise<Report | null> {
     const report = await prisma.report.findUnique({
       where: { id: reportId },
     });
@@ -86,7 +86,7 @@ export class ReportRepositoryImpl implements ReportRepository {
     };
   }
 
-  async findReportsByUserId(userId: number): Promise<Reports[]> {
+  async findReportsByUserId(userId: number): Promise<Report[]> {
     const whereClause: Prisma.ReportWhereInput = { userId };
 
     const reports = await prisma.report.findMany({
@@ -105,7 +105,7 @@ export class ReportRepositoryImpl implements ReportRepository {
   }
 
   //로그인 구현 이후 수정 예정
-  async findAllReports(): Promise<Reports[]> {
+  async findAllReports(): Promise<Report[]> {
     const reports = await prisma.report.findMany({
       orderBy: {
         createdAt: 'desc',
@@ -122,7 +122,7 @@ export class ReportRepositoryImpl implements ReportRepository {
     }));
   }
 
-  async findReportsByStatus(userId: number, status: ReportStatus): Promise<Reports[]> {
+  async findReportsByStatus(userId: number, status: ReportStatus): Promise<Report[]> {
     const whereClause: Prisma.ReportWhereInput = { userId };
 
     if (status) {
