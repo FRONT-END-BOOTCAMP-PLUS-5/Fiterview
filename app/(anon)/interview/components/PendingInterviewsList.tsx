@@ -4,7 +4,7 @@ import Arrow from '@/public/assets/icons/arrow-right.svg';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { NoneReports } from './NoneReports';
-import { LoadingSpinner } from '@/app/components/LoadingSpinner';
+import { LoadingSpinner } from '@/app/(anon)/components/LoadingSpinner';
 
 type PendingReport = {
   id: number;
