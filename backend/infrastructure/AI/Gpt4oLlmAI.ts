@@ -93,7 +93,6 @@ export class Gpt4oLlmAI implements Gpt4oLlmAIInterface {
 
     try {
       const parsed = JSON.parse(outputText);
-
       const strength = Array.isArray((parsed as any).strength)
         ? ((parsed as any).strength as unknown[]).map((v) => String(v))
         : typeof (parsed as any).strength === 'string'
