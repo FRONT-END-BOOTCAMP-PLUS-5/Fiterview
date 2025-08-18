@@ -1,13 +1,13 @@
 'use client';
 
+import axios from 'axios';
+import { useState } from 'react';
 import UploadOptions from './UploadOptions';
 import UploadedFiles from './UploadedFiles';
-import Sparkles from '@/public/assets/icons/sparkles.svg';
-import { useState } from 'react';
-import axios from 'axios';
 import GenerateQuestionModal from './GenerateQuestionModal';
 import LoginModal from '../../components/LoginModal';
 import { useModalStore } from '@/stores/useModalStore';
+import Sparkles from '@/public/assets/icons/sparkles.svg';
 
 type SourceType = 'portfolio' | 'job';
 type UploadedItem = {

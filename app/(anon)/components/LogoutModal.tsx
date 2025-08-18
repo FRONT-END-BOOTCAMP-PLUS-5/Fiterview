@@ -4,7 +4,7 @@ import ModalOverlay from './ModalOverlay';
 import Modal from './Modal';
 import { useModalStore } from '@/stores/useModalStore';
 
-export default function LoginModal() {
+export default function LogoutModal() {
   const { isOpen, closeModal } = useModalStore();
   const router = useRouter();
 
@@ -18,7 +18,7 @@ export default function LoginModal() {
             router.push('/login');
           }}
         >
-          로그인하러 가기
+          로그아웃하기
         </div>
       </div>
     );
@@ -28,7 +28,7 @@ export default function LoginModal() {
     <ModalOverlay isOpen={isOpen} onClose={closeModal}>
       <Modal
         size="small"
-        title="로그인이 필요한 서비스입니다."
+        title="로그아웃하시겠습니까?"
         onClose={closeModal}
         buttons={<ModalButton />}
       />
