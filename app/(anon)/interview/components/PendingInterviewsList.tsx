@@ -63,7 +63,11 @@ export default function PendingInterviewsList() {
           reports.map((report) => (
             <div
               key={`pending-report-${report.id}`}
-              className="self-stretch h-20 p-6 bg-gradient-to-r from-blue-500/25 via-blue-300/10 to-white/30 hover:bg-gradient-to-r hover:from-white/30 hover:via-blue-300/10 hover:to-blue-500/25 rounded-xl outline-1 outline-offset-[-1px] outline-slate-200 flex justify-between items-center transition-all duration-1000 ease-in-out cursor-pointer"
+              className="self-stretch h-20 p-6 rounded-xl outline-1 outline-offset-[-1px] outline-slate-200 flex justify-between items-center cursor-pointer
+                         bg-gradient-to-r from-white/30 via-blue-300/10 to-blue-500/25
+                         bg-[length:150%_100%] bg-[position:0%_0%]
+                         hover:bg-[position:100%_0%]
+                         transition-[background-position] duration-700 ease-out"
             >
               <div className="flex-1 inline-flex flex-col justify-start items-start gap-1.5">
                 <span className="justify-start text-slate-800 text-base font-semibold">
