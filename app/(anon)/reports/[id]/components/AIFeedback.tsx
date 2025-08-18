@@ -7,7 +7,6 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  // Helper function to check if feedback data is complete and valid
   const isFeedbackComplete = (feedbackData: any): boolean => {
     return (
       feedbackData &&
@@ -21,7 +20,6 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
     );
   };
 
-  // Function to generate new feedback
   const generateNewFeedback = async () => {
     console.log('Generating new feedback...');
     try {
@@ -39,12 +37,10 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
         const data = await generateResponse.json();
         console.log('New feedback generated successfully:', data);
 
-        // Check if the new feedback is complete
         if (isFeedbackComplete(data)) {
           setFeedback(data);
         } else {
           console.warn('Generated feedback is incomplete, retrying...');
-          // If still incomplete, try one more time
           setTimeout(() => generateNewFeedback(), 1000);
         }
       } else {
@@ -69,7 +65,6 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
       try {
         console.log('Fetching existing feedback for report:', reportId);
 
-        // First, try to get existing feedback
         const response = await fetch(`/api/reports/${reportId}/feedback`, {
           method: 'GET',
           headers: {
@@ -78,11 +73,9 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
         });
 
         if (response.ok) {
-          // Existing feedback found
           const data = await response.json();
           console.log('Existing feedback found:', data);
 
-          // Check if existing feedback is complete
           if (isFeedbackComplete(data)) {
             setFeedback(data);
           } else {
@@ -90,11 +83,9 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
             await generateNewFeedback();
           }
         } else if (response.status === 404) {
-          // No feedback exists, generate new one
           console.log('No existing feedback found, generating new feedback...');
           await generateNewFeedback();
         } else {
-          // Other error occurred
           const errorText = await response.text();
           console.error('Failed to fetch existing feedback:', response.status, errorText);
           throw new Error(`Failed to fetch existing feedback: ${response.status} - ${errorText}`);

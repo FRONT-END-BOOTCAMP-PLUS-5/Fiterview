@@ -81,9 +81,6 @@ export class Gpt4oLlmAI implements Gpt4oLlmAIInterface {
   public async generateFeedback(requestFeedbackDto: RequestFeedbackDto): Promise<Feedback> {
     const input = this.createInputToGpt4(requestFeedbackDto.pairs);
 
-    console.log('Input sent to GPT:', input);
-    console.log('Instructions:', requestFeedbackDto.instructions);
-
     const client = getOpenAIClient();
     const response = await client.responses.create({
       model: requestFeedbackDto.model,
@@ -93,11 +90,9 @@ export class Gpt4oLlmAI implements Gpt4oLlmAIInterface {
     } as any);
 
     const outputText = (response as any).output_text as string;
-    console.log('Raw GPT response:', outputText);
 
     try {
       const parsed = JSON.parse(outputText);
-      console.log('Parsed JSON:', parsed);
 
       const strength = Array.isArray((parsed as any).strength)
         ? ((parsed as any).strength as unknown[]).map((v) => String(v))
@@ -114,9 +109,6 @@ export class Gpt4oLlmAI implements Gpt4oLlmAIInterface {
               .filter(Boolean)
           : [];
 
-      console.log('Processed strength:', strength);
-      console.log('Processed improvement:', improvement);
-
       return toFeedback(
         requestFeedbackDto.reportId,
         Number((parsed as any).score),
@@ -124,7 +116,6 @@ export class Gpt4oLlmAI implements Gpt4oLlmAIInterface {
         improvement
       );
     } catch (error) {
-      console.error('Error parsing GPT response:', error);
       const scoreMatch = outputText.match(/(\d+)/);
       const fallbackScore = scoreMatch ? scoreMatch[1] : '50';
       return toFeedback(requestFeedbackDto.reportId, Number(fallbackScore), [], []);
