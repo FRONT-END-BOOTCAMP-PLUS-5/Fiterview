@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
+import AuthSessionProvider from '@/app/(anon)/components/AuthSessionProvider';
 
 const pretendard = localFont({
   src: '../public/fonts/PretendardVariable.woff2',
@@ -37,7 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`min-h-dvh ${pretendard.variable} ${gmarket.variable} antialiased`}>
-        {children}
+        <AuthSessionProvider>{children}</AuthSessionProvider>
       </body>
     </html>
   );
