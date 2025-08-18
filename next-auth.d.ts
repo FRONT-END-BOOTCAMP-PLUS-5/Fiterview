@@ -1,7 +1,6 @@
 import NextAuth, { DefaultSession, DefaultUser } from 'next-auth';
 import { DefaultJWT } from 'next-auth/jwt';
-
-interface ISessionUser {
+export interface ISessionUser {
   id?: string;
   username?: string;
   email?: string;
