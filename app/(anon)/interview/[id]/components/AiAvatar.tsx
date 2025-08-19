@@ -3,6 +3,7 @@
 import Avatar from './avatar/Avatar';
 import { useRef, useEffect, useState, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
+import { Environment } from '@react-three/drei';
 
 export default function AiAvatar({
   ttsAudio,
@@ -33,11 +34,12 @@ export default function AiAvatar({
   }, [ttsAudio]);
 
   return (
-    <div className="flex h-[500px] w-full items-center justify-center">
-      <Canvas className="h-full w-full" camera={{ position: [0, 0, 0], fov: 10 }}>
-        {/* <ambientLight intensity={0.7} />
-        <directionalLight position={[3, 3, 3]} intensity={1} /> */}
+    <div className="flex h-full w-full items-center justify-center">
+      <Canvas className="h-full w-full" camera={{ position: [0, 0, 0], fov: 35 }}>
+        <ambientLight intensity={0.7} />
+        <directionalLight position={[3, 3, 3]} intensity={0.7} />
         <Suspense fallback={null}>
+          <Environment files="/poly_haven_studio_4k.hdr" background />
           <Avatar
             url="https://models.readyplayer.me/689d3904c911aabc2eba50a6.glb"
             analyser={analyser}
