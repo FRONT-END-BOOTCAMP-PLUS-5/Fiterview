@@ -120,6 +120,16 @@ export default function InterviewClient() {
     [audioRef]
   );
 
+  // tts재생(audioRef) + 립싱크 분석(AiAvatar)
+  const [ttsAudioEl, setTtsAudioEl] = useState<HTMLAudioElement | null>(null);
+  const setAudioElementRef = useCallback(
+    (node: HTMLAudioElement | null) => {
+      audioRef.current = node;
+      setTtsAudioEl(node);
+    },
+    [audioRef]
+  );
+
   const goNext = () => {
     // 마지막 질문이어도 즉시 이동하지 않고 녹음을 먼저 멈춰 업로드 → 이동
     stopAndAdvance();
