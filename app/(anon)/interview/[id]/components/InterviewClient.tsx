@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import TopSection from '@/app/(anon)/interview/[id]/components/TopSection';
 import BottomSection from '@/app/(anon)/interview/[id]/components/BottomSection';
 import AiAvatar from '@/app/(anon)/interview/[id]/components/AiAvatar';
@@ -15,6 +15,7 @@ import type { InterviewPhase } from '@/types/interview';
 
 export default function InterviewClient() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const reportId = Number(id);
 
   const [phase, setPhase] = useState<InterviewPhase>('idle');
@@ -39,6 +40,7 @@ export default function InterviewClient() {
   });
 
   const goNext = () => {
+    // 마지막 질문이어도 즉시 이동하지 않고 녹음을 먼저 멈춰 업로드 → 이동
     stopAndAdvance();
   };
 
@@ -77,9 +79,16 @@ export default function InterviewClient() {
       lastAdvancedOrderRef.current = currentOrder;
       if (!reportId) return;
       await uploadRecording({ reportId, order: currentOrder, blob });
+      // 업로드 성공 후에만 진행/이동
+      if (currentOrder >= 10) {
+        router.push('/'); //마지막 질문인 경우
+      } else {
+        setCurrentOrder((o) => Math.min(10, o + 1));
+      }
+    } catch (e) {
+      setIsNextBtnDisabled(false);
     } finally {
       setIsUploading(false);
-      setCurrentOrder((o) => Math.min(10, o + 1));
     }
   };
 
@@ -104,6 +113,7 @@ export default function InterviewClient() {
         totalQuestions={10}
         onNext={goNext}
         isDisabled={isNextBtnDisabled || isUploading}
+        nextLabel={currentOrder >= 10 ? '종료하기' : '다음 질문'}
       />
     </div>
   );

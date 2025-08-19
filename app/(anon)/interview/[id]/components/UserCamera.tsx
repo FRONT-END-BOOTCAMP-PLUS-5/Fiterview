@@ -81,14 +81,14 @@ export default function UserCamera({ message = '카메라 연결 실패', device
     <div
       className={`w-full h-full relative border border-[#E2E8F0] rounded-[4px] overflow-hidden transition-all duration-300`}
     >
-      <button
+      {/* <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
         className="absolute right-[8px] top-[8px] z-10 p-1 rounded-[6px] bg-white hover:bg-white transition-colors border border-[#CBD5E1]"
         aria-label={expanded ? '축소' : '확대'}
       >
         <Frame className="w-6 h-6 text-[#CBD5E1]" />
-      </button>
+      </button> */}
 
       {errorText ? (
         <div className="w-full h-full flex items-center justify-center text-[#94A3B8] text-[14px]">
