@@ -50,11 +50,35 @@ export default function InterviewClient() {
     localStorage.setItem(key, String(currentOrder));
   }, [reportId, currentOrder]);
 
+  // 시작 버튼 클릭 후에만 TTS 허용
+  const [ttsEnabled, setTtsEnabled] = useState(false);
+  useEffect(() => {
+    let startTimer: number | null = null;
+    const onStart = () => {
+      if (startTimer !== null) return;
+      startTimer = window.setTimeout(() => {
+        setTtsEnabled(true);
+      }, 3000); //3초 대기 후 시작
+    };
+    window.addEventListener('fiterview:start', onStart as EventListener);
+    return () => {
+      window.removeEventListener('fiterview:start', onStart as EventListener);
+      if (startTimer !== null) {
+        clearTimeout(startTimer);
+        startTimer = null;
+      }
+    };
+  }, []);
+
   // TTS 자동 재생 훅
-  const { audioRef, isPlaying } = useTtsAutoPlay(currentAudioSrc, () => {
-    setIsNextBtnDisabled(false);
-    setPhase('recording');
-  });
+  const { audioRef, isPlaying } = useTtsAutoPlay(
+    currentAudioSrc,
+    () => {
+      setIsNextBtnDisabled(false);
+      setPhase('recording');
+    },
+    ttsEnabled
+  );
 
   // tts재생(audioRef) + 립싱크 분석(AiAvatar)
   const [ttsAudioEl, setTtsAudioEl] = useState<HTMLAudioElement | null>(null);

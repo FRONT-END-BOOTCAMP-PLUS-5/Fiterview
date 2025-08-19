@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 
-export function useTtsAutoPlay(src: string | undefined, onReadyToRecord: () => void) {
+export function useTtsAutoPlay(
+  src: string | undefined,
+  onReadyToRecord: () => void,
+  enabled: boolean = true
+) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const callbackRef = useRef(onReadyToRecord);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -10,7 +14,21 @@ export function useTtsAutoPlay(src: string | undefined, onReadyToRecord: () => v
     callbackRef.current = onReadyToRecord;
   }, [onReadyToRecord]);
 
+  // 비활성화 시 즉시 정지
   useEffect(() => {
+    if (enabled) return;
+    const el = audioRef.current;
+    if (el) {
+      try {
+        el.pause();
+        el.currentTime = 0;
+      } catch {}
+    }
+    setIsPlaying(false);
+  }, [enabled]);
+
+  useEffect(() => {
+    if (!enabled) return;
     if (!src) return;
     const el = audioRef.current;
     if (!el) return;
@@ -52,7 +70,7 @@ export function useTtsAutoPlay(src: string | undefined, onReadyToRecord: () => v
       el.removeEventListener('play', onPlay);
       el.removeEventListener('pause', onPause);
     };
-  }, [src]);
+  }, [src, enabled]);
 
   return { audioRef, isPlaying } as const;
 }
