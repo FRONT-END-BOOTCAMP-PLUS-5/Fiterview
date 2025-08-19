@@ -1,10 +1,13 @@
 'use client';
 
-import Arrow from '@/public/assets/icons/arrow-right.svg';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import { NoneReports } from './NoneReports';
-import { LoadingSpinner } from '@/app/components/LoadingSpinner';
+import { NoneReports } from '@/app/(anon)/interview/components/NoneReports';
+import { LoadingSpinner } from '@/app/(anon)/components/LoadingSpinner';
+import LoginModal from '@/app/(anon)/components/modal/LoginModal';
+import { useModalStore } from '@/stores/useModalStore';
+import Arrow from '@/public/assets/icons/arrow-right.svg';
 
 type PendingReport = {
   id: number;
@@ -14,6 +17,8 @@ type PendingReport = {
 export default function PendingInterviewsList() {
   const [reports, setReports] = useState<PendingReport[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const { openModal, currentStep, isOpen } = useModalStore();
 
   useEffect(() => {
     const fetchPendingReports = async () => {
@@ -26,8 +31,7 @@ export default function PendingInterviewsList() {
         console.error('pending reports 불러오기 실패:', error);
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 401) {
-            // 인증 필요 - 로그인 페이지로 리다이렉트
-            window.location.href = '/login';
+            openModal('login');
           } else if (error.response?.status === 403) {
             console.error('권한이 없습니다.');
           }
@@ -38,19 +42,14 @@ export default function PendingInterviewsList() {
     };
 
     fetchPendingReports();
-  }, []);
+  }, [openModal]);
   return (
-    <section className="flex-1 self-stretch inline-flex flex-col justify-start items-start min-h-0">
-      <div className="self-stretch flex flex-col justify-start items-start gap-2">
-        <h2 className="self-stretch justify-start text-slate-800 text-3xl font-semibold">
-          나의 대기 면접
-        </h2>
-        <div className="self-stretch justify-start text-slate-500 text-sm font-normal">
-          생성된 면접 중 아직 응시하지 않은 면접을 시작해보세요.
-        </div>
+    <section className="flex-1 self-stretch inline-flex flex-col justify-start items-start">
+      <div className="flex flex-col gap-2 mb-4">
+        <h2 className="justify-start text-[#1E293B] text-[20px] font-semibold">나의 대기 면접</h2>
       </div>
 
-      <div className="mt-8 self-stretch flex flex-col justify-start items-start gap-4 overflow-y-auto max-h-[calc(100vh)]">
+      <div className="self-stretch flex flex-col justify-start items-start gap-4 overflow-y-auto max-h-[calc(100vh)]">
         {loading ? (
           <LoadingSpinner
             size="medium"
@@ -68,6 +67,7 @@ export default function PendingInterviewsList() {
                          bg-[length:150%_100%] bg-[position:0%_0%]
                          hover:bg-[position:100%_0%]
                          transition-[background-position] duration-700 ease-out"
+              onClick={() => router.push(`/interview/${report.id}`)}
             >
               <div className="flex-1 inline-flex flex-col justify-start items-start gap-1.5">
                 <span className="justify-start text-slate-800 text-base font-semibold">
@@ -82,6 +82,8 @@ export default function PendingInterviewsList() {
           ))
         )}
       </div>
+
+      {isOpen && currentStep === 'login' && <LoginModal />}
     </section>
   );
 }

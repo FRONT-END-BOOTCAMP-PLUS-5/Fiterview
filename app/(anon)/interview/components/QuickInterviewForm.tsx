@@ -1,25 +1,24 @@
 'use client';
 
-import UploadOptions from './UploadOptions';
-import UploadedFiles from './UploadedFiles';
-import Sparkles from '@/public/assets/icons/sparkles.svg';
-import { useState } from 'react';
 import axios from 'axios';
-
-type SourceType = 'portfolio' | 'job';
-type UploadedItem = {
-  id: string;
-  name: string;
-  size: number;
-  type: string;
-  source: SourceType;
-  file: File;
-};
+import { useState } from 'react';
+import UploadOptions from '@/app/(anon)/interview/components/UploadOptions';
+import UploadedFiles from '@/app/(anon)/interview/components/UploadedFiles';
+import LoginModal from '@/app/(anon)/components/modal/LoginModal';
+import ErrorModal from '@/app/(anon)/interview/components/modal/ErrorModal';
+import { useModalStore } from '@/stores/useModalStore';
+import Sparkles from '@/public/assets/icons/sparkles.svg';
+import { useReportStore } from '@/stores/useReportStore';
+import { UploadedItem } from '@/types/file';
 
 export default function QuickInterviewForm() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedItem[]>([]);
   const [limitExceeded, setLimitExceeded] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { openModal, currentStep, isOpen } = useModalStore();
+  const { reportId, setReportId } = useReportStore();
+
+  type SourceType = 'portfolio' | 'job';
 
   const handleAddFiles = (files: File[], source: SourceType) => {
     setUploadedFiles((prev) => {
@@ -63,22 +62,24 @@ export default function QuickInterviewForm() {
       if (response.data.success) {
         setUploadedFiles([]);
         setLimitExceeded(false);
-
-        // 모달로대체
-        alert('면접 질문이 성공적으로 생성되었습니다!');
-        window.location.reload();
+        setReportId(response.data.data.reportId);
+        openModal('generateQuestion');
       }
     } catch (error) {
-      console.error('면접 생성 실패:', error);
-
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
-          alert('로그인이 필요합니다.');
-          window.location.href = '/login';
+          openModal('login');
         } else if (error.response?.status === 403) {
           alert('권한이 없습니다.');
+        } else if (error.response?.status === 400) {
+          const errorMessage = error.response?.data?.message || '파일 분석에 실패했습니다.';
+          if (errorMessage.includes('JSON 응답을 찾을 수 없습니다')) {
+            openModal('fileError');
+          } else {
+            alert(errorMessage);
+          }
         } else {
-          alert(error.response?.data?.message || '면접 생성에 실패했습니다.');
+          openModal('questionError');
         }
       } else {
         alert('네트워크 오류가 발생했습니다.');
@@ -89,15 +90,14 @@ export default function QuickInterviewForm() {
   };
 
   return (
-    <section className="flex-1 inline-flex flex-col h-full">
-      <div className="flex flex-col gap-2 mb-8">
-        <h2 className="justify-start text-slate-800 text-3xl font-semibold">빠른 AI 면접</h2>
-        <p className="text-slate-500 text-sm">포트폴리오나 채용공고를 업로드해보세요.</p>
+    <section className="flex-1 inline-flex flex-col">
+      <div className="flex flex-col gap-2 mb-4">
+        <h2 className="justify-start text-[#1E293B] text-[20px] font-semibold">빠른 AI 면접</h2>
       </div>
 
       <UploadOptions onAddFiles={handleAddFiles} />
 
-      <div className="flex flex-col h-full">
+      <div className="h-full self-stretch flex flex-col justify-start items-start gap-4 mt-10">
         <UploadedFiles
           files={uploadedFiles}
           limitExceeded={limitExceeded}
@@ -108,7 +108,7 @@ export default function QuickInterviewForm() {
         />
 
         <button
-          className={`w-full h-12 py-[14px] rounded-xl flex justify-center items-center gap-3 mt-6 ${
+          className={`w-full h-12 py-[14px] rounded-xl flex justify-center items-center gap-3 ${
             uploadedFiles.length === 0 || isSubmitting
               ? 'bg-slate-100 cursor-not-allowed'
               : 'bg-blue-500 hover:bg-blue-600'
@@ -131,6 +131,14 @@ export default function QuickInterviewForm() {
           </p>
         </button>
       </div>
+
+      {isOpen && currentStep === 'login' && <LoginModal />}
+      {isOpen && currentStep === 'fileError' && (
+        <ErrorModal subTitle="업로드된 파일의 내용으로는 적절한 면접 질문을 생성하기 어렵습니다." />
+      )}
+      {isOpen && currentStep === 'questionError' && (
+        <ErrorModal subTitle="면접 질문 생성에 실패했습니다. 다시 시도해주세요." />
+      )}
     </section>
   );
 }
