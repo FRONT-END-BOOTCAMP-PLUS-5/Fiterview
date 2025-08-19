@@ -8,9 +8,17 @@ import { FeedbackRepositoryImpl } from '@/backend/infrastructure/repositories/Fe
 import { UpdateReportStatusUsecase } from '@/backend/application/reports/usecases/UpdateReportStatusUsecase';
 import { ReportRepositoryImpl } from '@/backend/infrastructure/repositories/ReportRepositoryImpl';
 import { FEEDBACK_GENERATION_INSTRUCTIONS } from '@/constants/feedback';
+import { getUserFromSession } from '@/lib/auth/api-auth';
+import { GetReportByIdUsecase } from '@/backend/application/reports/usecases/GetReportByIdUsecase';
 
 export async function GET(request: NextRequest) {
   try {
+    // 사용자 인증 확인
+    const user = await getUserFromSession();
+    if (!user) {
+      return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const questions_report_id = searchParams.get('questions_report_id');
 
@@ -27,6 +35,17 @@ export async function GET(request: NextRequest) {
         { error: 'questions_report_id must be valid numbers' },
         { status: 400 }
       );
+    }
+
+    // 리포트 소유권 확인
+    const reportRepository = new ReportRepositoryImpl();
+    const getReportByIdUsecase = new GetReportByIdUsecase(reportRepository);
+    const existingReport = await getReportByIdUsecase.execute(reportId);
+    if (!existingReport) {
+      return NextResponse.json({ error: 'Report not found' }, { status: 404 });
+    }
+    if (existingReport.userId !== Number(user.id)) {
+      return NextResponse.json({ error: '이 리포트에 대한 권한이 없습니다.' }, { status: 403 });
     }
 
     // Fetch questions and answers from the database
@@ -49,7 +68,6 @@ export async function GET(request: NextRequest) {
     };
 
     const llmRepo = new Gpt4oLlmAI();
-    const reportRepository = new ReportRepositoryImpl();
     const updateReportStatusUsecase = new UpdateReportStatusUsecase(reportRepository);
     const usecase = new GenerateFeedbackUsecase(
       llmRepo,
