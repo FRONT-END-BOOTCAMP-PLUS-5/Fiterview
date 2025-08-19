@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import TopSection from '@/app/(anon)/interview/[id]/components/TopSection';
 import BottomSection from '@/app/(anon)/interview/[id]/components/BottomSection';
@@ -51,10 +51,20 @@ export default function InterviewClient() {
   }, [reportId, currentOrder]);
 
   // TTS 자동 재생 훅
-  const { audioRef } = useTtsAutoPlay(currentAudioSrc, () => {
+  const { audioRef, isPlaying } = useTtsAutoPlay(currentAudioSrc, () => {
     setIsNextBtnDisabled(false);
     setPhase('recording');
   });
+
+  // tts재생(audioRef) + 립싱크 분석(AiAvatar)
+  const [ttsAudioEl, setTtsAudioEl] = useState<HTMLAudioElement | null>(null);
+  const setAudioElementRef = useCallback(
+    (node: HTMLAudioElement | null) => {
+      audioRef.current = node;
+      setTtsAudioEl(node);
+    },
+    [audioRef]
+  );
 
   const goNext = () => {
     // 마지막 질문이어도 즉시 이동하지 않고 녹음을 먼저 멈춰 업로드 → 이동

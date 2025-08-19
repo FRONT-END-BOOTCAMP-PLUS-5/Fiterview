@@ -15,23 +15,48 @@ export default function AiAvatar({
   // TTS 오디오 분석용
   const analyser = useRef<AnalyserNode | null>(null);
   const timeBuf = useRef<Uint8Array | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
   const [energy, setEnergy] = useState(0);
 
   useEffect(() => {
     if (!ttsAudio) return;
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    audioCtxRef.current = ctx;
     const source = ctx.createMediaElementSource(ttsAudio);
     analyser.current = ctx.createAnalyser();
     analyser.current.fftSize = 2048;
     timeBuf.current = new Uint8Array(analyser.current.fftSize);
+    // 분석 + 출력
     source.connect(analyser.current);
-    analyser.current.connect(ctx.destination);
+    source.connect(ctx.destination);
+    // 컨텍스트가 정지 상태면 재개
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+    // 재생 시에도 재개 시도 (모바일/브라우저 정책 대응)
+    const handlePlay = () => {
+      if (ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+      }
+    };
+    ttsAudio.addEventListener('play', handlePlay);
     return () => {
       source.disconnect();
       analyser.current?.disconnect();
       ctx.close();
+      audioCtxRef.current = null;
+      ttsAudio.removeEventListener('play', handlePlay);
     };
   }, [ttsAudio]);
+
+  // 재생 시작 시 오디오 컨텍스트가 일시중지 상태라면 재개
+  useEffect(() => {
+    if (!playing) return;
+    const ctx = audioCtxRef.current;
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+  }, [playing]);
 
   return (
     <div className="flex h-full w-full items-center justify-center">
