@@ -7,6 +7,7 @@ export interface SaveUserAnswerRequest {
   transcription: STTResponse;
 }
 
+// STT 응답을 받아 DB에 저장
 export class SaveUserAnswerUseCase {
   constructor(private prisma: PrismaClient) {}
 
