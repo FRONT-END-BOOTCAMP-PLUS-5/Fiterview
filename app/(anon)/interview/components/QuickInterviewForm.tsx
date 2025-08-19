@@ -4,13 +4,12 @@ import axios from 'axios';
 import { useState } from 'react';
 import UploadOptions from './UploadOptions';
 import UploadedFiles from './UploadedFiles';
-import GenerateQuestionModal from './modal/GenerateQuestionModal';
-import LoginModal from '../../components/LoginModal';
-import FileAnalysisErrorModal from './modal/FileAnalysisErrorModal';
+import LoginModal from '@/app/(anon)/components/modal/LoginModal';
 import { useModalStore } from '@/stores/useModalStore';
 import Sparkles from '@/public/assets/icons/sparkles.svg';
 import { useReportStore } from '@/stores/useReportStore';
 import { UploadedItem } from '@/types/file';
+import ErrorModal from './modal/ErrorModal';
 
 export default function QuickInterviewForm() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedItem[]>([]);
@@ -133,9 +132,14 @@ export default function QuickInterviewForm() {
           </p>
         </button>
       </div>
-      {isOpen && currentStep === 'generateQuestion' && reportId && <GenerateQuestionModal />}
+
       {isOpen && currentStep === 'login' && <LoginModal />}
-      {isOpen && currentStep === 'fileError' && <FileAnalysisErrorModal />}
+      {isOpen && currentStep === 'fileError' && (
+        <ErrorModal subTitle="업로드된 파일의 내용으로는 적절한 면접 질문을 생성하기 어렵습니다." />
+      )}
+      {isOpen && currentStep === 'questionError' && (
+        <ErrorModal subTitle="면접 질문 생성에 실패했습니다. 다시 시도해주세요." />
+      )}
     </section>
   );
 }
