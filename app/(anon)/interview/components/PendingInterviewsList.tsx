@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import { NoneReports } from './NoneReports';
+import { NoneReports } from '@/app/(anon)/interview/components/NoneReports';
 import { LoadingSpinner } from '@/app/(anon)/components/LoadingSpinner';
 import LoginModal from '@/app/(anon)/components/modal/LoginModal';
 import { useModalStore } from '@/stores/useModalStore';

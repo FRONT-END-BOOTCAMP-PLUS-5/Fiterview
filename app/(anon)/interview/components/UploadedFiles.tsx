@@ -1,7 +1,7 @@
 'use client';
 
-import FileItem from './FileItem';
-import { NoneUploadFiles } from './NoneUploadFiles';
+import FileItem from '@/app/(anon)/interview/components/FileItem';
+import { NoneUploadFiles } from '@/app/(anon)/interview/components/NoneUploadFiles';
 
 type SourceType = 'portfolio' | 'job';
 
