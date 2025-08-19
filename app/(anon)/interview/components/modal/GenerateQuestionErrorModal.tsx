@@ -1,6 +1,6 @@
 'use client';
-import Modal from '../../../components/Modal';
-import ModalOverlay from '../../../components/ModalOverlay';
+import Modal from '@/app/(anon)/components/modal/Modal';
+import ModalOverlay from '@/app/(anon)/components/modal/ModalOverlay';
 import { useModalStore } from '@/stores/useModalStore';
 
 export default function GenerateQuestionErrorModal() {

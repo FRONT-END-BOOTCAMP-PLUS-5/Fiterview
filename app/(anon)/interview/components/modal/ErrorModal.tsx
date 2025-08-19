@@ -3,25 +3,27 @@ import Modal from '@/app/(anon)/components/modal/Modal';
 import ModalOverlay from '@/app/(anon)/components/modal/ModalOverlay';
 import { useModalStore } from '@/stores/useModalStore';
 
-export default function FileAnalysisErrorModal() {
+interface ErrorModalProps {
+  subTitle: string;
+}
+
+export default function ErrorModal({ subTitle }: ErrorModalProps) {
   const { isOpen, closeModal } = useModalStore();
 
-  const ModalButton = () => {
-    return (
-      <button className="self-stretch h-11 bg-[#3B82F6] rounded-lg inline-flex justify-center items-center">
-        <div className="text-white text-sm font-semibold cursor-pointer" onClick={closeModal}>
-          확인
-        </div>
-      </button>
-    );
-  };
+  const ModalButton = () => (
+    <button className="self-stretch h-11 bg-[#3B82F6] rounded-lg inline-flex justify-center items-center">
+      <div className="text-white text-sm font-semibold cursor-pointer" onClick={closeModal}>
+        확인
+      </div>
+    </button>
+  );
 
   return (
     <ModalOverlay isOpen={isOpen} onClose={closeModal}>
       <Modal
         size="large"
         title="질문 생성 실패"
-        subTitle="업로드된 파일의 내용으로는 적절한 면접 질문을 생성하기 어렵습니다."
+        subTitle={subTitle}
         onClose={closeModal}
         body={
           <div className="w-full text-left bg-slate-50 p-4 rounded-lg text-sm text-slate-600">
