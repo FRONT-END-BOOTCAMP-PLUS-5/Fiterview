@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import TopSection from '@/app/(anon)/interview/[id]/components/TopSection';
 import BottomSection from '@/app/(anon)/interview/[id]/components/BottomSection';
@@ -32,6 +32,23 @@ export default function InterviewClient() {
   const current = items?.[currentOrder - 1];
   const currentQuestionText = current?.question ?? '질문을 불러오는 중입니다...';
   const currentAudioSrc = current ? `data:audio/mpeg;base64,${current.audioBuffer}` : undefined;
+
+  // 새로고침 복원: 저장된 order 불러오기
+  useEffect(() => {
+    if (!reportId) return;
+    const key = `interview:${reportId}:currentOrder`;
+    const saved = Number(localStorage.getItem(key));
+    if (Number.isFinite(saved) && saved >= 1 && saved <= 10) {
+      setCurrentOrder(saved);
+    }
+  }, [reportId]);
+
+  // 진행 중 order 저장
+  useEffect(() => {
+    if (!reportId) return;
+    const key = `interview:${reportId}:currentOrder`;
+    localStorage.setItem(key, String(currentOrder));
+  }, [reportId, currentOrder]);
 
   // TTS 자동 재생 훅
   const { audioRef } = useTtsAutoPlay(currentAudioSrc, () => {
@@ -81,6 +98,8 @@ export default function InterviewClient() {
       await uploadRecording({ reportId, order: currentOrder, blob });
       // 업로드 성공 후에만 진행/이동
       if (currentOrder >= 10) {
+        const key = `interview:${reportId}:currentOrder`;
+        localStorage.removeItem(key);
         router.push('/'); //마지막 질문인 경우
       } else {
         setCurrentOrder((o) => Math.min(10, o + 1));
