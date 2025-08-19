@@ -4,30 +4,23 @@ import axios from 'axios';
 import { useState } from 'react';
 import UploadOptions from './UploadOptions';
 import UploadedFiles from './UploadedFiles';
-import GenerateQuestionModal from './GenerateQuestionModal';
+import GenerateQuestionModal from './modal/GenerateQuestionModal';
 import LoginModal from '../../components/LoginModal';
-import FileAnalysisErrorModal from './FileAnalysisErrorModal';
+import FileAnalysisErrorModal from './modal/FileAnalysisErrorModal';
 import { useModalStore } from '@/stores/useModalStore';
 import Sparkles from '@/public/assets/icons/sparkles.svg';
 import { useReportStore } from '@/stores/useReportStore';
+import { UploadedItem } from '@/types/file';
 
 type SourceType = 'portfolio' | 'job';
-type UploadedItem = {
-  id: string;
-  name: string;
-  size: number;
-  type: string;
-  source: SourceType;
-  file: File;
-};
 
 export default function QuickInterviewForm() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedItem[]>([]);
   const [limitExceeded, setLimitExceeded] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [modalType, setModalType] = useState<'generateQuestion' | 'login' | 'fileError' | null>(
-    null
-  );
+  const [modalType, setModalType] = useState<
+    'generateQuestion' | 'login' | 'fileError' | 'questionError' | null
+  >(null);
   const { openModal } = useModalStore();
   const { reportId, setReportId } = useReportStore();
 
@@ -73,14 +66,12 @@ export default function QuickInterviewForm() {
       if (response.data.success) {
         setUploadedFiles([]);
         setLimitExceeded(false);
-        setReportId(response.data.reportId);
+        setReportId(response.data.data.reportId);
         setModalType('generateQuestion');
 
         openModal();
       }
     } catch (error) {
-      console.error('면접 생성 실패:', error);
-
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
           setModalType('login');
@@ -96,7 +87,8 @@ export default function QuickInterviewForm() {
             alert(errorMessage);
           }
         } else {
-          alert(error.response?.data?.message || '면접 생성에 실패했습니다.');
+          setModalType('questionError');
+          openModal();
         }
       } else {
         alert('네트워크 오류가 발생했습니다.');

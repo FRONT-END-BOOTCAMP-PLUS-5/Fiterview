@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import Modal from '../../components/Modal';
-import ModalOverlay from '../../components/ModalOverlay';
+import Modal from '../../../components/Modal';
+import ModalOverlay from '../../../components/ModalOverlay';
 import Check from '@/public/assets/icons/check-circle.svg';
 import { useModalStore } from '@/stores/useModalStore';
 import { useReportStore } from '@/stores/useReportStore';
@@ -10,8 +10,6 @@ export default function GenerateQuestionModal() {
   const { isOpen, closeModal } = useModalStore();
   const router = useRouter();
   const { reportId } = useReportStore();
-
-  console.log('GenerateQuestionModal 렌더링, isOpen:', isOpen, 'reportId:', reportId);
 
   const ModalButtons = () => {
     return (
