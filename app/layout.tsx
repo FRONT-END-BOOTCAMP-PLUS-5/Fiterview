@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
 import AuthSessionProvider from '@/app/(anon)/components/AuthSessionProvider';
-import QueryProvider from './components/QueryProvider';
+import QueryProvider from '@/app/(anon)/components/QueryProvider';
 
 const pretendard = localFont({
   src: '../public/fonts/PretendardVariable.woff2',
