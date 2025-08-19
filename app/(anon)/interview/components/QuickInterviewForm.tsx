@@ -90,15 +90,14 @@ export default function QuickInterviewForm() {
   };
 
   return (
-    <section className="flex-1 inline-flex flex-col h-full">
-      <div className="flex flex-col gap-2 mb-8">
-        <h2 className="justify-start text-slate-800 text-3xl font-semibold">빠른 AI 면접</h2>
-        <p className="text-slate-500 text-sm">포트폴리오나 채용공고를 업로드해보세요.</p>
+    <section className="flex-1 inline-flex flex-col">
+      <div className="flex flex-col gap-2 mb-4">
+        <h2 className="justify-start text-[#1E293B] text-[20px] font-semibold">빠른 AI 면접</h2>
       </div>
 
       <UploadOptions onAddFiles={handleAddFiles} />
 
-      <div className="flex flex-col h-full">
+      <div className="h-full self-stretch flex flex-col justify-start items-start gap-4 mt-10">
         <UploadedFiles
           files={uploadedFiles}
           limitExceeded={limitExceeded}
@@ -109,7 +108,7 @@ export default function QuickInterviewForm() {
         />
 
         <button
-          className={`w-full h-12 py-[14px] rounded-xl flex justify-center items-center gap-3 mt-6 ${
+          className={`w-full h-12 py-[14px] rounded-xl flex justify-center items-center gap-3 ${
             uploadedFiles.length === 0 || isSubmitting
               ? 'bg-slate-100 cursor-not-allowed'
               : 'bg-blue-500 hover:bg-blue-600'
