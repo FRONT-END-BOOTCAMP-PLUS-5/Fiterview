@@ -29,7 +29,7 @@ export default function UploadOptions({ onAddFiles }: UploadOptionsProps) {
     }`;
 
   return (
-    <div className="self-stretch flex gap-8 w-full h-[302px]">
+    <div className="self-stretch flex gap-8 w-full h-[200px]">
       <input
         ref={portfolioInputRef}
         type="file"

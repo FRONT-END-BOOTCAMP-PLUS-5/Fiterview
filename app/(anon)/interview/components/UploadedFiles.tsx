@@ -22,28 +22,20 @@ interface UploadedFilesProps {
 export default function UploadedFiles({ files, onRemove, limitExceeded }: UploadedFilesProps) {
   if (files.length === 0) {
     return (
-      <div className="h-full self-stretch flex flex-col justify-start items-start gap-6 mt-10">
-        <h3 className="self-stretch justify-start text-slate-800 text-xl font-semibold">
-          업로드된 파일
-        </h3>
+      <div className="self-stretch flex flex-col justify-start items-start gap-2 h-[328px]">
         <NoneUploadFiles />
       </div>
     );
   }
 
   return (
-    <div className="h-full self-stretch flex flex-col justify-start items-start gap-6 mt-10">
-      <h3 className="self-stretch justify-start text-slate-800 text-xl font-semibold">
-        업로드된 파일
-      </h3>
-      <div className="self-stretch flex flex-col justify-start items-start gap-2 h-full">
-        {files.map((f) => (
-          <FileItem key={`files-${f.id}`} file={f} onRemove={onRemove} />
-        ))}
-        {(limitExceeded || files.length > 6) && (
-          <span className="text-red-500 text-xs pl-1">최대 6개까지 업로드할 수 있어요.</span>
-        )}
-      </div>
+    <div className="self-stretch flex flex-col justify-start items-start gap-2 h-[328px]">
+      {files.map((f) => (
+        <FileItem key={`files-${f.id}`} file={f} onRemove={onRemove} />
+      ))}
+      {(limitExceeded || files.length > 6) && (
+        <span className="text-red-500 text-xs pl-1">최대 6개까지 업로드할 수 있어요.</span>
+      )}
     </div>
   );
 }

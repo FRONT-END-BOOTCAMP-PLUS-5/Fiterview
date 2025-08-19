@@ -44,17 +44,12 @@ export default function PendingInterviewsList() {
     fetchPendingReports();
   }, [openModal]);
   return (
-    <section className="flex-1 self-stretch inline-flex flex-col justify-start items-start min-h-0">
-      <div className="self-stretch flex flex-col justify-start items-start gap-2">
-        <h2 className="self-stretch justify-start text-slate-800 text-3xl font-semibold">
-          나의 대기 면접
-        </h2>
-        <div className="self-stretch justify-start text-slate-500 text-sm font-normal">
-          생성된 면접 중 아직 응시하지 않은 면접을 시작해보세요.
-        </div>
+    <section className="flex-1 self-stretch inline-flex flex-col justify-start items-start">
+      <div className="flex flex-col gap-2 mb-4">
+        <h2 className="justify-start text-[#1E293B] text-[20px] font-semibold">나의 대기 면접</h2>
       </div>
 
-      <div className="mt-8 self-stretch flex flex-col justify-start items-start gap-4 overflow-y-auto max-h-[calc(100vh)]">
+      <div className="self-stretch flex flex-col justify-start items-start gap-4 overflow-y-auto max-h-[calc(100vh)]">
         {loading ? (
           <LoadingSpinner
             size="medium"
