@@ -50,11 +50,35 @@ export default function InterviewClient() {
     localStorage.setItem(key, String(currentOrder));
   }, [reportId, currentOrder]);
 
+  // 시작 버튼 클릭 후에만 TTS 허용
+  const [ttsEnabled, setTtsEnabled] = useState(false);
+  useEffect(() => {
+    let startTimer: number | null = null;
+    const onStart = () => {
+      if (startTimer !== null) return;
+      startTimer = window.setTimeout(() => {
+        setTtsEnabled(true);
+      }, 3000); //3초 대기 후 시작
+    };
+    window.addEventListener('fiterview:start', onStart as EventListener);
+    return () => {
+      window.removeEventListener('fiterview:start', onStart as EventListener);
+      if (startTimer !== null) {
+        clearTimeout(startTimer);
+        startTimer = null;
+      }
+    };
+  }, []);
+
   // TTS 자동 재생 훅
-  const { audioRef, isPlaying } = useTtsAutoPlay(currentAudioSrc, () => {
-    setIsNextBtnDisabled(false);
-    setPhase('recording');
-  });
+  const { audioRef, isPlaying } = useTtsAutoPlay(
+    currentAudioSrc,
+    () => {
+      setIsNextBtnDisabled(false);
+      setPhase('recording');
+    },
+    ttsEnabled
+  );
 
   // tts재생(audioRef) + 립싱크 분석(AiAvatar)
   const [ttsAudioEl, setTtsAudioEl] = useState<HTMLAudioElement | null>(null);
@@ -127,7 +151,7 @@ export default function InterviewClient() {
       <main className="flex-1 flex">
         {/* Left: 아바타 면접관 영역 */}
         <section className="relative flex-1 min-w-0 h-full bg-[#F1F5F9] flex flex-col items-center justify-between">
-          <audio ref={setAudioElementRef} className="hidden" />
+          <audio ref={setAudioElementRef} className="hidden" playsInline />
           <AiAvatar ttsAudio={ttsAudioEl} playing={isPlaying} />
           <Question text={currentQuestionText} />
         </section>
