@@ -112,12 +112,12 @@ export default function InterviewClient() {
   };
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col">
+    <div className="h-screen flex flex-col">
       <TopSection running={running} duration={60} onComplete={goNext} />
-      <main className="flex-1 flex overflow-hidden">
+      <main className="flex-1 flex">
         {/* Left: 아바타 면접관 영역 */}
-        <section className="flex-1 min-w-0 h-full bg-[#F1F5F9] flex flex-col items-center justify-between p-[52px]">
-          <AiAvatar />
+        <section className="relative flex-1 min-w-0 h-full bg-[#F1F5F9] flex flex-col items-center justify-between">
+          <AiAvatar ttsAudio={audioRef.current} playing={running} />
           <audio ref={audioRef} className="hidden" />
           <Question text={currentQuestionText} />
         </section>

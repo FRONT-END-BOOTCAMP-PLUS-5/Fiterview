@@ -154,7 +154,7 @@ export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = fal
 
   return (
     <group>
-      <primitive object={gltf.scene} position={[0, -3.59, -1]} scale={[2, 2, 2]} />
+      <primitive object={gltf.scene} position={[0, -3.158, -1.5]} scale={[2, 2, 2]} />
       {/* 디버그용 */}
       <mesh position={[0, 0, 0]}>
         <sphereGeometry args={[0.1, 16, 16]} />
