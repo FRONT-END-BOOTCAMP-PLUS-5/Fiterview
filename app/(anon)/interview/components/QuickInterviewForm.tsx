@@ -12,17 +12,14 @@ import Sparkles from '@/public/assets/icons/sparkles.svg';
 import { useReportStore } from '@/stores/useReportStore';
 import { UploadedItem } from '@/types/file';
 
-type SourceType = 'portfolio' | 'job';
-
 export default function QuickInterviewForm() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedItem[]>([]);
   const [limitExceeded, setLimitExceeded] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [modalType, setModalType] = useState<
-    'generateQuestion' | 'login' | 'fileError' | 'questionError' | null
-  >(null);
-  const { openModal } = useModalStore();
+  const { openModal, currentStep, isOpen } = useModalStore();
   const { reportId, setReportId } = useReportStore();
+
+  type SourceType = 'portfolio' | 'job';
 
   const handleAddFiles = (files: File[], source: SourceType) => {
     setUploadedFiles((prev) => {
@@ -67,28 +64,23 @@ export default function QuickInterviewForm() {
         setUploadedFiles([]);
         setLimitExceeded(false);
         setReportId(response.data.data.reportId);
-        setModalType('generateQuestion');
-
-        openModal();
+        openModal('generateQuestion');
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
-          setModalType('login');
-          openModal();
+          openModal('login');
         } else if (error.response?.status === 403) {
           alert('권한이 없습니다.');
         } else if (error.response?.status === 400) {
           const errorMessage = error.response?.data?.message || '파일 분석에 실패했습니다.';
           if (errorMessage.includes('JSON 응답을 찾을 수 없습니다')) {
-            setModalType('fileError');
-            openModal();
+            openModal('fileError');
           } else {
             alert(errorMessage);
           }
         } else {
-          setModalType('questionError');
-          openModal();
+          openModal('questionError');
         }
       } else {
         alert('네트워크 오류가 발생했습니다.');
@@ -141,9 +133,9 @@ export default function QuickInterviewForm() {
           </p>
         </button>
       </div>
-      {modalType === 'generateQuestion' && reportId && <GenerateQuestionModal />}
-      {modalType === 'login' && <LoginModal />}
-      {modalType === 'fileError' && <FileAnalysisErrorModal />}
+      {isOpen && currentStep === 'generateQuestion' && reportId && <GenerateQuestionModal />}
+      {isOpen && currentStep === 'login' && <LoginModal />}
+      {isOpen && currentStep === 'fileError' && <FileAnalysisErrorModal />}
     </section>
   );
 }

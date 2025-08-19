@@ -17,9 +17,8 @@ type PendingReport = {
 export default function PendingInterviewsList() {
   const [reports, setReports] = useState<PendingReport[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showLoginModal, setShowLoginModal] = useState(false);
   const router = useRouter();
-  const { openModal } = useModalStore();
+  const { openModal, currentStep, isOpen } = useModalStore();
 
   useEffect(() => {
     const fetchPendingReports = async () => {
@@ -32,8 +31,7 @@ export default function PendingInterviewsList() {
         console.error('pending reports 불러오기 실패:', error);
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 401) {
-            setShowLoginModal(true);
-            openModal();
+            openModal('login');
           } else if (error.response?.status === 403) {
             console.error('권한이 없습니다.');
           }
@@ -90,7 +88,7 @@ export default function PendingInterviewsList() {
         )}
       </div>
 
-      {showLoginModal && <LoginModal />}
+      {isOpen && currentStep === 'login' && <LoginModal />}
     </section>
   );
 }
