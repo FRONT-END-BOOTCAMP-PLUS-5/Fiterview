@@ -16,7 +16,12 @@ export const useGetTtsQuestions = (reportId: number) => {
   return useQuery<QuestionTTSResponse, Error>({
     queryKey: ['tts-questions', reportId],
     queryFn: () => getTtsQuestions(reportId),
-    staleTime: Infinity, //인터뷰 중 리패치 방지
-    gcTime: 15 * 60 * 1000, //15분동안 캐시 유지
+    staleTime: Infinity,
+    gcTime: 15 * 60 * 1000,
+    retry: 0,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    enabled: Number.isFinite(reportId) && reportId > 0,
   });
 };
