@@ -1,16 +1,10 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 import { AvatarProps, Target, BlinkParams, BlinkState, BlinkIndices } from './types';
-import {
-  BLINK_MAX,
-  CONTINUOUS_SLOW_BLINK,
-  sampleBlinkParams,
-  setBlinkAmountUnified,
-} from './blink';
 import { scanMorphs } from './morphScanner';
 import { getEnergy } from './audio';
 import { collectMouthControlIndices, applyMouthMorphs, adjustJawBone } from './mouth';
@@ -18,7 +12,18 @@ import { advanceBlink } from './blinkMachine';
 import { applyIdleMotion } from './idle';
 
 export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = false }: AvatarProps) {
-  const gltf = useGLTF(url);
+  const modelUrl = useMemo(() => {
+    const raw = (url as string).trim();
+    if (!raw) return url as string;
+    const isFull = raw.startsWith('http://') || raw.startsWith('https://');
+    const base = isFull ? raw : `https://models.readyplayer.me/${raw}.glb`;
+    const hasQuery = base.includes('?');
+    const q = 'morphTargets=ARKit,Oculus%20Visemes';
+    const finalUrl = base + (hasQuery ? (base.includes('morphTargets=') ? '' : `&${q}`) : `?${q}`);
+    return finalUrl;
+  }, [url]);
+
+  const gltf = useGLTF(modelUrl);
 
   const targetsRef = useRef<Target[]>([]);
   const jawBoneRef = useRef<THREE.Object3D | null>(null);

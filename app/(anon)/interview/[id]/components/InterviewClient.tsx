@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import TopSection from '@/app/(anon)/interview/[id]/components/TopSection';
 import BottomSection from '@/app/(anon)/interview/[id]/components/BottomSection';
@@ -51,10 +51,20 @@ export default function InterviewClient() {
   }, [reportId, currentOrder]);
 
   // TTS 자동 재생 훅
-  const { audioRef } = useTtsAutoPlay(currentAudioSrc, () => {
+  const { audioRef, isPlaying } = useTtsAutoPlay(currentAudioSrc, () => {
     setIsNextBtnDisabled(false);
     setPhase('recording');
   });
+
+  // tts재생(audioRef) + 립싱크 분석(AiAvatar)
+  const [ttsAudioEl, setTtsAudioEl] = useState<HTMLAudioElement | null>(null);
+  const setAudioElementRef = useCallback(
+    (node: HTMLAudioElement | null) => {
+      audioRef.current = node;
+      setTtsAudioEl(node);
+    },
+    [audioRef]
+  );
 
   const goNext = () => {
     // 마지막 질문이어도 즉시 이동하지 않고 녹음을 먼저 멈춰 업로드 → 이동
@@ -117,8 +127,8 @@ export default function InterviewClient() {
       <main className="flex-1 flex">
         {/* Left: 아바타 면접관 영역 */}
         <section className="relative flex-1 min-w-0 h-full bg-[#F1F5F9] flex flex-col items-center justify-between">
-          <AiAvatar ttsAudio={audioRef.current} playing={running} />
-          <audio ref={audioRef} className="hidden" />
+          <audio ref={setAudioElementRef} className="hidden" />
+          <AiAvatar ttsAudio={ttsAudioEl} playing={isPlaying} />
           <Question text={currentQuestionText} />
         </section>
         {/* Right: 사용자 영역 */}
