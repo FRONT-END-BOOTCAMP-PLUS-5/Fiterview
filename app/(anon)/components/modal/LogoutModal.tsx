@@ -1,5 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 import ModalOverlay from './ModalOverlay';
 import Modal from './Modal';
 import { useModalStore } from '@/stores/useModalStore';
@@ -13,7 +14,8 @@ export default function LogoutModal() {
       <button className="self-stretch h-11 bg-[#3B82F6] rounded-lg inline-flex justify-center items-center">
         <div
           className="text-white text-sm font-semibold cursor-pointer"
-          onClick={() => {
+          onClick={async () => {
+            await signOut({ redirect: false });
             closeModal();
             router.push('/login');
           }}
