@@ -117,7 +117,9 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
             {loading ? (
               <div className="animate-spin rounded-full h-7 w-7 border-b-2 border-slate-800"></div>
             ) : (
-              <b className="relative leading-[28.8px]">{feedback?.score ?? '로딩 중...'}</b>
+              <b className="relative leading-[28.8px]">
+                {isFeedbackComplete(feedback) ? `${feedback?.score}점` : '로딩 중...'}
+              </b>
             )}
             <div className="w-30 h-2 bg-slate-200 rounded flex flex-row items-start justify-start">
               <div
@@ -135,8 +137,8 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
             feedback.strength.length > 0 ? (
               feedback.strength.map((strengthItem: string, index: number) => (
                 <div key={index} className="self-stretch flex flex-row items-start justify-start">
-                  <div className="flex-1 flex flex-row items-center justify-start gap-2">
-                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-[3px]"></div>
+                  <div className="flex-1 flex flex-row items-start justify-start gap-2">
+                    <div className="w-1.5 h-1.5 mt-1 bg-emerald-500 rounded-[3px] items-start"></div>
                     <div className="flex-1 relative leading-[16.8px]">{strengthItem}</div>
                   </div>
                 </div>
@@ -156,8 +158,8 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
             feedback.improvement.length > 0 ? (
               feedback.improvement.map((improvementItem: string, index: number) => (
                 <div key={index} className="self-stretch flex flex-row items-start justify-start">
-                  <div className="flex-1 flex flex-row items-center justify-start gap-2">
-                    <div className="w-1.5 h-1.5 bg-red-600 rounded-[3px]"></div>
+                  <div className="flex-1 flex flex-row items-start justify-start gap-2">
+                    <div className="w-1.5 h-1.5 mt-1 bg-red-600 rounded-[3px]"></div>
                     <div className="flex-1 relative leading-[16.8px]">{improvementItem}</div>
                   </div>
                 </div>
