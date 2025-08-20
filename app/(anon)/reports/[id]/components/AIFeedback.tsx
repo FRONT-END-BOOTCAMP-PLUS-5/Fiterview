@@ -1,11 +1,11 @@
 'use client';
 import React, { useEffect } from 'react';
 import BrainIcon from '@/public/assets/icons/brain.svg';
-
+import { LoadingSpinner } from '@/app/components/LoadingSpinner';
 export default function AIFeedback({ reportId }: { reportId: number }) {
   const [feedback, setFeedback] = React.useState<any>(null);
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [isCompleted, setIsCompleted] = React.useState(false);
 
   const isFeedbackComplete = (feedbackData: any): boolean => {
     return (
@@ -20,56 +20,13 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
     );
   };
 
-  const generateNewFeedback = async () => {
-    console.log('Generating new feedback...');
-    try {
-      const generateResponse = await fetch(
-        `/api/reports/feedback?questions_report_id=${reportId}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (generateResponse.ok) {
-        const data = await generateResponse.json();
-        console.log('New feedback generated successfully:', data);
-
-        if (isFeedbackComplete(data)) {
-          setFeedback(data);
-        } else {
-          console.warn('Generated feedback is incomplete, retrying...');
-          setTimeout(() => generateNewFeedback(), 1000);
-        }
-      } else {
-        const errorText = await generateResponse.text();
-        console.error('Failed to generate feedback:', generateResponse.status, errorText);
-        throw new Error(
-          `Failed to generate AI feedback: ${generateResponse.status} - ${errorText}`
-        );
-      }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An error occurred';
-      setError(errorMessage);
-      console.error('Error generating feedback:', err);
-    }
-  };
-
   useEffect(() => {
     const fetchFeedback = async () => {
       setLoading(true);
-      setError(null);
 
       try {
-        console.log('Fetching existing feedback for report:', reportId);
-
         const response = await fetch(`/api/reports/${reportId}/feedback`, {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
         });
 
         if (response.ok) {
@@ -78,21 +35,22 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
 
           if (isFeedbackComplete(data)) {
             setFeedback(data);
-          } else {
-            console.log('Existing feedback is incomplete, generating new feedback...');
-            await generateNewFeedback();
+            setIsCompleted(true);
           }
+        } else if (response.status === 409) {
+          console.log('Report is not completed');
+          setIsCompleted(false);
+          return;
         } else if (response.status === 404) {
-          console.log('No existing feedback found, generating new feedback...');
-          await generateNewFeedback();
+          console.log('No existing feedback found');
+          setIsCompleted(false);
+          return;
         } else {
           const errorText = await response.text();
           console.error('Failed to fetch existing feedback:', response.status, errorText);
           throw new Error(`Failed to fetch existing feedback: ${response.status} - ${errorText}`);
         }
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'An error occurred';
-        setError(errorMessage);
         console.error('Error in feedback flow:', err);
       } finally {
         setLoading(false);
@@ -115,66 +73,84 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
           <div className="self-stretch relative leading-[16.8px] font-semibold">전체 평가</div>
           <div className="self-stretch flex flex-row items-center justify-between gap-0 text-2xl text-slate-800">
             {loading ? (
-              <div className="animate-spin rounded-full h-7 w-7 border-b-2 border-slate-800"></div>
-            ) : (
+              <LoadingSpinner />
+            ) : isCompleted ? (
               <b className="relative leading-[28.8px]">
-                {isFeedbackComplete(feedback) ? `${feedback?.score}점` : '로딩 중...'}
+                {isFeedbackComplete(feedback) ? `${feedback?.score}점` : '--점'}
               </b>
+            ) : (
+              <b className="relative leading-[28.8px]">--점</b>
             )}
-            <div className="w-30 h-2 bg-slate-200 rounded flex flex-row items-start justify-start">
+
+            <div
+              className={`${loading ? 'hidden' : ''} w-30 h-2 bg-slate-200 rounded flex flex-row items-start justify-start`}
+            >
               <div
-                className="h-2 bg-blue-500 rounded transition-all duration-300"
+                className={`h-2 bg-blue-500 rounded transition-all duration-300`}
                 style={{ width: `${feedback?.score ?? 0}%` }}
               ></div>
             </div>
           </div>
         </div>
-        <div className="self-stretch flex flex-col items-start justify-start gap-3 text-green-600">
-          <div className="self-stretch relative leading-[16.8px] font-bold">강점</div>
-          <div className="self-stretch flex flex-col items-start justify-start gap-2 text-gray-700">
-            {feedback?.strength &&
-            Array.isArray(feedback.strength) &&
-            feedback.strength.length > 0 ? (
-              feedback.strength.map((strengthItem: string, index: number) => (
-                <div key={index} className="self-stretch flex flex-row items-start justify-start">
-                  <div className="flex-1 flex flex-row items-start justify-start gap-2">
-                    <div className="w-1.5 h-1.5 mt-1 bg-emerald-500 rounded-[3px] items-start"></div>
-                    <div className="flex-1 relative leading-[16.8px]">{strengthItem}</div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-slate-400">
-                {loading ? '로딩 중...' : '강점 정보가 없습니다'}
+        {isCompleted ? (
+          <>
+            <div className="self-stretch flex flex-col items-start justify-start gap-3 text-green-600">
+              <div
+                className={`self-stretch relative leading-[16.8px] ${isCompleted ? '' : 'hidden'} font-bold`}
+              >
+                강점
               </div>
-            )}
-          </div>
-        </div>
-        <div className="self-stretch flex flex-col items-start justify-start gap-3 text-red-600">
-          <div className="self-stretch relative leading-[16.8px] font-bold">개선점</div>
-          <div className="self-stretch flex flex-col items-start justify-start gap-2 text-gray-700">
-            {feedback?.improvement &&
-            Array.isArray(feedback.improvement) &&
-            feedback.improvement.length > 0 ? (
-              feedback.improvement.map((improvementItem: string, index: number) => (
-                <div key={index} className="self-stretch flex flex-row items-start justify-start">
-                  <div className="flex-1 flex flex-row items-start justify-start gap-2">
-                    <div className="w-1.5 h-1.5 mt-1 bg-red-600 rounded-[3px]"></div>
-                    <div className="flex-1 relative leading-[16.8px]">{improvementItem}</div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-slate-400">
-                {loading ? '로딩 중...' : '개선점 정보가 없습니다'}
+              <div className="self-stretch flex flex-col items-start justify-start gap-2 text-gray-700">
+                {feedback?.strength &&
+                Array.isArray(feedback.strength) &&
+                feedback.strength.length > 0 ? (
+                  feedback.strength.map((strengthItem: string, index: number) => (
+                    <div
+                      key={index}
+                      className="self-stretch flex flex-row items-start justify-start"
+                    >
+                      <div className="flex-1 flex flex-row items-start justify-start gap-2">
+                        <div className="w-1.5 h-1.5 mt-1 bg-emerald-500 rounded-[3px] items-start"></div>
+                        <div className="flex-1 relative leading-[16.8px]">{strengthItem}</div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-slate-400"></div>
+                )}
               </div>
-            )}
-          </div>
-        </div>
-        {error && (
-          <div className="text-red-500 text-sm mt-2 p-2 bg-red-50 rounded">
-            <strong>오류:</strong> {error}
-          </div>
+            </div>
+            <div className="self-stretch flex flex-col items-start justify-start gap-3 text-red-600">
+              <div
+                className={`self-stretch relative leading-[16.8px] ${isCompleted ? '' : 'hidden'} font-bold`}
+              >
+                개선점
+              </div>
+              <div className="self-stretch flex flex-col items-start justify-start gap-2 text-gray-700">
+                {feedback?.improvement &&
+                Array.isArray(feedback.improvement) &&
+                feedback.improvement.length > 0 ? (
+                  feedback.improvement.map((improvementItem: string, index: number) => (
+                    <div
+                      key={index}
+                      className="self-stretch flex flex-row items-start justify-start"
+                    >
+                      <div className="flex-1 flex flex-row items-start justify-start gap-2">
+                        <div className="w-1.5 h-1.5 mt-1 bg-red-600 rounded-[3px]"></div>
+                        <div className="flex-1 relative leading-[16.8px]">{improvementItem}</div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-slate-400"></div>
+                )}
+              </div>
+            </div>
+          </>
+        ) : null}
+
+        {!isCompleted && !loading && (
+          <div className="text-slate-400">면접을 응시하고 AI 피드백을 받아보세요!</div>
         )}
         {feedback && !isFeedbackComplete(feedback) && (
           <div className="text-orange-600 text-sm mt-2 p-2 bg-orange-50 rounded">
