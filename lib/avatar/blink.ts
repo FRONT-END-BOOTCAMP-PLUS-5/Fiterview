@@ -1,5 +1,5 @@
+import { BlinkIndices, BlinkParams } from '@/types/avatar';
 import * as THREE from 'three';
-import { BlinkIndices, BlinkParams, BlinkState } from './types';
 
 export const BLINK_MAX = 1.0;
 export const CONTINUOUS_SLOW_BLINK = false;

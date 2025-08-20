@@ -4,12 +4,12 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
-import { AvatarProps, Target, BlinkParams, BlinkState, BlinkIndices } from './types';
-import { scanMorphs } from './morphScanner';
-import { getEnergy } from './audio';
-import { collectMouthControlIndices, applyMouthMorphs, adjustJawBone } from './mouth';
-import { advanceBlink } from './blinkMachine';
-import { applyIdleMotion } from './idle';
+import { AvatarProps, Target, BlinkState, BlinkIndices } from '@/types/avatar';
+import { scanMorphs } from '@/lib/avatar/morphScanner';
+import { getEnergy } from '@/lib/avatar/audio';
+import { collectMouthControlIndices, applyMouthMorphs, adjustJawBone } from '@/lib/avatar/mouth';
+import { advanceBlink } from '@/lib/avatar/blinkMachine';
+import { applyIdleMotion } from '@/lib/avatar/idle';
 
 export default function Avatar({ url, analyser, timeBuf, onEnergy, playing = false }: AvatarProps) {
   const modelUrl = useMemo(() => {

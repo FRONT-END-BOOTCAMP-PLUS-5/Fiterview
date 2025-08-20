@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Target } from './types';
+import { Target } from '@/types/avatar';
 
 export const MOUTH_KEYS: string[] = [
   'jawOpen',
