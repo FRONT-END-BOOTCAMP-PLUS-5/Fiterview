@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { NoneReports } from '@/app/(anon)/interview/components/NoneReports';
-import { LoadingSpinner } from '@/app/(anon)/components/LoadingSpinner';
+import { LoadingSpinner } from '@/app/(anon)/components/loading/LoadingSpinner';
 import LoginModal from '@/app/(anon)/components/modal/LoginModal';
 import { useModalStore } from '@/stores/useModalStore';
 import Arrow from '@/public/assets/icons/arrow-right.svg';
