@@ -194,40 +194,42 @@ export default function CheckDeviceStatus({
     <>
       <div className="flex flex-col p-[24px] gap-[16px] bg-[#FEF9E7] rounded-[8px]">
         <div className="flex items-center justify-between">
-          <p className="text-[16px] text-[#92400E] font-semibold">기기 연결 상태 확인</p>
+          <p className="text-[16px] text-[#92400E] font-semibold cursor-default">
+            기기 연결 상태 확인
+          </p>
           <button
             onClick={runAll}
-            className="px-3 py-1 rounded-[6px] text-[12px] text-[#92400E] border border-[#F59E0B]"
+            className="px-3 py-1 rounded-[6px] text-[12px] text-[#92400E] border border-[#F59E0B] cursor-pointer"
           >
             재확인
           </button>
         </div>
         <div className="flex justify-between">
           <div className="flex flex-col">
-            <p className="text-[#64748B] text-[14px]">카메라</p>
+            <p className="text-[#64748B] text-[14px] cursor-default">카메라</p>
             <span className="mt-[8px] flex items-center">
               <span
                 className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${statusColor(camStatus)}`}
               ></span>
-              <p className="text-[#64748B] text-[14px]">{statusText(camStatus)}</p>
+              <p className="text-[#64748B] text-[14px] cursor-default">{statusText(camStatus)}</p>
             </span>
           </div>
           <div className="flex flex-col">
-            <p className="text-[#64748B] text-[14px]">마이크</p>
+            <p className="text-[#64748B] text-[14px] cursor-default">마이크</p>
             <span className="mt-[8px] flex items-center">
               <span
                 className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${statusColor(micStatus)}`}
               ></span>
-              <p className="text-[#64748B] text-[14px]">{statusText(micStatus)}</p>
+              <p className="text-[#64748B] text-[14px] cursor-default">{statusText(micStatus)}</p>
             </span>
           </div>
           <div className="flex flex-col">
-            <p className="text-[#64748B] text-[14px]">인터넷</p>
+            <p className="text-[#64748B] text-[14px] cursor-default">인터넷</p>
             <span className="mt-[8px] flex items-center">
               <span
                 className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${statusColor(netStatus)}`}
               ></span>
-              <p className="text-[#64748B] text-[14px]">{statusText(netStatus)}</p>
+              <p className="text-[#64748B] text-[14px] cursor-default">{statusText(netStatus)}</p>
             </span>
           </div>
         </div>
