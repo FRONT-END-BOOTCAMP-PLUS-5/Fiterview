@@ -3,7 +3,7 @@
 import Logo from '@/public/assets/images/logo1.png';
 import Arrow from '@/public/assets/icons/arrow-down.svg';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useSessionUser } from '@/lib/auth/useSessionUser';
 import DropDown from '@/app/(anon)/components/user/DropDown';
 import { useState } from 'react';
@@ -11,6 +11,7 @@ import LogoutModal from '@/app/(anon)/components/modal/LogoutModal';
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const { user } = useSessionUser();
   const username = user?.nickname;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -26,16 +27,16 @@ export default function Header() {
             <li>
               <button
                 type="button"
-                className="text-[#334155] font-medium cursor-pointer"
+                className={`text-[#334155] cursor-pointer ${pathname === '/interview' ? 'font-semibold' : 'font-medium'}`}
                 onClick={() => router.push('/interview')}
               >
-                모의면접
+                AI 면접
               </button>
             </li>
             <li>
               <button
                 type="button"
-                className="text-[#334155] font-semibold cursor-pointer"
+                className={`text-[#334155] cursor-pointer ${pathname === '/reports' ? 'font-semibold' : 'font-medium'}`}
                 onClick={() => router.push('/reports')}
               >
                 기록
