@@ -9,10 +9,10 @@ export function NoneReports() {
         <CalendarX width={40} height={40} strokeWidth={3} stroke="#CBD5E1" />
       </div>
       <div className="flex flex-col justify-start items-center gap-3">
-        <p className="text-center justify-start text-slate-800 text-lg font-semibold">
+        <p className="text-center justify-start text-[#64748B] text-lg font-semibold">
           대기중인 면접이 없습니다.
         </p>
-        <p className="text-center justify-start text-slate-500 text-sm">
+        <p className="text-center justify-start text-[#64748B] text-sm">
           포트폴리오를 업로드하고 맞춤형 면접을 생성해보세요.
         </p>
       </div>
