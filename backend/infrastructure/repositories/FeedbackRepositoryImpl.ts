@@ -2,6 +2,7 @@ import prisma from '@/utils/prisma';
 import { FeedbackRepository } from '@/backend/domain/repositories/FeedbackRepository';
 import { Feedback } from '@/backend/domain/entities/Feedback';
 import { Question } from '@/backend/domain/entities/Question';
+import { ReportStatus } from '@prisma/client';
 
 export class FeedbackRepositoryImpl implements FeedbackRepository {
   async getFeedback(feedback_report_id: number): Promise<Feedback> {
@@ -9,6 +10,14 @@ export class FeedbackRepositoryImpl implements FeedbackRepository {
       where: { reportId: feedback_report_id },
       select: { reportId: true, score: true, strength: true, improvement: true },
     });
+    const reportStatus = await prisma.report.findUnique({
+      where: { id: feedback_report_id },
+      select: { status: true },
+    });
+    console.log(reportStatus);
+    if (reportStatus?.status !== ReportStatus.COMPLETED) {
+      throw new Error(`Report is not completed`);
+    }
     if (!feedback) {
       throw new Error(`Feedback not found for report ${feedback_report_id}`);
     }
