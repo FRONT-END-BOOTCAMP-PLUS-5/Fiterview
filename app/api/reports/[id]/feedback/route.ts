@@ -13,11 +13,11 @@ import { GetReportByIdUsecase } from '@/backend/application/reports/usecases/Get
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    // // 사용자 인증 확인
-    // const user = await getUserFromSession();
-    // if (!user) {
-    //   return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
-    // }
+    // 사용자 인증 확인
+    const user = await getUserFromSession();
+    if (!user) {
+      return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
+    }
 
     const { id } = await params;
     const reportId = parseInt(id, 10);
@@ -27,15 +27,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     // 리포트 소유권 확인
-    // const reportRepository = new ReportRepositoryImpl();
-    // const getReportByIdUsecase = new GetReportByIdUsecase(reportRepository);
-    // const existingReport = await getReportByIdUsecase.execute(reportId);
-    // if (!existingReport) {
-    //   return NextResponse.json({ error: 'Report not found' }, { status: 404 });
-    // }
-    // if (existingReport.userId !== Number(user.id)) {
-    //   return NextResponse.json({ error: '이 리포트에 대한 권한이 없습니다.' }, { status: 403 });
-    // }
+    const reportRepository = new ReportRepositoryImpl();
+    const getReportByIdUsecase = new GetReportByIdUsecase(reportRepository);
+    const existingReport = await getReportByIdUsecase.execute(reportId);
+    if (!existingReport) {
+      return NextResponse.json({ error: 'Report not found' }, { status: 404 });
+    }
+    if (existingReport.userId !== Number(user.id)) {
+      return NextResponse.json({ error: '이 리포트에 대한 권한이 없습니다.' }, { status: 403 });
+    }
 
     const feedbackRepository = new FeedbackRepositoryImpl();
     const getFeedbackUsecase = new GetFeedbackUsecase(feedbackRepository);
