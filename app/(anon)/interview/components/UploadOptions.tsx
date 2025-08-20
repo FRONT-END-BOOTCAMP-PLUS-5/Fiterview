@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { SourceType } from '@/types/file';
 import Upload from '@/public/assets/icons/upload.svg';
 import Picture from '@/public/assets/icons/image.svg';
+
 interface UploadOptionsProps {
   onAddFiles: (files: File[], source: SourceType) => void;
 }
@@ -28,7 +29,7 @@ export default function UploadOptions({ onAddFiles }: UploadOptionsProps) {
     }`;
 
   return (
-    <div className="self-stretch flex gap-8 w-full h-[302px]">
+    <div className="self-stretch flex gap-8 w-full h-[200px]">
       <input
         ref={portfolioInputRef}
         type="file"
