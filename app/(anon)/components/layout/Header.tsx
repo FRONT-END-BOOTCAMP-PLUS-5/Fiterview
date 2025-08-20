@@ -7,27 +7,13 @@ import { useRouter } from 'next/navigation';
 import { useSessionUser } from '@/lib/auth/useSessionUser';
 import DropDown from '@/app/(anon)/components/user/DropDown';
 import { useState } from 'react';
-import { useRef, useEffect } from 'react';
+import LogoutModal from '@/app/(anon)/components/modal/LogoutModal';
 
 export default function Header() {
   const router = useRouter();
   const { user } = useSessionUser();
   const username = user?.nickname;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLLIElement>(null);
-
-  useEffect(() => {
-    if (!isDropdownOpen) return;
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isDropdownOpen]);
 
   return (
     <header className="w-full h-20 px-9 bg-white border-b border-[#F1F5F9] inline-flex justify-between items-center">
@@ -59,7 +45,15 @@ export default function Header() {
         </div>
         <ul className="flex justify-end items-center gap-6">
           {username ? (
-            <li className="relative">
+            <li
+              className="relative"
+              onBlur={(e) => {
+                const next = e.relatedTarget as Node | null;
+                if (!next || !e.currentTarget.contains(next)) {
+                  setIsDropdownOpen(false);
+                }
+              }}
+            >
               <button
                 className="flex justify-center items-center gap-2"
                 type="button"
@@ -102,6 +96,7 @@ export default function Header() {
           )}
         </ul>
       </nav>
+      <LogoutModal />
     </header>
   );
 }
