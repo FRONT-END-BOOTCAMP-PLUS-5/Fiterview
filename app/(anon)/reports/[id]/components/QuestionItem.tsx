@@ -97,7 +97,7 @@ export default function QuestionItem({
       className={`w-[792px] min-h-[56px] p-4 bg-slate-50 ${isEditing ? '' : 'cursor-pointer'} rounded-lg flex flex-col justify-start items-start gap-3 ${className}`}
     >
       {/* 질문 헤더 */}
-      <div className="self-stretch flex justify-start items-start gap-4">
+      <div className="self-stretch flex justify-start items-center gap-4">
         {/* 질문 번호  */}
         <div className="w-7 h-7 bg-blue-50 rounded outline outline-1 outline-offset-[-1px] outline-blue-500 flex justify-center items-center flex-shrink-0">
           <div className="flex justify-center items-center text-blue-500 text-[12px] font-bold w-full h-full">
@@ -106,7 +106,7 @@ export default function QuestionItem({
         </div>
 
         {/* 질문 텍스트와 화살표를 포함하는 영역 */}
-        <div className="flex-1 flex justify-between items-start gap-2">
+        <div className="flex-1 flex justify-between items-center gap-2">
           {/* 질문 텍스트 */}
           <div className="justify-start text-slate-800 text-sm font-semibold leading-normal whitespace-pre-line">
             {questionText}
