@@ -186,40 +186,28 @@ export default function InterviewClient() {
   };
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col">
-      {isError ? (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="px-4 py-3 rounded-md border border-red-200 bg-red-50 text-red-700 text-sm">
-            {(error as any)?.response?.data?.message ||
-              (error as any)?.response?.data?.error ||
-              '질문을 불러오지 못했습니다.'}
-          </div>
-        </div>
-      ) : (
-        <>
-          <TopSection running={running} duration={60} onComplete={goNext} />
-          <main className="flex-1 flex overflow-hidden">
-            {/* Left: 아바타 면접관 영역 */}
-            <section className="flex-1 min-w-0 h-full bg-[#F1F5F9] flex flex-col items-center justify-between p-[52px]">
-              <AiAvatar />
-              <audio ref={audioRef} className="hidden" />
-              <Question text={currentQuestionText} />
-            </section>
-            {/* Right: 사용자 영역 */}
-            <section className="flex-1 min-w-0 h-full bg-[#FAFBFC] flex flex-col items-center justify-between p-[52px] gap-[24px]">
-              <UserCamera />
-              <UserAudio active={running} onFinish={handleFinishRecording} />
-            </section>
-          </main>
-          <BottomSection
-            currentQuestion={currentOrder}
-            totalQuestions={10}
-            onNext={goNext}
-            isDisabled={isNextBtnDisabled || isUploading}
-            nextLabel={currentOrder >= 10 ? '종료하기' : '다음 질문'}
-          />
-        </>
-      )}
+    <div className="h-screen flex flex-col">
+      <TopSection running={running} duration={60} onComplete={goNext} />
+      <main className="flex-1 flex">
+        {/* Left: 아바타 면접관 영역 */}
+        <section className="relative flex-1 min-w-0 h-full bg-[#F1F5F9] flex flex-col items-center justify-between">
+          <audio ref={setAudioElementRef} className="hidden" playsInline />
+          <AiAvatar ttsAudio={ttsAudioEl} playing={isPlaying} />
+          <Question text={currentQuestionText} />
+        </section>
+        {/* Right: 사용자 영역 */}
+        <section className="relative flex-1 min-w-0 h-full bg-[#FAFBFC] flex flex-col items-center justify-between gap-[24px]">
+          <UserCamera />
+          <UserAudio active={running} onFinish={handleFinishRecording} />
+        </section>
+      </main>
+      <BottomSection
+        currentQuestion={currentOrder}
+        totalQuestions={10}
+        onNext={goNext}
+        isDisabled={isNextBtnDisabled || isUploading}
+        nextLabel={currentOrder >= 10 ? '종료하기' : '다음 질문'}
+      />
     </div>
   );
 }
