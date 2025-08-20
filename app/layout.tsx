@@ -3,8 +3,8 @@ import localFont from 'next/font/local';
 import './globals.css';
 import AuthSessionProvider from '@/app/(anon)/components/provider/AuthSessionProvider';
 import QueryProvider from '@/app/(anon)/components/provider/QueryProvider';
-import Header from '@/app/(anon)/components/layout/Header';
-import Footer from '@/app/(anon)/components/layout/Footer';
+import HeaderVisibility from '@/app/(anon)/components/layout/HeaderVisibility';
+import FooterVisibility from '@/app/(anon)/components/layout/FooterVisibility';
 
 const pretendard = localFont({
   src: '../public/fonts/PretendardVariable.woff2',
@@ -43,9 +43,9 @@ export default function RootLayout({
       <body className={`min-h-dvh ${pretendard.variable} ${gmarket.variable} antialiased`}>
         <AuthSessionProvider>
           <QueryProvider>
-            <Header />
+            <HeaderVisibility />
             {children}
-            <Footer />
+            <FooterVisibility />
           </QueryProvider>
         </AuthSessionProvider>
       </body>
