@@ -3,15 +3,31 @@
 import { useEffect, useState } from 'react';
 import MessageSquareIcon from '@/public/assets/icons/message-square.svg';
 import { LoadingSpinner } from '@/app/(anon)/components/LoadingSpinner';
+import axios from 'axios';
 
-export default function Reflection({ reflection }: { reflection: string }) {
-  const [isEditing, setIsEditing] = useState(false);
+export default function Reflection({
+  reportId,
+  reflection,
+}: {
+  reportId: number;
+  reflection: string;
+}) {
   const [isLoading, setIsLoading] = useState(true);
   const [text, setText] = useState(reflection ?? 'ex) 이번 면접에서 가장 잘한 점');
 
   useEffect(() => {
     setIsLoading(false);
   }, [reflection]);
+
+  const handleSaveClick = async () => {
+    try {
+      await axios.put(`/api/reports/${reportId}`, {
+        reflection: text,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   if (isLoading) return <LoadingSpinner />;
 
@@ -28,26 +44,22 @@ export default function Reflection({ reflection }: { reflection: string }) {
             면접에서 느낀 생각과 감정을 솔직하게 기록해보세요.
           </div>
 
-          {isEditing ? (
-            <textarea
-              className="w-full min-h-48 p-3 bg-slate-50 rounded-md border border-slate-200 outline-none focus:border-slate-300 text-slate-700 placeholder-slate-400"
-              placeholder="ex) 이번 면접에서 가장 잘한 점"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-            />
-          ) : (
-            <div className="w-full min-h-48 p-3 bg-slate-50 rounded-md border border-slate-200 text-slate-700 whitespace-pre-wrap">
-              {text || <span className="text-slate-400">ex) 이번 면접에서 가장 잘한 점</span>}
-            </div>
-          )}
+          <textarea
+            className="w-full min-h-48 p-3 bg-slate-50 rounded-md border border-slate-200 outline-none focus:border-slate-300 text-slate-700 placeholder-slate-400"
+            placeholder="ex) 이번 면접에서 가장 잘한 점"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+          />
         </div>
 
         <button
           type="button"
-          className="text-xs font-medium text-slate-400 hover:text-slate-500 transition-colors"
-          onClick={() => setIsEditing((prev) => !prev)}
+          className="text-xs font-medium self-end text-slate-400 hover:text-slate-500 transition-colors"
+          onClick={() => {
+            handleSaveClick();
+          }}
         >
-          {isEditing ? '저장' : '수정하기'}
+          수정하기
         </button>
       </div>
     </div>
