@@ -14,6 +14,7 @@ interface CheckDeviceStatusProps {
   availableMicrophones: DeviceInfo[];
   selectedCamera: string;
   selectedMicrophone: string;
+  onStatusChange?: (statuses: { mic: Status; cam: Status; net: Status }) => void;
 }
 
 function stopStream(stream: MediaStream | null) {
@@ -29,6 +30,7 @@ export default function CheckDeviceStatus({
   availableMicrophones,
   selectedCamera,
   selectedMicrophone,
+  onStatusChange,
 }: CheckDeviceStatusProps) {
   const [micStatus, setMicStatus] = useState<Status>('checking');
   const [camStatus, setCamStatus] = useState<Status>('checking');
@@ -189,6 +191,10 @@ export default function CheckDeviceStatus({
         return '';
     }
   }
+
+  useEffect(() => {
+    onStatusChange?.({ mic: micStatus, cam: camStatus, net: netStatus });
+  }, [micStatus, camStatus, netStatus, onStatusChange]);
 
   return (
     <>
