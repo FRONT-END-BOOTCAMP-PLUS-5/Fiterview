@@ -49,12 +49,12 @@ export default function PendingInterviewsList() {
         <h2 className="justify-start text-[#1E293B] text-[20px] font-semibold">나의 대기 면접</h2>
       </div>
 
-      <div className="h-full w-full flex flex-col justify-start items-start gap-4 overflow-y-auto max-h-[calc(100vh)]">
+      <div className="h-full w-full flex flex-col justify-start items-start gap-4 overflow-y-auto">
         {loading ? (
           <LoadingSpinner
             size="medium"
             message="대기 면접을 불러오는 중..."
-            className="self-stretch justify-center items-center h-dvh"
+            className="self-stretch justify-center items-center h-full"
           />
         ) : reports.length === 0 ? (
           <NoneReports />

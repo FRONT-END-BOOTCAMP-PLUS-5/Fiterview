@@ -10,6 +10,7 @@ import { useModalStore } from '@/stores/useModalStore';
 import Sparkles from '@/public/assets/icons/sparkles.svg';
 import { useReportStore } from '@/stores/useReportStore';
 import { UploadedItem } from '@/types/file';
+import GenerateQuestionModal from './modal/GenerateQuestionModal';
 
 export default function QuickInterviewForm() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedItem[]>([]);
@@ -139,6 +140,7 @@ export default function QuickInterviewForm() {
       {isOpen && currentStep === 'questionError' && (
         <ErrorModal subTitle="면접 질문 생성에 실패했습니다. 다시 시도해주세요." />
       )}
+      {isOpen && currentStep === 'generateQuestion' && <GenerateQuestionModal />}
     </section>
   );
 }
