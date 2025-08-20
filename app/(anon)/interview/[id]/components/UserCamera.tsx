@@ -79,7 +79,7 @@ export default function UserCamera({ message = '카메라 연결 실패', device
 
   return (
     <div
-      className={`w-full h-full relative border border-[#E2E8F0] rounded-[4px] overflow-hidden transition-all duration-300`}
+      className={`w-full h-full relative border border-[#E2E8F0] overflow-hidden transition-all duration-300`}
     >
       {/* <button
         type="button"
