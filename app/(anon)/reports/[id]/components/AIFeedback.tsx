@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect } from 'react';
 import BrainIcon from '@/public/assets/icons/brain.svg';
-import { LoadingSpinner } from '@/app/components/LoadingSpinner';
+import { LoadingSpinner } from '@/app/(anon)/components/LoadingSpinner';
 export default function AIFeedback({ reportId }: { reportId: number }) {
   const [feedback, setFeedback] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(true);
