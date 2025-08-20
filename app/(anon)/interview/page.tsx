@@ -3,7 +3,7 @@ import PendingInterviewsList from './components/PendingInterviewsList';
 
 export default function InterviewPage() {
   return (
-    <div className="h-full px-[104px] py-10 ">
+    <div className="h-full place-self-stretch px-[104px] py-10 ">
       <div className="flex flex-col mb-6 gap-2">
         <h1 className="self-stretch justify-start text-[#1E293B] text-[32px] font-semibold">
           AI 면접
