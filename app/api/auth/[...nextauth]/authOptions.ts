@@ -8,19 +8,45 @@ import { UserRepositoryImpl } from '@/backend/infrastructure/repositories/UserRe
 import { CreateUserUseCase } from '@/backend/application/auth/usecases/CreateUserUseCase';
 import { SignUpRequestDto } from '@/backend/application/users/dtos/SignUpRequestDto';
 
-interface ISessionUser {
-  id?: number;
-  username?: string;
-  email?: string;
-  nickname?: string;
-}
-
 export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
+  // 세션 만료 시간
+  session: {
+    strategy: 'jwt' as const,
+    maxAge: 24 * 60 * 60, // 24시간
+    updateAge: 60 * 60, // 1시간마다 업데이트
+  },
+  // 토큰 만료 시간
+  jwt: {
+    maxAge: 24 * 60 * 60, // 24시간
+  },
+  // Google OAuth 자동 로그인 방지
+  useSecureCookies: process.env.NODE_ENV === 'production',
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true, // XSS 공격 방지
+        sameSite: 'lax', // CSRF 공격 방지
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60,
+      },
+    },
+  },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: 'select_account',
+          access_type: 'offline',
+          response_type: 'code',
+          include_granted_scopes: 'true',
+          hd: '',
+        },
+      },
     }),
     CredentialsProvider({
       name: 'Credentials',
@@ -60,8 +86,8 @@ export const authOptions = {
       account,
       profile,
     }: {
-      user: User;
-      account: { provider: string } | null;
+      user: User & { accessToken?: string };
+      account: { provider: string; access_token?: string } | null;
       profile?: any;
     }) {
       // Google OAuth로 로그인한 경우 사용자 정보 처리
@@ -77,6 +103,14 @@ export const authOptions = {
             user.id = existingUser.id!.toString();
             user.username = existingUser.username;
             user.nickname = existingUser.nickname;
+            user.email = existingUser.email;
+
+            // 기존 세션 정보 정리
+            if (account.access_token) {
+              // Google OAuth 토큰 정보로 저장
+              user.accessToken = account.access_token;
+            }
+
             return true;
           } else {
             // 새 사용자 생성
@@ -110,6 +144,13 @@ export const authOptions = {
               user.id = result.user.id!.toString();
               user.username = result.user.username;
               user.nickname = result.user.nickname;
+              user.email = result.user.email;
+
+              // Google OAuth 토큰 정보 저장
+              if (account.access_token) {
+                user.accessToken = account.access_token;
+              }
+
               return true;
             }
           }
@@ -120,22 +161,54 @@ export const authOptions = {
       }
       return true;
     },
-    async jwt({ token, user }: { token: JWT; user?: User }) {
+    async jwt({
+      token,
+      user,
+      account,
+    }: {
+      token: JWT;
+      user?: User & { accessToken?: string };
+      account?: any;
+    }) {
       if (user) {
         token.id = user.id;
         token.username = user.username;
         token.email = user.email;
         token.nickname = user.nickname;
+
+        // Google OAuth 토큰 정보 저장
+        if (user.accessToken) {
+          token.accessToken = user.accessToken;
+        }
       }
+
+      // Google OAuth 계정 정보가 있으면 토큰에 저장
+      if (account?.provider === 'google' && account.access_token) {
+        token.provider = 'google';
+        token.accessToken = account.access_token;
+      }
+
       return token;
     },
 
-    async session({ session, token }: { session: Session; token: JWT }) {
+    async session({
+      session,
+      token,
+    }: {
+      session: Session;
+      token: JWT & { accessToken?: string; provider?: string };
+    }) {
       if (session.user && token.id) {
         session.user.id = token.id;
         session.user.username = token.username as string;
         session.user.email = token.email as string;
         session.user.nickname = token.nickname as string;
+
+        // Google OAuth 정보 추가
+        if (token.provider === 'google') {
+          (session as any).provider = 'google';
+          (session as any).accessToken = token.accessToken;
+        }
       }
 
       return session;
