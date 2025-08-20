@@ -9,9 +9,9 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
 
   return (
     <div>
-      <AIFeedback reportId={parseInt(id, 10)} />
-      <AudioReportViewer reportId={id} />
-      <Reflection reflection={reflection} />
+      {/* <AIFeedback reportId={parseInt(id, 10)} /> */}
+      {/* <AudioReportViewer reportId={id} /> */}
+      <Reflection reportId={parseInt(id, 10)} reflection={reflection} />
     </div>
   );
 }
