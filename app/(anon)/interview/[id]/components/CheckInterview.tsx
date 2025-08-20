@@ -5,6 +5,8 @@ import CheckCircle from '@/public/assets/icons/check-circle.svg';
 import NoticeList from '@/app/(anon)/interview/[id]/components/precheck/NoticeList';
 import CheckDeviceStatus from '@/app/(anon)/interview/[id]/components/precheck/CheckDeviceStatus';
 import ChooseDevice from '@/app/(anon)/interview/[id]/components/precheck/ChooseDevice';
+import Play from '@/public/assets/icons/play.svg';
+import X from '@/public/assets/icons/x.svg';
 
 type DeviceInfo = {
   deviceId: string;
@@ -82,7 +84,7 @@ export default function CheckInterview() {
 
   return (
     <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-white">
-      <div className="flex flex-col w-[800px] p-12  bg-white rounded-[16px] gap-[32px]">
+      <div className="flex flex-col w-[800px] p-12 bg-white rounded-[16px] gap-[32px]">
         <section className="flex flex-col justify-center items-center ">
           <div className="w-[64px] h-[64px] bg-[#3B82F6] rounded-[32px] flex justify-center items-center">
             <div className="w-[32px] h-[32px] flex justify-center items-center">
@@ -114,14 +116,26 @@ export default function CheckInterview() {
             selectedMicrophone={selectedMicrophone}
           />
         </section>
-        <button
-          type="button"
-          disabled={false}
-          onClick={handleStart}
-          className="px-5 py-2.5 rounded-md bg-black text-white hover:bg-gray-800"
-        >
-          시작하기
-        </button>
+        <section className="flex justify-center gap-[16px]">
+          <button
+            type="button"
+            disabled={false}
+            onClick={handleStart}
+            className="flex px-[32px] py-[12px] gap-[8px] justify-center items-center rounded-[8px] border border-[#E2E8F0] bg-white text-[#64748B] text-[16px] font-semibold cursor-pointer hover:bg-[#F1F5F9]"
+          >
+            <X className="w-[20px] h-[20px] text-[#64748B]" />
+            취소하기
+          </button>
+          <button
+            type="button"
+            disabled={false}
+            onClick={handleStart}
+            className="flex px-[32px] py-[12px] gap-[8px] justify-center items-center rounded-[8px] bg-[#3B82F6] text-white text-[16px] font-semibold cursor-pointer hover:bg-[#2563EB]"
+          >
+            <Play className="w-[20px] h-[20px]" />
+            면접 시작하기
+          </button>
+        </section>
       </div>
     </div>
   );
