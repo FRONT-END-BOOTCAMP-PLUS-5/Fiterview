@@ -12,7 +12,11 @@ import { useReportStore } from '@/stores/useReportStore';
 import { UploadedItem } from '@/types/file';
 import GenerateQuestionModal from './modal/GenerateQuestionModal';
 
-export default function QuickInterviewForm() {
+interface QuickInterviewFormProps {
+  onReportCreated?: () => void;
+}
+
+export default function QuickInterviewForm({ onReportCreated }: QuickInterviewFormProps) {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedItem[]>([]);
   const [limitExceeded, setLimitExceeded] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,6 +68,9 @@ export default function QuickInterviewForm() {
         setUploadedFiles([]);
         setLimitExceeded(false);
         setReportId(response.data.data.reportId);
+        if (onReportCreated) {
+          onReportCreated();
+        }
         openModal('generateQuestion');
       }
     } catch (error) {
