@@ -49,7 +49,7 @@ export default function PendingInterviewsList() {
         <h2 className="justify-start text-[#1E293B] text-[20px] font-semibold">나의 대기 면접</h2>
       </div>
 
-      <div className="self-stretch flex flex-col justify-start items-start gap-4 overflow-y-auto max-h-[calc(100vh)]">
+      <div className="h-full w-full flex flex-col justify-start items-start gap-4 overflow-y-auto max-h-[calc(100vh)]">
         {loading ? (
           <LoadingSpinner
             size="medium"
