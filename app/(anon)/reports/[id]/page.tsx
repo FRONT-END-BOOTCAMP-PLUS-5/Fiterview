@@ -1,11 +1,7 @@
-import AIFeedback from './components/AIFeedback';
+import AudioReportViewer from '@/app/(anon)/reports/[id]/components/AudioReportViewer';
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+export default async function ReportPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-
-  return (
-    <div>
-      <AIFeedback reportId={parseInt(id, 10)} />
-    </div>
-  );
+  return <AudioReportViewer reportId={id} />;
+  //   <AIFeedback reportId={parseInt(id, 10)} />
 }
