@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { signIn, useSession } from 'next-auth/react';
+import { signIn, useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -12,6 +12,38 @@ export default function LoginPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [redirecting, setRedirecting] = useState(false);
+
+  // 페이지 로드 시 브라우저 캐시 정리
+  useEffect(() => {
+    const clearBrowserCache = () => {
+      if (typeof window !== 'undefined') {
+        // 로컬 스토리지에서 인증 관련 데이터 정리
+        const keysToRemove = Object.keys(localStorage).filter(
+          (key) =>
+            key.includes('auth') ||
+            key.includes('session') ||
+            key.includes('next-auth') ||
+            key.includes('google')
+        );
+
+        keysToRemove.forEach((key) => localStorage.removeItem(key));
+
+        // 세션 스토리지 정리
+        sessionStorage.clear();
+
+        // Google OAuth 관련 쿠키 정리
+        document.cookie.split(';').forEach(function (c) {
+          if (c.includes('google') || c.includes('auth') || c.includes('session')) {
+            document.cookie = c
+              .replace(/^ +/, '')
+              .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
+          }
+        });
+      }
+    };
+
+    clearBrowserCache();
+  }, []);
 
   // 이미 로그인된 경우 리다이렉트
   useEffect(() => {
@@ -128,7 +160,56 @@ export default function LoginPage() {
           <div>
             <button
               type="button"
-              onClick={() => signIn('google', { callbackUrl: '/user' })}
+              onClick={async () => {
+                try {
+                  console.log('Google 로그인 시작 - 현재 세션 정리 중...');
+
+                  // 기존 세션 정리
+                  await signOut({ redirect: false });
+
+                  console.log('NextAuth 세션 정리 완료 - 브라우저 캐시 정리 중...');
+
+                  // 강제로 브라우저 캐시 정리
+                  if (typeof window !== 'undefined') {
+                    // 모든 인증 관련 쿠키 삭제
+                    document.cookie.split(';').forEach(function (c) {
+                      const eqPos = c.indexOf('=');
+                      const name = eqPos > -1 ? c.substr(0, eqPos) : c;
+                      document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+                    });
+
+                    // 로컬 스토리지 완전 정리
+                    localStorage.clear();
+                    sessionStorage.clear();
+
+                    // Google OAuth 관련 스토리지 정리
+                    if (typeof window !== 'undefined' && (window as any).gapi) {
+                      const gapi = (window as any).gapi;
+                      if (gapi.auth2?.getAuthInstance()) {
+                        gapi.auth2.getAuthInstance().signOut();
+                      }
+                    }
+
+                    console.log('브라우저 캐시 정리 완료');
+                  }
+
+                  // 잠시 대기 후 Google OAuth 로그인
+                  console.log('Google OAuth 로그인 시도 중...');
+                  setTimeout(async () => {
+                    try {
+                      // Google OAuth 로그인 시도 (계정 선택 강제)
+                      await signIn('google', {
+                        callbackUrl: '/user',
+                        prompt: 'select_account',
+                      });
+                    } catch (error) {
+                      console.error('Google 로그인 중 오류:', error);
+                    }
+                  }, 100);
+                } catch (error) {
+                  console.error('Google 로그인 중 오류:', error);
+                }
+              }}
               className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
