@@ -64,7 +64,7 @@ export default function AiAvatar({
         <ambientLight intensity={0.7} />
         <directionalLight position={[3, 3, 3]} intensity={0.7} />
         <Suspense fallback={null}>
-          <Environment files="/poly_haven_studio_4k.hdr" background />
+          <Environment files="/assets/env/poly_haven_studio_4k.hdr" background />
           <Avatar
             url="https://models.readyplayer.me/689d3904c911aabc2eba50a6.glb"
             analyser={analyser}
