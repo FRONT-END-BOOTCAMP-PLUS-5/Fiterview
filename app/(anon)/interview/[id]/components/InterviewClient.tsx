@@ -27,7 +27,7 @@ export default function InterviewClient() {
   const running = phase === 'recording';
 
   // 질문 TTS 조회 (훅 사용)
-  const { data /*, isLoading, isError */ } = useGetTtsQuestions(reportId);
+  const { data, isError, error } = useGetTtsQuestions(reportId);
   const items = (data as any)?.data as QuestionTTSResponse[] | undefined;
   const current = items?.[currentOrder - 1];
   const currentQuestionText = current?.question ?? '질문을 불러오는 중입니다...';
