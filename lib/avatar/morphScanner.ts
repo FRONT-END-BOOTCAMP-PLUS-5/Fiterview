@@ -1,4 +1,4 @@
-import { BlinkIndices, Target } from './types';
+import { BlinkIndices, Target } from '@/types/avatar';
 
 //모프 스캔(뼈 찾기 + 모프 타겟 찾기)
 export function scanMorphs(

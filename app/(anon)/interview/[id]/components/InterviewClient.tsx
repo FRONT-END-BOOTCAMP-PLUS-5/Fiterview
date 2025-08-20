@@ -156,7 +156,7 @@ export default function InterviewClient() {
           <Question text={currentQuestionText} />
         </section>
         {/* Right: 사용자 영역 */}
-        <section className="flex-1 min-w-0 h-full bg-[#FAFBFC] flex flex-col items-center justify-between p-[52px] gap-[24px]">
+        <section className="relative flex-1 min-w-0 h-full bg-[#FAFBFC] flex flex-col items-center justify-between gap-[24px]">
           <UserCamera />
           <UserAudio active={running} onFinish={handleFinishRecording} />
         </section>
