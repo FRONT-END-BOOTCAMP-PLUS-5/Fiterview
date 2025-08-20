@@ -1,20 +1,22 @@
 'use client';
 
-import Logo from '@/public/assets/images/logo1.png';
-import Arrow from '@/public/assets/icons/arrow-down.svg';
 import Image from 'next/image';
+import { useRef, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useSessionUser } from '@/lib/auth/useSessionUser';
 import DropDown from '@/app/(anon)/components/user/DropDown';
-import { useState } from 'react';
 import LogoutModal from '@/app/(anon)/components/modal/LogoutModal';
+import { LoadingSpinner } from '@/app/(anon)/components/loading/LoadingSpinner';
+import Logo from '@/public/assets/images/logo1.png';
+import Arrow from '@/public/assets/icons/arrow-down.svg';
 
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const { user } = useSessionUser();
+  const { user, status } = useSessionUser();
   const username = user?.nickname;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLLIElement>(null);
 
   return (
     <header className="w-full h-20 px-9 bg-white border-b border-[#F1F5F9] inline-flex justify-between items-center">
@@ -45,22 +47,18 @@ export default function Header() {
           </ul>
         </div>
         <ul className="flex justify-end items-center gap-6">
-          {username ? (
-            <li
-              className="relative"
-              onBlur={(e) => {
-                const next = e.relatedTarget as Node | null;
-                if (!next || !e.currentTarget.contains(next)) {
-                  setIsDropdownOpen(false);
-                }
-              }}
-            >
+          {status === 'loading' ? (
+            <li>
+              <LoadingSpinner size="small" />
+            </li>
+          ) : username ? (
+            <li className="relative" ref={dropdownRef}>
               <button
                 className="flex justify-center items-center gap-2"
                 type="button"
                 onClick={() => setIsDropdownOpen((prev) => !prev)}
               >
-                <span className="justify-start text-[#334155] text-[14px] font-medium cursor-default">
+                <span className="whitespace-nowrap justify-start text-[#334155] text-[14px] font-medium cursor-default">
                   {username}
                 </span>
                 <Arrow
@@ -71,7 +69,12 @@ export default function Header() {
                   className={isDropdownOpen ? 'rotate-0' : 'rotate-180'}
                 />
               </button>
-              {isDropdownOpen && <DropDown />}
+              {isDropdownOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setIsDropdownOpen(false)} />
+                  <DropDown />
+                </>
+              )}
             </li>
           ) : (
             <>
