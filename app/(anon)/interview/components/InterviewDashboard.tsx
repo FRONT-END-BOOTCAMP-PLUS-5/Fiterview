@@ -40,7 +40,7 @@ export default function InterviewDashboard() {
   }, [fetchPendingReports]);
 
   return (
-    <div className="h-full place-self-stretch px-[104px] py-10 ">
+    <div className="h-full place-self-stretch px-[208px] py-8">
       <div className="flex flex-col mb-6 gap-2">
         <h1 className="self-stretch justify-start text-[#1E293B] text-[32px] font-semibold">
           AI 면접
@@ -51,10 +51,12 @@ export default function InterviewDashboard() {
         </p>
       </div>
       <div className="flex justify-start items-start gap-10">
-        <QuickInterviewForm onReportCreated={fetchPendingReports} />
+        <QuickInterviewForm
+          onReportCreated={fetchPendingReports}
+          LoginModal={isOpen && currentStep === 'login' ? <LoginModal /> : null}
+        />
         <PendingInterviewsList reports={reports} loading={loading} />
       </div>
-      {isOpen && currentStep === 'login' && <LoginModal />}
     </div>
   );
 }

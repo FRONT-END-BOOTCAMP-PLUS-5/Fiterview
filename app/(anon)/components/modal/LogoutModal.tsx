@@ -1,8 +1,8 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
-import ModalOverlay from './ModalOverlay';
-import Modal from './Modal';
+import ModalOverlay from '@/app/(anon)/components/modal/ModalOverlay';
+import Modal from '@/app/(anon)/components/modal/Modal';
 import { useModalStore } from '@/stores/useModalStore';
 
 export default function LogoutModal() {
@@ -11,17 +11,16 @@ export default function LogoutModal() {
 
   const ModalButton = () => {
     return (
-      <button className="self-stretch h-11 bg-[#3B82F6] rounded-lg inline-flex justify-center items-center">
-        <div
-          className="text-white text-sm font-semibold cursor-pointer"
-          onClick={async () => {
-            await signOut({ redirect: false });
-            closeModal();
-            router.push('/login');
-          }}
-        >
-          로그아웃하기
-        </div>
+      <button
+        type="button"
+        className="self-stretch h-11 bg-[#3B82F6] rounded-lg inline-flex justify-center items-center"
+        onClick={async () => {
+          await signOut({ redirect: false });
+          closeModal();
+          router.push('/login');
+        }}
+      >
+        <span className="text-white text-sm font-semibold">로그아웃하기</span>
       </button>
     );
   };
