@@ -14,9 +14,13 @@ import Sparkles from '@/public/assets/icons/sparkles.svg';
 
 interface QuickInterviewFormProps {
   onReportCreated?: () => void;
+  LoginModal?: React.ReactNode;
 }
 
-export default function QuickInterviewForm({ onReportCreated }: QuickInterviewFormProps) {
+export default function QuickInterviewForm({
+  onReportCreated,
+  LoginModal,
+}: QuickInterviewFormProps) {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedItem[]>([]);
   const [limitExceeded, setLimitExceeded] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -140,7 +144,7 @@ export default function QuickInterviewForm({ onReportCreated }: QuickInterviewFo
         </button>
       </div>
 
-      {isOpen && currentStep === 'login' && <LoginModal />}
+      {LoginModal}
       {isOpen && currentStep === 'fileError' && (
         <ErrorModal subTitle="업로드된 파일의 내용으로는 적절한 면접 질문을 생성하기 어렵습니다." />
       )}
