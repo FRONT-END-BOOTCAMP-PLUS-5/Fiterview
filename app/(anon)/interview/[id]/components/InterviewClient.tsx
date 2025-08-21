@@ -14,11 +14,13 @@ import { transcribeAudio } from '@/hooks/useTranscribeAudio';
 import { QuestionTTSResponse } from '@/backend/application/questions/dtos/QuestionTTSResponse';
 import type { InterviewPhase } from '@/types/interview';
 import axios from 'axios';
+import { useReportStatusStore } from '@/stores/useReportStatusStore';
 
 export default function InterviewClient() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const reportId = Number(id);
+  const { updateReportStatus } = useReportStatusStore();
 
   const [phase, setPhase] = useState<InterviewPhase>('idle');
   const [currentOrder, setCurrentOrder] = useState(1);
@@ -154,6 +156,8 @@ export default function InterviewClient() {
       if (currentOrder >= 10) {
         const key = `interview:${reportId}:currentOrder`;
         localStorage.removeItem(key);
+        // 피드백 생성 요청 보낼 때 상태를 ANALYZING으로 업데이트
+        await updateReportStatus(reportId.toString(), 'ANALYZING');
         // 피드백 생성
         const feedbackResult = await axios.post(`/api/reports/${reportId}/feedback`);
         console.log('피드백 생성 결과:', feedbackResult.status);
