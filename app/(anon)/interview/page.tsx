@@ -1,5 +1,6 @@
 import QuickInterviewForm from './components/QuickInterviewForm';
 import PendingInterviewsList from './components/PendingInterviewsList';
+import ReflectionModal from './components/modal/ReflectionModal';
 
 export default function InterviewPage() {
   return (
@@ -17,6 +18,7 @@ export default function InterviewPage() {
         <QuickInterviewForm />
         <PendingInterviewsList />
       </div>
+      <ReflectionModal />
     </div>
   );
 }
