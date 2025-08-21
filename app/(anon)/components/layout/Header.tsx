@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { useRef, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useSessionUser } from '@/lib/auth/useSessionUser';
@@ -22,7 +21,7 @@ export default function Header() {
     <header className="w-full h-20 px-9 bg-white border-b border-[#F1F5F9] inline-flex justify-between items-center">
       <nav className="flex-1 flex justify-between items-center">
         <div className="flex justify-start items-center gap-16">
-          <button type="button" onClick={() => router.push('/')}>
+          <button className="cursor-pointer" type="button" onClick={() => router.push('/')}>
             <Logo1 width={104} height={40} />
           </button>
           <ul className="flex justify-start items-center gap-6">
@@ -38,7 +37,7 @@ export default function Header() {
             <li>
               <button
                 type="button"
-                className={`text-[#334155] cursor-pointer ${pathname === '/reports' ? 'font-bold' : 'font-medium'}`}
+                className={`text-[#334155] cursor-pointer ${/^\/reports(\/[^/]+)?$/.test(pathname) ? 'font-bold' : 'font-medium'}`}
                 onClick={() => router.push('/reports')}
               >
                 기록
@@ -54,11 +53,11 @@ export default function Header() {
           ) : username ? (
             <li className="relative" ref={dropdownRef}>
               <button
-                className="flex justify-center items-center gap-2"
+                className="cursor-pointer flex justify-center items-center gap-2"
                 type="button"
                 onClick={() => setIsDropdownOpen((prev) => !prev)}
               >
-                <span className="whitespace-nowrap justify-start text-[#334155] text-[14px] font-medium cursor-default">
+                <span className="whitespace-nowrap justify-start text-[#334155] text-[14px] font-medium">
                   {username}
                 </span>
                 <Arrow
