@@ -7,7 +7,7 @@ interface ModalProps {
   title: string;
   subTitle?: string;
   body?: ReactNode;
-  buttons: ReactNode;
+  buttons?: ReactNode;
   onClose?: () => void;
   size?: ModalSize;
 }
