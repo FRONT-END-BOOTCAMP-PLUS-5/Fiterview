@@ -7,7 +7,7 @@ import { useSessionUser } from '@/lib/auth/useSessionUser';
 import DropDown from '@/app/(anon)/components/user/DropDown';
 import LogoutModal from '@/app/(anon)/components/modal/LogoutModal';
 import { LoadingSpinner } from '@/app/(anon)/components/loading/LoadingSpinner';
-import Logo from '@/public/assets/images/logo1.png';
+import Logo1 from '@/public/assets/icons/logo1.svg';
 import Arrow from '@/public/assets/icons/arrow-down.svg';
 
 export default function Header() {
@@ -23,13 +23,13 @@ export default function Header() {
       <nav className="flex-1 flex justify-between items-center">
         <div className="flex justify-start items-center gap-16">
           <button type="button" onClick={() => router.push('/')}>
-            <Image src={Logo} alt="Logo" width={104} height={40} />
+            <Logo1 width={104} height={40} />
           </button>
           <ul className="flex justify-start items-center gap-6">
             <li>
               <button
                 type="button"
-                className={`text-[#334155] cursor-pointer ${pathname === '/interview' ? 'font-semibold' : 'font-medium'}`}
+                className={`text-[#334155] cursor-pointer ${pathname === '/interview' ? 'font-bold' : 'font-medium'}`}
                 onClick={() => router.push('/interview')}
               >
                 AI 면접
@@ -38,7 +38,7 @@ export default function Header() {
             <li>
               <button
                 type="button"
-                className={`text-[#334155] cursor-pointer ${pathname === '/reports' ? 'font-semibold' : 'font-medium'}`}
+                className={`text-[#334155] cursor-pointer ${pathname === '/reports' ? 'font-bold' : 'font-medium'}`}
                 onClick={() => router.push('/reports')}
               >
                 기록
