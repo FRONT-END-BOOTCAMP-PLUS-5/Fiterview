@@ -15,12 +15,15 @@ import { QuestionTTSResponse } from '@/backend/application/questions/dtos/Questi
 import type { InterviewPhase } from '@/types/interview';
 import axios from 'axios';
 import { useModalStore } from '@/stores/useModalStore';
+import { useReportStatusStore } from '@/stores/useReportStatusStore';
 
 export default function InterviewClient() {
   const { openModal } = useModalStore();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const reportId = Number(id);
+  const { updateReportStatus } = useReportStatusStore();
+
   const [phase, setPhase] = useState<InterviewPhase>('idle');
   const [currentOrder, setCurrentOrder] = useState(1);
   const [isNextBtnDisabled, setIsNextBtnDisabled] = useState(true);
@@ -155,6 +158,8 @@ export default function InterviewClient() {
       if (currentOrder >= 10) {
         const key = `interview:${reportId}:currentOrder`;
         localStorage.removeItem(key);
+        // 피드백 생성 요청 보낼 때 상태를 ANALYZING으로 업데이트
+        await updateReportStatus(reportId.toString(), 'ANALYZING');
         // 피드백 생성
         const feedbackResult = await axios.post(`/api/reports/${reportId}/feedback`);
         console.log('피드백 생성 결과:', feedbackResult.status);
