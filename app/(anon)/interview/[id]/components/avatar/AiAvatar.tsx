@@ -1,6 +1,6 @@
 'use client';
 
-import Avatar from './avatar/Avatar';
+import Avatar from '@/app/(anon)/interview/[id]/components/avatar/Avatar';
 import { useRef, useEffect, useState, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Environment } from '@react-three/drei';
