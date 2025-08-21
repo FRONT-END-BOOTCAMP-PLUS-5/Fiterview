@@ -155,7 +155,8 @@ export default function InterviewClient() {
         const key = `interview:${reportId}:currentOrder`;
         localStorage.removeItem(key);
         // 피드백 생성
-        axios.post(`/api/reports/${reportId}/feedback`);
+        const feedbackResult = await axios.post(`/api/reports/${reportId}/feedback`);
+        console.log('피드백 생성 결과:', feedbackResult.status);
         router.push('/'); //마지막 질문인 경우
       } else {
         setCurrentOrder((o) => Math.min(10, o + 1));
