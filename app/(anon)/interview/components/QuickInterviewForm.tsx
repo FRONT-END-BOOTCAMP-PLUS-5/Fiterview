@@ -2,16 +2,25 @@
 
 import axios from 'axios';
 import { useState } from 'react';
+import { UploadedItem } from '@/types/file';
+import { useModalStore } from '@/stores/useModalStore';
+import { useReportStore } from '@/stores/useReportStore';
 import UploadOptions from '@/app/(anon)/interview/components/UploadOptions';
 import UploadedFiles from '@/app/(anon)/interview/components/UploadedFiles';
 import LoginModal from '@/app/(anon)/components/modal/LoginModal';
 import ErrorModal from '@/app/(anon)/interview/components/modal/ErrorModal';
-import { useModalStore } from '@/stores/useModalStore';
+import GenerateQuestionModal from '@/app/(anon)/interview/components/modal/GenerateQuestionModal';
 import Sparkles from '@/public/assets/icons/sparkles.svg';
-import { useReportStore } from '@/stores/useReportStore';
-import { UploadedItem } from '@/types/file';
 
-export default function QuickInterviewForm() {
+interface QuickInterviewFormProps {
+  onReportCreated?: () => void;
+  LoginModal?: React.ReactNode;
+}
+
+export default function QuickInterviewForm({
+  onReportCreated,
+  LoginModal,
+}: QuickInterviewFormProps) {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedItem[]>([]);
   const [limitExceeded, setLimitExceeded] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -63,6 +72,9 @@ export default function QuickInterviewForm() {
         setUploadedFiles([]);
         setLimitExceeded(false);
         setReportId(response.data.data.reportId);
+        if (onReportCreated) {
+          onReportCreated();
+        }
         openModal('generateQuestion');
       }
     } catch (error) {
@@ -132,13 +144,14 @@ export default function QuickInterviewForm() {
         </button>
       </div>
 
-      {isOpen && currentStep === 'login' && <LoginModal />}
+      {LoginModal}
       {isOpen && currentStep === 'fileError' && (
         <ErrorModal subTitle="업로드된 파일의 내용으로는 적절한 면접 질문을 생성하기 어렵습니다." />
       )}
       {isOpen && currentStep === 'questionError' && (
         <ErrorModal subTitle="면접 질문 생성에 실패했습니다. 다시 시도해주세요." />
       )}
+      {isOpen && currentStep === 'generateQuestion' && <GenerateQuestionModal />}
     </section>
   );
 }

@@ -2,16 +2,18 @@
 
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import TopSection from '@/app/(anon)/interview/[id]/components/TopSection';
-import BottomSection from '@/app/(anon)/interview/[id]/components/BottomSection';
-import AiAvatar from '@/app/(anon)/interview/[id]/components/AiAvatar';
-import Question from '@/app/(anon)/interview/[id]/components/Question';
-import UserCamera from '@/app/(anon)/interview/[id]/components/UserCamera';
-import UserAudio from '@/app/(anon)/interview/[id]/components/UserAudio';
+import TopSection from '@/app/(anon)/interview/[id]/components/top/TopSection';
+import BottomSection from '@/app/(anon)/interview/[id]/components/bottom/BottomSection';
+import AiAvatar from '@/app/(anon)/interview/[id]/components/avatar/AiAvatar';
+import Question from '@/app/(anon)/interview/[id]/components/avatar/Question';
+import UserCamera from '@/app/(anon)/interview/[id]/components/user/UserCamera';
+import UserAudio from '@/app/(anon)/interview/[id]/components/user/UserAudio';
 import { useTtsAutoPlay } from '@/hooks/useTtsAutoPlay';
 import { useGetTtsQuestions } from '@/hooks/useGetTtsQuestions';
+import { transcribeAudio } from '@/hooks/useTranscribeAudio';
 import { QuestionTTSResponse } from '@/backend/application/questions/dtos/QuestionTTSResponse';
 import type { InterviewPhase } from '@/types/interview';
+import axios from 'axios';
 
 export default function InterviewClient() {
   const { id } = useParams<{ id: string }>();
@@ -129,11 +131,32 @@ export default function InterviewClient() {
       if (lastAdvancedOrderRef.current === currentOrder) return; // 이미 처리된 거 중복 방지
       lastAdvancedOrderRef.current = currentOrder;
       if (!reportId) return;
+      // 녹음 파일 업로드
       await uploadRecording({ reportId, order: currentOrder, blob });
-      // 업로드 성공 후에만 진행/이동
+
+      // STT 처리 (음성을 텍스트로 변환)
+      try {
+        const sttResult = await transcribeAudio({
+          reportId,
+          order: currentOrder,
+        });
+
+        if (sttResult.success) {
+          console.log('STT 성공:', sttResult.data?.transcription.text);
+        } else {
+          console.error('STT 실패:', sttResult.error);
+        }
+      } catch (sttError) {
+        console.error('STT 처리 중 오류:', sttError);
+      }
+
+      // 다음 질문으로 이동
       if (currentOrder >= 10) {
         const key = `interview:${reportId}:currentOrder`;
         localStorage.removeItem(key);
+        // 피드백 생성
+        const feedbackResult = await axios.post(`/api/reports/${reportId}/feedback`);
+        console.log('피드백 생성 결과:', feedbackResult.status);
         router.push('/'); //마지막 질문인 경우
       } else {
         setCurrentOrder((o) => Math.min(10, o + 1));
