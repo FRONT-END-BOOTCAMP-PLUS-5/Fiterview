@@ -40,7 +40,7 @@ export default function Reflection({
 
       <div className="self-stretch flex flex-col items-start justify-start gap-5 text-sm">
         <div className="self-stretch flex flex-col items-start justify-start gap-[6px]">
-          <div className="self-stretch relative leading-[16.8px] font-medium text-[#3B82F6]">
+          <div className="self-stretch relative leading-[16.8px] font-medium text-[##374151]">
             면접에서 느낀 생각과 감정을 솔직하게 기록해보세요.
           </div>
 
