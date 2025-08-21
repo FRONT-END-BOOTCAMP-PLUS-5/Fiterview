@@ -4,10 +4,11 @@ import { signOut } from 'next-auth/react';
 import ModalOverlay from './ModalOverlay';
 import Modal from './Modal';
 import { useModalStore } from '@/stores/useModalStore';
+import { useLogout } from '@/hooks/useLogout';
 
 export default function LogoutModal() {
   const { isOpen, closeModal } = useModalStore();
-  const router = useRouter();
+  const { handleLogout } = useLogout();
 
   const ModalButton = () => {
     return (
