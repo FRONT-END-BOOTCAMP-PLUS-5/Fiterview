@@ -158,7 +158,8 @@ export default function InterviewClient() {
       if (currentOrder >= 10) {
         const key = `interview:${reportId}:currentOrder`;
         localStorage.removeItem(key);
-
+        // 피드백 생성 요청 보낼 때 상태를 ANALYZING으로 업데이트
+        await updateReportStatus(reportId.toString(), 'ANALYZING');
         // 피드백 생성
         const feedbackResult = await axios.post(`/api/reports/${reportId}/feedback`);
         console.log('피드백 생성 결과:', feedbackResult.status);
