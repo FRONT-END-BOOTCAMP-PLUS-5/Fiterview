@@ -5,8 +5,8 @@ import { useState } from 'react';
 import { UploadedItem } from '@/types/file';
 import { useModalStore } from '@/stores/useModalStore';
 import { useReportStore } from '@/stores/useReportStore';
-import UploadOptions from '@/app/(anon)/interview/components/UploadOptions';
-import UploadedFiles from '@/app/(anon)/interview/components/UploadedFiles';
+import FilesUpload from '@/app/(anon)/home/components/FilesUpload';
+import FilesOptions from '@/app/(anon)/home/components/FilesOptions';
 import ErrorModal from '@/app/(anon)/components/modal/ErrorModal';
 import GenerateQuestionModal from '@/app/(anon)/components/modal/GenerateQuestionModal';
 import Sparkles from '@/public/assets/icons/sparkles.svg';
@@ -16,10 +16,7 @@ interface QuickInterviewFormProps {
   LoginModal?: React.ReactNode;
 }
 
-export default function QuickInterviewForm({
-  onReportCreated,
-  LoginModal,
-}: QuickInterviewFormProps) {
+export default function InterviewForm({ onReportCreated, LoginModal }: QuickInterviewFormProps) {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedItem[]>([]);
   const [limitExceeded, setLimitExceeded] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -101,15 +98,15 @@ export default function QuickInterviewForm({
   };
 
   return (
-    <section className="flex-1 inline-flex flex-col">
-      <div className="flex flex-col gap-2 mb-4">
+    <section className="flex-1 inline-flex flex-col h-full gap-6">
+      <div className="flex flex-col gap-2">
         <h2 className="justify-start text-[#1E293B] text-[20px] font-semibold">빠른 AI 면접</h2>
       </div>
 
-      <UploadOptions onAddFiles={handleAddFiles} />
+      <FilesOptions onAddFiles={handleAddFiles} />
 
-      <div className="h-full self-stretch flex flex-col justify-start items-start gap-4 mt-10">
-        <UploadedFiles
+      <div className="min-h-[227px] self-stretch flex flex-col justify-between items-start">
+        <FilesUpload
           files={uploadedFiles}
           limitExceeded={limitExceeded}
           onRemove={(id) => {
