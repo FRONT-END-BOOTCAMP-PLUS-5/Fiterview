@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import MessageSquareIcon from '@/public/assets/icons/message-square.svg';
-import { LoadingSpinner } from '@/app/(anon)/components/LoadingSpinner';
+import { LoadingSpinner } from '@/app/(anon)/components/loading/LoadingSpinner';
 import axios from 'axios';
 
 export default function Reflection({
