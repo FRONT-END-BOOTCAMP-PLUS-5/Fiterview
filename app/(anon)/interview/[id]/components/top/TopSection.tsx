@@ -1,6 +1,6 @@
 'use client';
 
-import Timer from '@/app/(anon)/interview/[id]/components/Timer';
+import Timer from '@/app/(anon)/interview/[id]/components/top/Timer';
 import WaveAnimation from '@/public/assets/icons/wave-animation.svg';
 
 interface TopSectionProps {

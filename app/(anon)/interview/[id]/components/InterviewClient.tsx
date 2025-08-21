@@ -2,17 +2,18 @@
 
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import TopSection from '@/app/(anon)/interview/[id]/components/TopSection';
-import BottomSection from '@/app/(anon)/interview/[id]/components/BottomSection';
-import AiAvatar from '@/app/(anon)/interview/[id]/components/AiAvatar';
-import Question from '@/app/(anon)/interview/[id]/components/Question';
-import UserCamera from '@/app/(anon)/interview/[id]/components/UserCamera';
-import UserAudio from '@/app/(anon)/interview/[id]/components/UserAudio';
+import TopSection from '@/app/(anon)/interview/[id]/components/top/TopSection';
+import BottomSection from '@/app/(anon)/interview/[id]/components/bottom/BottomSection';
+import AiAvatar from '@/app/(anon)/interview/[id]/components/avatar/AiAvatar';
+import Question from '@/app/(anon)/interview/[id]/components/avatar/Question';
+import UserCamera from '@/app/(anon)/interview/[id]/components/user/UserCamera';
+import UserAudio from '@/app/(anon)/interview/[id]/components/user/UserAudio';
 import { useTtsAutoPlay } from '@/hooks/useTtsAutoPlay';
 import { useGetTtsQuestions } from '@/hooks/useGetTtsQuestions';
 import { transcribeAudio } from '@/hooks/useTranscribeAudio';
 import { QuestionTTSResponse } from '@/backend/application/questions/dtos/QuestionTTSResponse';
 import type { InterviewPhase } from '@/types/interview';
+import axios from 'axios';
 
 export default function InterviewClient() {
   const { id } = useParams<{ id: string }>();
@@ -153,6 +154,9 @@ export default function InterviewClient() {
       if (currentOrder >= 10) {
         const key = `interview:${reportId}:currentOrder`;
         localStorage.removeItem(key);
+        // 피드백 생성
+        const feedbackResult = await axios.post(`/api/reports/${reportId}/feedback`);
+        console.log('피드백 생성 결과:', feedbackResult.status);
         router.push('/'); //마지막 질문인 경우
       } else {
         setCurrentOrder((o) => Math.min(10, o + 1));
