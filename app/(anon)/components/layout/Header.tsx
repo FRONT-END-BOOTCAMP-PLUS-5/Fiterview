@@ -66,7 +66,7 @@ export default function Header() {
                   height={16}
                   stroke="#94A3B8"
                   strokeWidth={1.33}
-                  className={isDropdownOpen ? 'rotate-0' : 'rotate-180'}
+                  className={isDropdownOpen ? 'rotate-180' : 'rotate-0'}
                 />
               </button>
               {isDropdownOpen && (
