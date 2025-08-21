@@ -19,7 +19,6 @@ export default function InterviewClient() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const reportId = Number(id);
-
   const [phase, setPhase] = useState<InterviewPhase>('idle');
   const [currentOrder, setCurrentOrder] = useState(1);
   const [isNextBtnDisabled, setIsNextBtnDisabled] = useState(true);
