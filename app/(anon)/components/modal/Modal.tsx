@@ -27,7 +27,7 @@ export default function Modal({
 
   return (
     <div
-      className={`${sizeClasses[size]} bg-white rounded-2xl shadow-[0px_8px_32px_0px_rgba(0,0,0,0.13)] inline-flex flex-col justify-start items-start gap-3`}
+      className={`${sizeClasses[size]} bg-white rounded-[16px] shadow-[0px_8px_32px_0px_rgba(0,0,0,0.13)] inline-flex flex-col justify-start items-start gap-3`}
     >
       <div className="self-stretch px-6 pt-6 flex flex-col justify-start items-end gap-4">
         <div className="self-stretch flex justify-between items-start">
