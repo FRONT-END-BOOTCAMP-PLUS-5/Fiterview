@@ -86,6 +86,7 @@ export default function CustomSelect({
           {truncatedText}
         </span>
         <Arrow
+          strokeWidth={1.33}
           className={`pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] transition-transform duration-200 ease-in-out ${
             isOpen ? '-rotate-90' : 'rotate-90'
           }`}
