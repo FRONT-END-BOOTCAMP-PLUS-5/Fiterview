@@ -15,8 +15,10 @@ import { QuestionTTSResponse } from '@/backend/application/questions/dtos/Questi
 import type { InterviewPhase } from '@/types/interview';
 import axios from 'axios';
 import { useReportStatusStore } from '@/stores/useReportStatusStore';
+import { useModalStore } from '@/stores/useModalStore';
 
 export default function InterviewClient() {
+  const { openModal } = useModalStore();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const reportId = Number(id);
@@ -160,8 +162,7 @@ export default function InterviewClient() {
         // 피드백 생성
         const feedbackResult = await axios.post(`/api/reports/${reportId}/feedback`);
         console.log('피드백 생성 결과:', feedbackResult.status);
-
-        router.push('/'); //마지막 질문인 경우
+        openModal('reflection');
       } else {
         setCurrentOrder((o) => Math.min(10, o + 1));
       }

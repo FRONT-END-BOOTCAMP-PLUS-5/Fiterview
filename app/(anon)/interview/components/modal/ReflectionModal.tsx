@@ -2,13 +2,21 @@
 import Modal from '@/app/(anon)/components/modal/Modal';
 import ModalOverlay from '@/app/(anon)/components/modal/ModalOverlay';
 import { useModalStore } from '@/stores/useModalStore';
+import { useRouter } from 'next/navigation';
 
 export default function ReflectionModal() {
-  const { isOpen, closeModal } = useModalStore();
+  const router = useRouter();
+  const { isOpen, currentStep, closeModal, replaceModal } = useModalStore();
+  if (!isOpen || currentStep !== 'reflection') return null;
 
-  const NextButton = () => (
+  const NextButton = ({ onClick }: { onClick?: () => void }) => (
     <button className="self-stretch h-11 bg-[#3B82F6] rounded-lg inline-flex justify-center items-center">
-      <div className="text-white text-sm font-semibold cursor-pointer" onClick={closeModal}>
+      <div
+        className="text-white text-sm font-semibold cursor-pointer"
+        onClick={() => {
+          handleReplaceModal();
+        }}
+      >
         다음
       </div>
     </button>
@@ -16,11 +24,21 @@ export default function ReflectionModal() {
 
   const SkipButton = () => (
     <button className="self-stretch h-11 bg-[#FFFFFF] rounded-lg inline-flex justify-center items-center">
-      <div className="text-[#64748B] text-sm font-semibold cursor-pointer" onClick={closeModal}>
+      <div
+        className="text-[#64748B] text-sm font-semibold cursor-pointer"
+        onClick={() => {
+          closeModal();
+          router.push('/');
+        }}
+      >
         건너뛰기
       </div>
     </button>
   );
+
+  const handleReplaceModal = () => {
+    replaceModal('video');
+  };
 
   return (
     <ModalOverlay isOpen={isOpen} onClose={closeModal}>
@@ -41,7 +59,7 @@ export default function ReflectionModal() {
               <SkipButton />
             </div>
             <div className="flex-1 h-11 px-5 bg-blue-500 rounded-lg flex justify-center items-center">
-              <NextButton />
+              <NextButton onClick={handleReplaceModal} />
             </div>
           </div>
         }
