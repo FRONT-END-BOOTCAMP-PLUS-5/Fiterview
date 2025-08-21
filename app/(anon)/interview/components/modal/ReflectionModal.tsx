@@ -2,39 +2,61 @@
 import Modal from '@/app/(anon)/components/modal/Modal';
 import ModalOverlay from '@/app/(anon)/components/modal/ModalOverlay';
 import { useModalStore } from '@/stores/useModalStore';
-import { useRouter } from 'next/navigation';
+import axios from 'axios';
+import { useParams } from 'next/navigation';
+import { useState } from 'react';
 
 export default function ReflectionModal() {
-  const router = useRouter();
+  const { id } = useParams<{ id: string }>();
+  const reportId = Number(id);
+  const [reflection, setReflection] = useState<string>('');
   const { isOpen, currentStep, closeModal, replaceModal } = useModalStore();
   if (!isOpen || currentStep !== 'reflection') return null;
 
-  const NextButton = ({ onClick }: { onClick?: () => void }) => (
-    <button className="self-stretch h-11 bg-[#3B82F6] rounded-lg inline-flex justify-center items-center">
-      <div
-        className="text-white text-sm font-semibold cursor-pointer"
-        onClick={() => {
-          handleReplaceModal();
-        }}
-      >
-        다음
-      </div>
+  const NextButton = ({ onClick, className }: { onClick?: () => void; className?: string }) => (
+    <button
+      type="button"
+      className={`flex-1 h-11 px-5 rounded-lg inline-flex justify-center items-center ${className ?? ''}`}
+      onClick={() => {
+        if (onClick) {
+          onClick();
+        } else {
+          console.error('NextButton onClick is not defined');
+        }
+      }}
+    >
+      <div className="text-white text-sm font-semibold">다음</div>
     </button>
   );
 
-  const SkipButton = () => (
-    <button className="self-stretch h-11 bg-[#FFFFFF] rounded-lg inline-flex justify-center items-center">
-      <div
-        className="text-[#64748B] text-sm font-semibold cursor-pointer"
-        onClick={() => {
-          closeModal();
-          router.push('/');
-        }}
-      >
-        건너뛰기
-      </div>
+  const SkipButton = ({ onClick, className }: { onClick?: () => void; className?: string }) => (
+    <button
+      type="button"
+      className={`flex-1 h-11 px-5 rounded-lg inline-flex justify-center items-center ${className ?? ''}`}
+      onClick={() => {
+        if (onClick) {
+          onClick();
+        } else {
+          console.error('SkipButton onClick is not defined');
+        }
+      }}
+    >
+      <div className="text-[#64748B] text-sm font-semibold">건너뛰기</div>
     </button>
   );
+
+  const handleSubmitReflection = async () => {
+    try {
+      await axios.put(`/api/reports/${reportId}`, {
+        reflection: reflection,
+      });
+      console.log('reflection submitted');
+      replaceModal('video');
+    } catch (error) {
+      console.error(error);
+      replaceModal('video');
+    }
+  };
 
   const handleReplaceModal = () => {
     replaceModal('video');
@@ -51,16 +73,17 @@ export default function ReflectionModal() {
           <textarea
             className="w-[432px] h-[132px] self-stretch px-4 py-3 bg-slate-50 rounded-lg outline outline-1 outline-offset-[-1px] outline-slate-300 resize-none align-top"
             placeholder="모의면접 진행 후 느낀점을 자유롭게 적어주세요."
+            value={reflection}
+            onChange={(e) => setReflection(e.target.value)}
           />
         }
         buttons={
-          <div className="self-stretch inline-flex justify-center items-center gap-3">
-            <div className="flex-1 h-11 px-5 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-slate-300 flex justify-center items-center gap-1">
-              <SkipButton />
-            </div>
-            <div className="flex-1 h-11 px-5 bg-blue-500 rounded-lg flex justify-center items-center">
-              <NextButton onClick={handleReplaceModal} />
-            </div>
+          <div className="w-full inline-flex justify-center items-center gap-3">
+            <SkipButton
+              className="bg-white outline outline-1 outline-offset-[-1px] outline-slate-300"
+              onClick={handleReplaceModal}
+            />
+            <NextButton className="bg-blue-500" onClick={handleSubmitReflection} />
           </div>
         }
       />
