@@ -1,5 +1,5 @@
 'use client';
-import CustomSelect from './CustomSelect';
+import CustomSelect from '@/app/(anon)/interview/[id]/components/precheck/CustomSelect';
 
 interface ChooseDeviceProps {
   availableCameras: { deviceId: string; label: string }[];

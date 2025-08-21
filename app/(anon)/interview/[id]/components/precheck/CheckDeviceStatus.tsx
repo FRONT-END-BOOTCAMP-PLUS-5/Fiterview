@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-type Status = 'checking' | 'ok' | 'blocked' | 'not-found' | 'offline' | 'error';
+import { DEVICE_STATUS_COLOR, DEVICE_STATUS_TEXT } from '@/constants/devicestatus';
+import type { DeviceStatus as Status } from '@/types/interview';
 
 type DeviceInfo = {
   deviceId: string;
@@ -156,42 +156,6 @@ export default function CheckDeviceStatus({
     };
   }, [selectedCamera, selectedMicrophone]); // 선택된 장치가 변경될 때마다 재확인
 
-  function statusColor(s: Status) {
-    switch (s) {
-      case 'ok':
-        return 'bg-[#10B981]';
-      case 'checking':
-        return 'bg-[#F59E0B]';
-      case 'blocked':
-      case 'offline':
-      case 'error':
-        return 'bg-[#EF4444]';
-      case 'not-found':
-        return 'bg-slate-300';
-      default:
-        return 'bg-slate-300';
-    }
-  }
-
-  function statusText(s: Status) {
-    switch (s) {
-      case 'ok':
-        return '정상';
-      case 'checking':
-        return '확인 중';
-      case 'blocked':
-        return '권한 거부';
-      case 'not-found':
-        return '장치 없음';
-      case 'offline':
-        return '오프라인';
-      case 'error':
-        return '오류';
-      default:
-        return '';
-    }
-  }
-
   useEffect(() => {
     onStatusChange?.({ mic: micStatus, cam: camStatus, net: netStatus });
   }, [micStatus, camStatus, netStatus, onStatusChange]);
@@ -215,27 +179,33 @@ export default function CheckDeviceStatus({
             <p className="text-[#64748B] text-[14px] cursor-default">카메라</p>
             <span className="mt-[8px] flex items-center">
               <span
-                className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${statusColor(camStatus)}`}
+                className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[camStatus]}`}
               ></span>
-              <p className="text-[#64748B] text-[14px] cursor-default">{statusText(camStatus)}</p>
+              <p className="text-[#64748B] text-[14px] cursor-default">
+                {DEVICE_STATUS_TEXT[camStatus]}
+              </p>
             </span>
           </div>
           <div className="flex flex-col">
             <p className="text-[#64748B] text-[14px] cursor-default">마이크</p>
             <span className="mt-[8px] flex items-center">
               <span
-                className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${statusColor(micStatus)}`}
+                className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[micStatus]}`}
               ></span>
-              <p className="text-[#64748B] text-[14px] cursor-default">{statusText(micStatus)}</p>
+              <p className="text-[#64748B] text-[14px] cursor-default">
+                {DEVICE_STATUS_TEXT[micStatus]}
+              </p>
             </span>
           </div>
           <div className="flex flex-col">
             <p className="text-[#64748B] text-[14px] cursor-default">인터넷</p>
             <span className="mt-[8px] flex items-center">
               <span
-                className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${statusColor(netStatus)}`}
+                className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[netStatus]}`}
               ></span>
-              <p className="text-[#64748B] text-[14px] cursor-default">{statusText(netStatus)}</p>
+              <p className="text-[#64748B] text-[14px] cursor-default">
+                {DEVICE_STATUS_TEXT[netStatus]}
+              </p>
             </span>
           </div>
         </div>
