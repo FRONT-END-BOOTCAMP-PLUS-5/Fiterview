@@ -7,7 +7,6 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
   const [feedback, setFeedback] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(true);
   const [isCompleted, setIsCompleted] = React.useState(false);
-  const { updateReportStatus } = useReportStatusStore();
 
   const isFeedbackComplete = (feedbackData: any): boolean => {
     return (
@@ -38,8 +37,6 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
           if (isFeedbackComplete(data)) {
             setFeedback(data);
             setIsCompleted(true);
-            // 피드백이 완성되면 리포트 상태를 COMPLETED로 업데이트
-            updateReportStatus(reportId.toString(), 'COMPLETED');
           }
         } else if (response.status === 409) {
           console.log('Report is not completed');
