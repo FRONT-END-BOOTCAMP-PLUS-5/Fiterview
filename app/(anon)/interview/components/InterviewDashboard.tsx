@@ -2,10 +2,10 @@
 
 import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
-import PendingInterviewsList from './PendingInterviewsList';
-import QuickInterviewForm from './QuickInterviewForm';
-import LoginModal from '@/app/(anon)/components/modal/LoginModal';
 import { useModalStore } from '@/stores/useModalStore';
+import PendingInterviewsList from '@/app/(anon)/interview/components/PendingInterviewsList';
+import QuickInterviewForm from '@/app/(anon)/interview/components/QuickInterviewForm';
+import LoginModal from '@/app/(anon)/components/modal/LoginModal';
 
 type PendingReport = {
   id: number;
