@@ -2,12 +2,12 @@
 
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import TopSection from '@/app/(anon)/interview/[id]/components/TopSection';
-import BottomSection from '@/app/(anon)/interview/[id]/components/BottomSection';
-import AiAvatar from '@/app/(anon)/interview/[id]/components/AiAvatar';
-import Question from '@/app/(anon)/interview/[id]/components/Question';
-import UserCamera from '@/app/(anon)/interview/[id]/components/UserCamera';
-import UserAudio from '@/app/(anon)/interview/[id]/components/UserAudio';
+import TopSection from '@/app/(anon)/interview/[id]/components/top/TopSection';
+import BottomSection from '@/app/(anon)/interview/[id]/components/bottom/BottomSection';
+import AiAvatar from '@/app/(anon)/interview/[id]/components/avatar/AiAvatar';
+import Question from '@/app/(anon)/interview/[id]/components/avatar/Question';
+import UserCamera from '@/app/(anon)/interview/[id]/components/user/UserCamera';
+import UserAudio from '@/app/(anon)/interview/[id]/components/user/UserAudio';
 import { useTtsAutoPlay } from '@/hooks/useTtsAutoPlay';
 import { useGetTtsQuestions } from '@/hooks/useGetTtsQuestions';
 import { transcribeAudio } from '@/hooks/useTranscribeAudio';
