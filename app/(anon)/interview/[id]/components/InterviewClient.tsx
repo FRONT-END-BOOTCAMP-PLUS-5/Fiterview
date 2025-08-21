@@ -13,7 +13,7 @@ import { useGetTtsQuestions } from '@/hooks/useGetTtsQuestions';
 import { transcribeAudio } from '@/hooks/useTranscribeAudio';
 import { QuestionTTSResponse } from '@/backend/application/questions/dtos/QuestionTTSResponse';
 import type { InterviewPhase } from '@/types/interview';
-import { generateFeedback } from '@/hooks/useGenerateFeedback';
+import axios from 'axios';
 
 export default function InterviewClient() {
   const { id } = useParams<{ id: string }>();
@@ -155,7 +155,7 @@ export default function InterviewClient() {
         const key = `interview:${reportId}:currentOrder`;
         localStorage.removeItem(key);
         // 피드백 생성
-        generateFeedback(reportId);
+        axios.post(`/api/reports/${reportId}/feedback`);
         router.push('/'); //마지막 질문인 경우
       } else {
         setCurrentOrder((o) => Math.min(10, o + 1));
