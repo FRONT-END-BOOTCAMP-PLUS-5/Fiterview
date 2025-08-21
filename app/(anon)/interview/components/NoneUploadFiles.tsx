@@ -9,7 +9,7 @@ export function NoneUploadFiles() {
         <div className="w-20 h-20 bg-[#F8FAFC] rounded-[100px] flex justify-center items-center">
           <FileX width={48} height={48} strokeWidth={3} stroke="#CBD5E1" />
         </div>
-        <div className="text-center justify-start text-slate-500 text-sm font-medium">
+        <div className="text-center justify-start text-[#64748B] text-sm font-medium">
           업로드된 파일이 없습니다.
         </div>
       </div>
