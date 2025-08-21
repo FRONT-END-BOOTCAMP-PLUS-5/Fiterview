@@ -14,8 +14,7 @@ export default function FiterviewPrepare() {
       <div className="w-full inline-flex justify-between items-center">
         <StepCard
           number="1"
-          bgColor="bg-slate-100"
-          innerBgColor="bg-slate-600"
+          innerBgColor="bg-[#475569]"
           title="자료 분석"
           description={
             <>
@@ -28,8 +27,7 @@ export default function FiterviewPrepare() {
         <ArrowRight width={24} height={24} stroke="#CBD5E1" />
         <StepCard
           number="2"
-          bgColor="bg-slate-50"
-          innerBgColor="bg-blue-500/50"
+          innerBgColor="bg-[#3B82F6]/50"
           title="맞춤 질문 생성"
           description={
             <>
@@ -43,8 +41,7 @@ export default function FiterviewPrepare() {
 
         <StepCard
           number="3"
-          bgColor="bg-slate-50"
-          innerBgColor="bg-blue-500"
+          innerBgColor="bg-[#3B82F6]"
           title="AI 모의면접"
           description={
             <>
@@ -61,20 +58,18 @@ export default function FiterviewPrepare() {
 
 function StepCard({
   number,
-  bgColor,
   innerBgColor,
   title,
   description,
 }: {
   number: string;
-  bgColor: string;
   innerBgColor: string;
   title: string;
   description: React.ReactNode;
 }) {
   return (
     <div className="w-80 flex flex-col items-center gap-5">
-      <div className={`w-20 h-20 ${bgColor} rounded-[40px] flex justify-center items-center`}>
+      <div className={`w-20 h-20 bg-[#F1F5F9] rounded-[40px] flex justify-center items-center`}>
         <div
           className={`w-14 h-14 ${innerBgColor} rounded-[30px] flex justify-center items-center`}
         >
@@ -82,8 +77,8 @@ function StepCard({
         </div>
       </div>
       <div className="flex flex-col items-center gap-3">
-        <p className="text-center text-slate-800 text-[18px] font-semibold leading-snug">{title}</p>
-        <p className="text-center text-slate-500 text-[14px] leading-tight">{description}</p>
+        <p className="text-center text-[#1E293B] text-[18px] font-semibold leading-snug">{title}</p>
+        <p className="text-center text-[#64748B] text-[14px] leading-tight">{description}</p>
       </div>
     </div>
   );
