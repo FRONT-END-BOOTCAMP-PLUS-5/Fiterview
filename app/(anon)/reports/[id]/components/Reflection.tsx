@@ -1,14 +1,29 @@
 'use client';
 
-import React from 'react';
+import { useState, useEffect } from 'react';
 import MessageSquareIcon from '@/public/assets/icons/message-square.svg';
+import { LoadingSpinner } from '@/app/(anon)/components/LoadingSpinner';
+import useReflection from '@/hooks/useReflection';
 
-export default function Reflection() {
-  const [isEditing, setIsEditing] = React.useState(true);
-  const [text, setText] = React.useState('');
+export default function Reflection({ reportId }: { reportId: number }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const { reportQuery, saveMutation } = useReflection({ reportId });
+  const [text, setText] = useState(
+    reportQuery.data?.reflection ?? 'ex) 이번 면접에서 가장 잘한 점'
+  );
+
+  useEffect(() => {
+    if (!reportQuery.data) return;
+    if (text === (reportQuery.data.reflection ?? '')) return;
+    const t = setTimeout(() => saveMutation.mutate(text), 600);
+    return () => clearTimeout(t);
+  }, [text, reportQuery.data, saveMutation]);
+  if (reportQuery.isLoading) return <LoadingSpinner />;
+  if (reportQuery.isError) return <div>Error</div>;
+  if (!reportQuery.data) return <div>No data</div>;
 
   return (
-    <div className="w-full rounded-xl bg-white border border-slate-200 box-border flex flex-col items-start justify-start p-6 gap-5 text-left text-lg text-slate-800 font-['Inter']">
+    <div className="w-146 rounded-xl bg-white border border-slate-200 box-border flex flex-col items-start justify-start p-6 gap-5 text-left text-lg text-slate-800 font-['Inter']">
       <div className="self-stretch flex flex-row items-center justify-start gap-2">
         <MessageSquareIcon className="w-5 h-5 relative overflow-hidden flex-shrink-0" />
         <b className="flex-1 relative leading-[21.6px]">면접 회고</b>
