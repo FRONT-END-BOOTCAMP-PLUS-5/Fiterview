@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Arrow from '@/public/assets/icons/arrow.svg';
+import { useTruncateText } from '@/hooks/useTruncateText';
 
 export interface CustomSelectOption {
   value: string;
@@ -31,6 +32,19 @@ export default function CustomSelect({
 
   const selected = useMemo(() => options.find((o) => o.value === value), [options, value]);
 
+  // 선택 동작
+  const selectAt = (idx: number) => {
+    const option = options[idx];
+    if (!option) return;
+    onChange(option.value);
+    setIsOpen(false);
+  };
+
+  const displayLabel = selected ? selected.label : placeholder;
+  const { truncatedText, originalText, isTruncated } = useTruncateText(displayLabel, {
+    maxLength: 25,
+  });
+
   // 외부 영역 클릭 시 닫기 동작
   useEffect(() => {
     const onDocMouseDown = (e: MouseEvent) => {
@@ -54,14 +68,6 @@ export default function CustomSelect({
     }
   }, [isOpen, options, value]);
 
-  // 선택 동작
-  const selectAt = (idx: number) => {
-    const option = options[idx];
-    if (!option) return;
-    onChange(option.value);
-    setIsOpen(false);
-  };
-
   return (
     <div ref={containerRef} className="relative">
       <button
@@ -73,8 +79,11 @@ export default function CustomSelect({
         onClick={() => setIsOpen((v) => !v)}
         className="w-full border border-gray-300 rounded-md p-[12px] pr-10 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 cursor-pointer"
       >
-        <span className={selected ? 'text-[#0F172A]' : 'text-[#94A3B8]'}>
-          {selected ? selected.label : placeholder}
+        <span
+          className={selected ? 'text-[#0F172A]' : 'text-[#94A3B8]'}
+          title={isTruncated ? originalText : undefined}
+        >
+          {truncatedText}
         </span>
         <Arrow
           className={`pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] transition-transform duration-200 ease-in-out ${
