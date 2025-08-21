@@ -108,7 +108,7 @@ export default function CheckInterview() {
             면접 시작 전 확인사항
           </p>
           <p className=" text-[#64748B] text-[16px] font-normal mt-[8px] cursor-default">
-            원할한 면접 진행을 위해 아래 내용을 확인해주세요
+            원활한 면접 진행을 위해 아래 내용을 확인해주세요
           </p>
           <NoticeList />
         </section>
