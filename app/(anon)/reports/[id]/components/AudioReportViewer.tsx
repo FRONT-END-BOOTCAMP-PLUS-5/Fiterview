@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import AudioPlayer from '@/app/(anon)/reports/[id]/components/AudioPlayer';
 import QuestionItem from '@/app/(anon)/reports/[id]/components/QuestionItem';
+import AudioFileSection from '@/app/(anon)/reports/[id]/components/AudioFileSection';
 import Edit from '@/public/assets/icons/edit.svg';
 import X from '@/public/assets/icons/x.svg';
 import Check from '@/public/assets/icons/check.svg';
+import { useReportStatusStore } from '@/stores/useReportStatusStore';
 
 interface AudioReportViewerProps {
   reportId: string;
@@ -16,12 +17,11 @@ export default function AudioReportViewer({ reportId }: AudioReportViewerProps) 
   const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editingTitle, setEditingTitle] = useState('');
+  const { currentStatus, setStatus } = useReportStatusStore();
 
   // DB에서 리포트와 질문 데이터 가져오기
   useEffect(() => {
     const fetchReportData = async () => {
-      console.log('🔍 API 호출 시작:', `/api/reports/${reportId}`);
-
       try {
         const response = await fetch(`/api/reports/${reportId}`, {
           credentials: 'include', // 쿠키 포함하여 인증 정보 전달
@@ -35,6 +35,8 @@ export default function AudioReportViewer({ reportId }: AudioReportViewerProps) 
 
         if (result.success) {
           setReport(result.data);
+          // 리포트 상태를 스토어에 동기화
+          setStatus(result.data.status);
           // 첫 번째 질문을 기본 선택으로 설정
           if (result.data.questions && result.data.questions.length > 0) {
             setSelectedQuestion(result.data.questions[0]);
@@ -175,35 +177,12 @@ export default function AudioReportViewer({ reportId }: AudioReportViewerProps) 
 
       {/* 음성 재생 컴포넌트 */}
       <div className="flex flex-col gap-6">
-        {/* 오디오 플레이어 */}
-        <div className="w-[840px] p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-slate-200 flex flex-col gap-5">
-          <div className="flex flex-col gap-3">
-            <div className="flex justify-between items-center">
-              <div className="text-slate-800 text-lg font-bold leading-snug">면접 음성 파일</div>
-              <div className="h-6 px-2 bg-green-100 rounded-xl flex justify-center items-center">
-                <div className="text-green-600 text-xs font-medium leading-none">분석 완료</div>
-              </div>
-            </div>
-            <div className="text-slate-500 text-sm font-normal leading-none">
-              질문을 클릭하여 음성파일을 확인해보세요.
-            </div>
-          </div>
-
-          {/* 음성 - 선택된 질문의 녹음 파일 사용 */}
-          {selectedQuestion && (
-            <AudioPlayer
-              key={`${reportId}-${selectedQuestion.order}`}
-              questionNumber={`Q${selectedQuestion.order}`}
-              questionText={selectedQuestion.question}
-              audioUrl={
-                selectedQuestion.recording
-                  ? `/assets/audios/${reportId}/${selectedQuestion.recording}`
-                  : '/assets/audios/2/recording_2_8.mp3'
-              }
-              className="self-stretch"
-            />
-          )}
-        </div>
+        {/* 오디오 파일 섹션 */}
+        <AudioFileSection
+          status={currentStatus}
+          selectedQuestion={selectedQuestion}
+          reportId={reportId}
+        />
 
         {/* 질문 목록 */}
         <div className="w-[840px] p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-slate-200 flex flex-col gap-4">
