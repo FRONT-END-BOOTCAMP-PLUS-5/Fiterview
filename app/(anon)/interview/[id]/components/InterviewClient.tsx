@@ -17,6 +17,7 @@ import axios from 'axios';
 import { useReportStatusStore } from '@/stores/useReportStatusStore';
 
 export default function InterviewClient() {
+  const { openModal } = useModalStore();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const reportId = Number(id);
