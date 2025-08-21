@@ -2,15 +2,15 @@
 
 import axios from 'axios';
 import { useState } from 'react';
+import { UploadedItem } from '@/types/file';
+import { useModalStore } from '@/stores/useModalStore';
+import { useReportStore } from '@/stores/useReportStore';
 import UploadOptions from '@/app/(anon)/interview/components/UploadOptions';
 import UploadedFiles from '@/app/(anon)/interview/components/UploadedFiles';
 import LoginModal from '@/app/(anon)/components/modal/LoginModal';
 import ErrorModal from '@/app/(anon)/interview/components/modal/ErrorModal';
-import { useModalStore } from '@/stores/useModalStore';
+import GenerateQuestionModal from '@/app/(anon)/interview/components/modal/GenerateQuestionModal';
 import Sparkles from '@/public/assets/icons/sparkles.svg';
-import { useReportStore } from '@/stores/useReportStore';
-import { UploadedItem } from '@/types/file';
-import GenerateQuestionModal from './modal/GenerateQuestionModal';
 
 interface QuickInterviewFormProps {
   onReportCreated?: () => void;
