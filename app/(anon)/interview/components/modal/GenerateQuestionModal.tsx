@@ -1,10 +1,10 @@
 'use client';
 import { useRouter } from 'next/navigation';
+import { useModalStore } from '@/stores/useModalStore';
+import { useReportStore } from '@/stores/useReportStore';
 import Modal from '@/app/(anon)/components/modal/Modal';
 import ModalOverlay from '@/app/(anon)/components/modal/ModalOverlay';
 import Check from '@/public/assets/icons/check-circle.svg';
-import { useModalStore } from '@/stores/useModalStore';
-import { useReportStore } from '@/stores/useReportStore';
 
 export default function GenerateQuestionModal() {
   const { isOpen, closeModal } = useModalStore();

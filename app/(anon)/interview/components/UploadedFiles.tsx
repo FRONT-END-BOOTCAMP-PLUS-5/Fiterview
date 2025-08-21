@@ -2,17 +2,10 @@
 
 import FileItem from '@/app/(anon)/interview/components/FileItem';
 import { NoneUploadFiles } from '@/app/(anon)/interview/components/NoneUploadFiles';
+import { UploadedItem } from '@/types/file';
 
 type SourceType = 'portfolio' | 'job';
 
-type UploadedItem = {
-  id: string;
-  name: string;
-  size: number;
-  type: string;
-  source: SourceType;
-  file: File;
-};
 interface UploadedFilesProps {
   files: UploadedItem[];
   onRemove?: (id: string) => void;
