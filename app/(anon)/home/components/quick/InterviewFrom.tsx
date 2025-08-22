@@ -1,25 +1,22 @@
 'use client';
 
+import { useState } from 'react';
 import axios from 'axios';
 import { useUploadFiles } from '@/app/hooks/useUploadFiles';
-import { useState } from 'react';
 import { useModalStore } from '@/stores/useModalStore';
 import { useReportStore } from '@/stores/useReportStore';
+import FilesUpload from '@/app/(anon)/home/components/quick/FilesUpload';
 import UploadOptions from '@/app/(anon)/interview/components/UploadOptions';
-import UploadedFiles from '@/app/(anon)/interview/components/UploadedFiles';
 import ErrorModal from '@/app/(anon)/components/modal/ErrorModal';
+import LoginModal from '@/app/(anon)/components/modal/LoginModal';
 import GenerateQuestionModal from '@/app/(anon)/components/modal/GenerateQuestionModal';
 import Sparkles from '@/public/assets/icons/sparkles.svg';
 
 interface QuickInterviewFormProps {
   onReportCreated?: () => void;
-  LoginModal?: React.ReactNode;
 }
 
-export default function QuickInterviewForm({
-  onReportCreated,
-  LoginModal,
-}: QuickInterviewFormProps) {
+export default function InterviewForm({ onReportCreated }: QuickInterviewFormProps) {
   const {
     uploadedFiles,
     limitExceeded,
@@ -80,22 +77,22 @@ export default function QuickInterviewForm({
   };
 
   return (
-    <section className="flex-1 inline-flex flex-col">
-      <div className="flex flex-col gap-2 mb-4">
+    <section className="flex-1 inline-flex flex-col h-full gap-6">
+      <div className="flex flex-col gap-2">
         <h2 className="justify-start text-[#1E293B] text-[20px] font-semibold">빠른 AI 면접</h2>
       </div>
 
       <UploadOptions onAddFiles={handleAddFiles} />
 
-      <div className="h-full self-stretch flex flex-col justify-start items-start gap-4 mt-10">
-        <UploadedFiles
+      <div className="min-h-[227px] self-stretch flex flex-col justify-between items-start">
+        <FilesUpload
           files={uploadedFiles}
           limitExceeded={limitExceeded}
           onRemove={handleRemoveFile}
         />
 
         <button
-          className={`w-full h-12 py-[14px] rounded-xl flex justify-center items-center gap-3 ${
+          className={`mt-6 w-full h-12 py-[14px] rounded-xl flex justify-center items-center gap-3 ${
             uploadedFiles.length === 0 || isSubmitting
               ? 'bg-slate-100 cursor-not-allowed'
               : 'bg-blue-500 hover:bg-blue-600'
@@ -119,7 +116,6 @@ export default function QuickInterviewForm({
         </button>
       </div>
 
-      {LoginModal}
       {isOpen && currentStep === 'fileError' && (
         <ErrorModal subTitle="업로드된 파일의 내용으로는 적절한 면접 질문을 생성하기 어렵습니다." />
       )}
@@ -127,6 +123,7 @@ export default function QuickInterviewForm({
         <ErrorModal subTitle="면접 질문 생성에 실패했습니다. 다시 시도해주세요." />
       )}
       {isOpen && currentStep === 'generateQuestion' && <GenerateQuestionModal />}
+      {isOpen && currentStep === 'login' && <LoginModal />}
     </section>
   );
 }

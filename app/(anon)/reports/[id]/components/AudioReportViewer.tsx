@@ -3,9 +3,6 @@
 import { useEffect, useState } from 'react';
 import QuestionItem from '@/app/(anon)/reports/[id]/components/QuestionItem';
 import AudioFileSection from '@/app/(anon)/reports/[id]/components/AudioFileSection';
-import Edit from '@/public/assets/icons/edit.svg';
-import X from '@/public/assets/icons/x.svg';
-import Check from '@/public/assets/icons/check.svg';
 import { useReportStatusStore } from '@/stores/useReportStatusStore';
 
 interface AudioReportViewerProps {
@@ -15,8 +12,6 @@ interface AudioReportViewerProps {
 export default function AudioReportViewer({ reportId }: AudioReportViewerProps) {
   const [report, setReport] = useState<any>(null);
   const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [editingTitle, setEditingTitle] = useState('');
   const { currentStatus, setStatus } = useReportStatusStore();
 
   // DB에서 리포트와 질문 데이터 가져오기
@@ -82,101 +77,10 @@ export default function AudioReportViewer({ reportId }: AudioReportViewerProps) 
     }
   };
 
-  // 제목 편집 시작 핸들러
-  const handleEditTitle = () => {
-    setIsEditingTitle(true);
-    setEditingTitle(report?.title || '');
-  };
-
-  // 제목 저장 핸들러
-  const handleSaveTitle = async () => {
-    if (!reportId || !editingTitle.trim()) return;
-
-    try {
-      // 서버에 제목 업데이트 요청
-      const response = await fetch(`/api/reports/${reportId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ title: editingTitle.trim() }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          // DB 업데이트 성공 시 로컬 상태도 업데이트
-          setReport({
-            ...report,
-            title: result.data.title,
-          });
-          setIsEditingTitle(false);
-          console.log('✅ 제목이 성공적으로 업데이트되었습니다.');
-        }
-      } else {
-        console.error('❌ 제목 업데이트 실패:', response.status);
-        // 실패 시 편집 모드 유지
-      }
-    } catch (error) {
-      console.error('💥 제목 업데이트 오류:', error);
-      // 에러 시 편집 모드 유지
-    }
-  };
-
-  // 제목 편집 취소 핸들러
-  const handleCancelTitle = () => {
-    setIsEditingTitle(false);
-    setEditingTitle('');
-  };
-
   return (
-    <div className="self-stretch h-[1413px] px-16 py-8 bg-slate-50 inline-flex flex-col justify-start items-start gap-16">
-      {/* 파일명 헤더 */}
-      <div className="self-stretch flex flex-col justify-start items-start gap-2">
-        <div className="self-stretch inline-flex justify-start items-center gap-2">
-          {/* 파일명 */}
-          {isEditingTitle ? (
-            <input
-              type="text"
-              value={editingTitle}
-              onChange={(e) => setEditingTitle(e.target.value)}
-              className="text-center text-slate-800 text-3xl font-bold leading-normal border-2 border-blue-500 focus:outline-none focus:border-blue-600 px-2 rounded"
-              placeholder="제목을 입력하세요"
-              style={{ width: `${editingTitle.length + 4}ch` }}
-            />
-          ) : (
-            <div className="text-center text-slate-800 text-3xl font-bold leading-normal flex items-center">
-              {report?.title || '제목 없음'}
-            </div>
-          )}
-
-          {/* 편집 섹션 */}
-          <div className="flex items-center gap-2">
-            {isEditingTitle ? (
-              <>
-                {/* 저장 버튼 */}
-                <div className="cursor-pointer" onClick={handleSaveTitle}>
-                  <Check width={20} height={20} strokeWidth={0.5} stroke="#303030" />
-                </div>
-                {/* 취소 버튼 */}
-                <div className="cursor-pointer" onClick={handleCancelTitle}>
-                  <X width={20} height={20} strokeWidth={2.3} stroke="#303030" />
-                </div>
-              </>
-            ) : (
-              /* 수정버튼 */
-              <div className="cursor-pointer" onClick={handleEditTitle}>
-                <Edit width={20} height={20} strokeWidth={0.5} stroke="#303030" />
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="self-stretch justify-start text-slate-500 text-base font-normal leading-tight">
-          음성 녹음을 기반으로 생성된 면접 스크립트를 통해 개선점을 제안받으세요
-        </div>
-      </div>
-
+    <div className=" bg-slate-50 flex flex-col justify-start items-start gap-16">
       {/* 음성 재생 컴포넌트 */}
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6 w-full">
         {/* 오디오 파일 섹션 */}
         <AudioFileSection
           status={currentStatus}
@@ -185,8 +89,8 @@ export default function AudioReportViewer({ reportId }: AudioReportViewerProps) 
         />
 
         {/* 질문 목록 */}
-        <div className="w-[840px] p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-slate-200 flex flex-col gap-4">
-          {/* 질문 목록 렌더링 (DB에서 가져온 데이터) */}
+        <div className="w-full p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-slate-200 flex flex-col gap-4">
+          {/* 질문 목록 렌더링 */}
           {report?.questions?.map((question: any) => (
             <QuestionItem
               key={question.id}

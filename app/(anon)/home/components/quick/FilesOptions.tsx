@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { UploadOptionsProps } from '@/types/file';
 import Upload from '@/public/assets/icons/upload.svg';
 import Picture from '@/public/assets/icons/image.svg';
+import { useEffect, useRef, useState } from 'react';
+import { UploadOptionsProps } from '@/types/file';
 
-export default function UploadOptions({ onAddFiles }: UploadOptionsProps) {
+export default function FilesOptions({ onAddFiles }: UploadOptionsProps) {
   const [selected, setSelected] = useState<'portfolio' | 'job' | null>(null);
   const portfolioInputRef = useRef<HTMLInputElement | null>(null);
   const jobInputRef = useRef<HTMLInputElement | null>(null);

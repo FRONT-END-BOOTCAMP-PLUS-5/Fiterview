@@ -4,6 +4,7 @@ import { ReportRepositoryImpl } from '@/backend/infrastructure/repositories/Repo
 import { QuestionRepositoryImpl } from '@/backend/infrastructure/repositories/QuestionRepositoryImpl';
 import { GetUserReportsUsecase } from '@/backend/application/reports/usecases/GetUserReportsUsecase';
 import { GetReportsByStatusUsecase } from '@/backend/application/reports/usecases/GetReportsByStatusUsecase';
+import { DeleteReportUsecase } from '@/backend/application/reports/usecases/DeleteReportUsecase';
 import { ReportDto } from '@/backend/application/reports/dtos/ReportDto';
 import { getUserFromSession } from '@/lib/auth/api-auth';
 
@@ -12,6 +13,7 @@ const questionRepository = new QuestionRepositoryImpl();
 const getUserReportsUsecase = new GetUserReportsUsecase(reportsRepository);
 const getReportsByStatusUsecase = new GetReportsByStatusUsecase(reportsRepository);
 const createReportUsecase = new CreateReportUsecase(reportsRepository, questionRepository);
+const deleteReportUsecase = new DeleteReportUsecase(reportsRepository);
 
 //조회
 export async function GET(request: NextRequest) {
@@ -95,6 +97,59 @@ export async function POST(request: NextRequest) {
     const result = await createReportUsecase.execute({ userId, files: questionFiles });
 
     return NextResponse.json({ success: true, data: result });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: error instanceof Error ? error.message : '서버 오류가 발생했습니다.',
+      },
+      { status: 500 }
+    );
+  }
+}
+
+//삭제
+export async function DELETE(request: NextRequest) {
+  try {
+    // 사용자 인증 확인
+    const user = await getUserFromSession();
+    if (!user) {
+      return NextResponse.json({ success: false, message: '인증이 필요합니다.' }, { status: 401 });
+    }
+
+    const userId = Number(user.id);
+    const { searchParams } = new URL(request.url);
+    const reportId = searchParams.get('id');
+
+    if (!reportId) {
+      return NextResponse.json(
+        { success: false, message: '리포트 ID가 필요합니다.' },
+        { status: 400 }
+      );
+    }
+
+    const reportIdNumber = Number(reportId);
+
+    // 리포트 존재 여부 및 소유권 확인
+    const existingReport = await reportsRepository.findReportById(reportIdNumber);
+    if (!existingReport) {
+      return NextResponse.json(
+        { success: false, message: '삭제할 리포트를 찾을 수 없습니다.' },
+        { status: 404 }
+      );
+    }
+
+    if (existingReport.userId !== userId) {
+      return NextResponse.json(
+        { success: false, message: '삭제 권한이 없습니다.' },
+        { status: 403 }
+      );
+    }
+
+    // 리포트 삭제
+    await deleteReportUsecase.execute(reportIdNumber);
+
+    return NextResponse.json({ success: true, message: '리포트가 성공적으로 삭제되었습니다.' });
   } catch (error) {
     return NextResponse.json(
       {

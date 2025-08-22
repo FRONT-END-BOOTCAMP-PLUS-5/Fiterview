@@ -24,7 +24,7 @@ export default function DropDown() {
           <button
             type="button"
             className="w-full px-4 py-3 gap-3 flex items-center justify-center rounded-b-[8px] hover:bg-[#F1F5F9] active:bg-[#E2E8F0]"
-            onClick={() => openModal()}
+            onClick={() => openModal('logout')}
           >
             <Logout width={18} height={18} stroke="#EF4444" strokeWidth={1.5} />
             <span className="w-full text-start text-[#EF4444] text-sm font-medium">로그아웃</span>
