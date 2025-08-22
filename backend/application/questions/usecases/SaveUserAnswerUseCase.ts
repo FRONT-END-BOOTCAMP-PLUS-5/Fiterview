@@ -34,14 +34,6 @@ export class SaveUserAnswerUseCase {
       },
     });
 
-    // Report 상태를 'COMPLETED'로 업데이트
-    await this.prisma.report.update({
-      where: { id: reportId },
-      data: {
-        status: 'COMPLETED',
-      },
-    });
-
     console.log(`✅ 사용자 답변이 저장되었습니다. Report ID: ${reportId}, Order: ${order}`);
   }
 }
