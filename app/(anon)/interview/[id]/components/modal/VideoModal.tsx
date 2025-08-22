@@ -147,8 +147,8 @@ export default function VideoModal() {
     <InterviewModalOverlay isOpen={isOpen}>
       <Modal
         size="large"
-        title="레포트를 발행 중입니다"
-        subTitle="wait a minute! 면접왕의 레슨을 들어보는 건 어떤가요?"
+        title="리포트를 발행 중입니다"
+        subTitle="Wait a minute! 면접왕의 레슨을 들어보는 건 어떤가요?"
         onClose={() => {
           closeModal();
           router.push(`/reports`);
