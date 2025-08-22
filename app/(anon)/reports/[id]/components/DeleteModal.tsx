@@ -39,7 +39,7 @@ export default function DeleteModal({
           </div>
         }
         buttons={
-          <div className="flex gap-3 w-full">
+          <div className="flex gap-3 w-full justify-center items-center">
             <button
               type="button"
               className="w-48 h-11 px-5 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-slate-300 inline-flex justify-center items-center cursor-pointer hover:bg-gray-50 transition-colors"
