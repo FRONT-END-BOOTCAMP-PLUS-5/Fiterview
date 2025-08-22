@@ -64,7 +64,7 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
   }, [reportId]);
 
   return (
-    <div className="w-100 relative rounded-xl bg-white border border-slate-200 box-border flex flex-col items-start justify-start p-6 gap-5 text-left text-lg text-slate-800 font-['Inter']">
+    <div className="w-full relative rounded-xl bg-white border border-slate-200 box-border flex flex-col items-start justify-start p-6 gap-5 text-left text-lg text-slate-800 font-['Inter']">
       <div className="self-stretch flex flex-row items-center justify-start gap-2">
         <BrainIcon className="w-5 h-5 relative overflow-hidden flex-shrink-0 text-[#3B82F6]" />
         <b className="flex-1 relative leading-[21.6px]">AI 피드백</b>
