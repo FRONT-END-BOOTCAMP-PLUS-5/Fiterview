@@ -32,7 +32,9 @@ export default function Modal({
       <div className="self-stretch px-6 pt-6 flex flex-col justify-start items-end gap-4">
         <div className="self-stretch flex justify-between items-start">
           <div className="flex flex-col">
-            <p className="self-stretch justify-start text-[#1E293B] text-xl font-bold">{title}</p>
+            <p className="self-stretch justify-start text-start text-[#1E293B] text-xl font-bold">
+              {title}
+            </p>
             {subTitle && (
               <p className="self-stretch justify-start text-[#64748B] text-sm">{subTitle}</p>
             )}

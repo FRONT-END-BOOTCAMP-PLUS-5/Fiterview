@@ -1,8 +1,8 @@
 'use client';
 
 import axios from 'axios';
+import { useUploadFiles } from '@/app/hooks/useUploadFiles';
 import { useState } from 'react';
-import { UploadedItem } from '@/types/file';
 import { useModalStore } from '@/stores/useModalStore';
 import { useReportStore } from '@/stores/useReportStore';
 import UploadOptions from '@/app/(anon)/interview/components/UploadOptions';
@@ -20,38 +20,17 @@ export default function QuickInterviewForm({
   onReportCreated,
   LoginModal,
 }: QuickInterviewFormProps) {
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedItem[]>([]);
-  const [limitExceeded, setLimitExceeded] = useState(false);
+  const {
+    uploadedFiles,
+    limitExceeded,
+    handleAddFiles,
+    handleRemoveFile,
+    setUploadedFiles,
+    setLimitExceeded,
+  } = useUploadFiles();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { openModal, currentStep, isOpen } = useModalStore();
   const { reportId, setReportId } = useReportStore();
-
-  type SourceType = 'portfolio' | 'job';
-
-  const handleAddFiles = (files: File[], source: SourceType) => {
-    setUploadedFiles((prev) => {
-      const getFileKey = (file: File) =>
-        `${file.name}:${file.size}:${file.type}:${(file as any).lastModified ?? ''}`;
-      const existingKeys = new Set(prev.map((p) => getFileKey(p.file)));
-
-      const dedupedNew = files.filter((f) => !existingKeys.has(getFileKey(f)));
-
-      const remainingSlots = Math.max(0, 6 - prev.length);
-      const toAdd = dedupedNew.slice(0, remainingSlots).map((f) => ({
-        id: `${Date.now()}-${f.name}-${Math.random().toString(36).slice(2, 8)}`,
-        name: f.name,
-        size: f.size,
-        type: f.type,
-        source,
-        file: f,
-      }));
-
-      const attemptedOverflow = dedupedNew.length > remainingSlots;
-      setLimitExceeded(attemptedOverflow);
-
-      return [...prev, ...toAdd];
-    });
-  };
 
   const submitFiles = async () => {
     if (uploadedFiles.length === 0 || isSubmitting) return;
@@ -112,10 +91,7 @@ export default function QuickInterviewForm({
         <UploadedFiles
           files={uploadedFiles}
           limitExceeded={limitExceeded}
-          onRemove={(id) => {
-            setUploadedFiles((prev) => prev.filter((f) => f.id !== id));
-            setLimitExceeded(false);
-          }}
+          onRemove={handleRemoveFile}
         />
 
         <button

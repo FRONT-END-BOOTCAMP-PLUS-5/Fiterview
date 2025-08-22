@@ -1,54 +1,33 @@
 'use client';
 
-import axios from 'axios';
 import { useState } from 'react';
-import { UploadedItem } from '@/types/file';
+import axios from 'axios';
+import { useUploadFiles } from '@/app/hooks/useUploadFiles';
 import { useModalStore } from '@/stores/useModalStore';
 import { useReportStore } from '@/stores/useReportStore';
-import FilesUpload from '@/app/(anon)/home/components/FilesUpload';
-import FilesOptions from '@/app/(anon)/home/components/FilesOptions';
+import FilesUpload from '@/app/(anon)/home/components/quick/FilesUpload';
+import UploadOptions from '@/app/(anon)/interview/components/UploadOptions';
 import ErrorModal from '@/app/(anon)/components/modal/ErrorModal';
+import LoginModal from '@/app/(anon)/components/modal/LoginModal';
 import GenerateQuestionModal from '@/app/(anon)/components/modal/GenerateQuestionModal';
 import Sparkles from '@/public/assets/icons/sparkles.svg';
 
 interface QuickInterviewFormProps {
   onReportCreated?: () => void;
-  LoginModal?: React.ReactNode;
 }
 
-export default function InterviewForm({ onReportCreated, LoginModal }: QuickInterviewFormProps) {
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedItem[]>([]);
-  const [limitExceeded, setLimitExceeded] = useState(false);
+export default function InterviewForm({ onReportCreated }: QuickInterviewFormProps) {
+  const {
+    uploadedFiles,
+    limitExceeded,
+    handleAddFiles,
+    handleRemoveFile,
+    setUploadedFiles,
+    setLimitExceeded,
+  } = useUploadFiles();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { openModal, currentStep, isOpen } = useModalStore();
   const { reportId, setReportId } = useReportStore();
-
-  type SourceType = 'portfolio' | 'job';
-
-  const handleAddFiles = (files: File[], source: SourceType) => {
-    setUploadedFiles((prev) => {
-      const getFileKey = (file: File) =>
-        `${file.name}:${file.size}:${file.type}:${(file as any).lastModified ?? ''}`;
-      const existingKeys = new Set(prev.map((p) => getFileKey(p.file)));
-
-      const dedupedNew = files.filter((f) => !existingKeys.has(getFileKey(f)));
-
-      const remainingSlots = Math.max(0, 6 - prev.length);
-      const toAdd = dedupedNew.slice(0, remainingSlots).map((f) => ({
-        id: `${Date.now()}-${f.name}-${Math.random().toString(36).slice(2, 8)}`,
-        name: f.name,
-        size: f.size,
-        type: f.type,
-        source,
-        file: f,
-      }));
-
-      const attemptedOverflow = dedupedNew.length > remainingSlots;
-      setLimitExceeded(attemptedOverflow);
-
-      return [...prev, ...toAdd];
-    });
-  };
 
   const submitFiles = async () => {
     if (uploadedFiles.length === 0 || isSubmitting) return;
@@ -103,20 +82,17 @@ export default function InterviewForm({ onReportCreated, LoginModal }: QuickInte
         <h2 className="justify-start text-[#1E293B] text-[20px] font-semibold">빠른 AI 면접</h2>
       </div>
 
-      <FilesOptions onAddFiles={handleAddFiles} />
+      <UploadOptions onAddFiles={handleAddFiles} />
 
       <div className="min-h-[227px] self-stretch flex flex-col justify-between items-start">
         <FilesUpload
           files={uploadedFiles}
           limitExceeded={limitExceeded}
-          onRemove={(id) => {
-            setUploadedFiles((prev) => prev.filter((f) => f.id !== id));
-            setLimitExceeded(false);
-          }}
+          onRemove={handleRemoveFile}
         />
 
         <button
-          className={`w-full h-12 py-[14px] rounded-xl flex justify-center items-center gap-3 ${
+          className={`mt-6 w-full h-12 py-[14px] rounded-xl flex justify-center items-center gap-3 ${
             uploadedFiles.length === 0 || isSubmitting
               ? 'bg-slate-100 cursor-not-allowed'
               : 'bg-blue-500 hover:bg-blue-600'
@@ -140,7 +116,6 @@ export default function InterviewForm({ onReportCreated, LoginModal }: QuickInte
         </button>
       </div>
 
-      {LoginModal}
       {isOpen && currentStep === 'fileError' && (
         <ErrorModal subTitle="업로드된 파일의 내용으로는 적절한 면접 질문을 생성하기 어렵습니다." />
       )}
@@ -148,6 +123,7 @@ export default function InterviewForm({ onReportCreated, LoginModal }: QuickInte
         <ErrorModal subTitle="면접 질문 생성에 실패했습니다. 다시 시도해주세요." />
       )}
       {isOpen && currentStep === 'generateQuestion' && <GenerateQuestionModal />}
+      {isOpen && currentStep === 'login' && <LoginModal />}
     </section>
   );
 }

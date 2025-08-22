@@ -1,7 +1,7 @@
 'use client';
 
-import FileItem from '@/app/(anon)/home/components/FileItem';
-import { NoneFiles } from '@/app/(anon)/home/components/NoneFiles';
+import FileItem from '@/app/(anon)/home/components/quick/FileItem';
+import { NoneFiles } from '@/app/(anon)/home/components/quick/NoneFiles';
 import { UploadedItem } from '@/types/file';
 
 interface UploadedFilesProps {
