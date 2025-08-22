@@ -19,7 +19,7 @@ export default function Input({
   showPassword,
 }: InputProps) {
   return (
-    <div className="w-full py-[12px] px-[16px] flex bg-[#F8FAFC] justify-center rounded-[8px] border border-[#CBD5E1]">
+    <div className="w-full flex py-[12px] px-[16px] bg-[#F8FAFC] justify-center rounded-[8px] border border-[#CBD5E1]">
       <input
         required
         type={type}
