@@ -1,13 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { SourceType } from '@/types/file';
+import { UploadOptionsProps } from '@/types/file';
 import Upload from '@/public/assets/icons/upload.svg';
 import Picture from '@/public/assets/icons/image.svg';
-
-interface UploadOptionsProps {
-  onAddFiles: (files: File[], source: SourceType) => void;
-}
 
 export default function UploadOptions({ onAddFiles }: UploadOptionsProps) {
   const [selected, setSelected] = useState<'portfolio' | 'job' | null>(null);

@@ -1,11 +1,6 @@
-import { UploadedItem } from '@/types/file';
+import { FileItemProps } from '@/types/file';
 import { useTruncateText } from '@/hooks/useTruncateText';
 import Del from '@/public/assets/icons/x.svg';
-
-interface FileItemProps {
-  file: UploadedItem;
-  onRemove?: (id: string) => void;
-}
 
 export default function FileItem({ file, onRemove }: FileItemProps) {
   const { truncatedText, originalText, isTruncated } = useTruncateText(file.name, {

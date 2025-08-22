@@ -3,11 +3,7 @@
 import Upload from '@/public/assets/icons/upload.svg';
 import Picture from '@/public/assets/icons/image.svg';
 import { useEffect, useRef, useState } from 'react';
-import { SourceType } from '@/types/file';
-
-interface UploadOptionsProps {
-  onAddFiles: (files: File[], source: SourceType) => void;
-}
+import { UploadOptionsProps } from '@/types/file';
 
 export default function FilesOptions({ onAddFiles }: UploadOptionsProps) {
   const [selected, setSelected] = useState<'portfolio' | 'job' | null>(null);
