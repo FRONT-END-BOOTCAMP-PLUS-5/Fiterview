@@ -20,9 +20,9 @@ export default function Header() {
   const { isOpen, currentStep } = useModalStore();
 
   return (
-    <header className="w-full h-20 px-9 bg-white border-b border-[#F1F5F9] inline-flex justify-between items-center">
-      <nav className="flex-1 flex justify-between items-center">
-        <div className="flex justify-start items-center gap-16">
+    <header className="w-full h-20 px-9 py-7 bg-white border-b border-[#F1F5F9] inline-flex justify-between">
+      <nav className="flex-1 flex justify-between items-end">
+        <div className="flex justify-start items-end gap-16">
           <button className="cursor-pointer" type="button" onClick={() => router.push('/')}>
             <Logo1 width={104} height={40} />
           </button>

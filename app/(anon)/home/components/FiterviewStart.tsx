@@ -15,7 +15,7 @@ export default function FiterviewStart() {
           무료로 첫 번째 맞춤형 면접 질문 세트를 생성해보세요
         </p>
         <button
-          className="h-14 px-8 bg-white rounded-[12px] flex justify-center items-center gap-2"
+          className="h-14 px-8 bg-white rounded-[12px] flex justify-center items-center gap-2 cursor-pointer"
           onClick={() => router.push('/login')}
         >
           <Start width={20} height={20} stroke="#3B82F6" strokeWidth={1.67} />
