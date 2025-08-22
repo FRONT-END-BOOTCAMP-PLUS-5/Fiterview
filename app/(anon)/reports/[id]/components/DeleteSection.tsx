@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useModalStore } from '@/stores/useModalStore';
 import DeleteModal from './DeleteModal';
 
 interface DeleteSectionProps {
@@ -9,16 +10,16 @@ interface DeleteSectionProps {
 }
 
 export default function DeleteSection({ reportId }: DeleteSectionProps) {
-  const [isOpen, setIsOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
+  const { isOpen, openModal, closeModal } = useModalStore();
 
   const handleDeleteClick = () => {
-    setIsOpen(true);
+    openModal('delete');
   };
 
   const handleClose = () => {
-    setIsOpen(false);
+    closeModal();
   };
 
   const handleConfirm = async () => {
@@ -50,7 +51,7 @@ export default function DeleteSection({ reportId }: DeleteSectionProps) {
       alert('삭제 중 오류가 발생했습니다.');
     } finally {
       setIsDeleting(false);
-      setIsOpen(false);
+      closeModal();
     }
   };
 
