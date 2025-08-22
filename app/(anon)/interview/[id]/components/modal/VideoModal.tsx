@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef } from 'react';
 import Modal from '@/app/(anon)/components/modal/Modal';
-import ModalOverlay from '@/app/(anon)/components/modal/ModalOverlay';
+import InterviewModalOverlay from '@/app/(anon)/interview/[id]/components/modal/InterviewModalOverlay';
 import { useModalStore } from '@/stores/useModalStore';
 import { useRouter } from 'next/navigation';
 import { YOUTUBE_URLS } from '@/constants/videourls';
@@ -94,8 +94,47 @@ export default function VideoModal() {
 
   if (!isOpen || currentStep !== 'video') return null;
 
+  const AnimatedDots = () => (
+    <>
+      <style jsx>{`
+        @keyframes dot-bounce {
+          0%,
+          80%,
+          100% {
+            transform: translateY(0);
+          }
+          40% {
+            transform: translateY(-4px);
+          }
+        }
+        .dot {
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: #1e293b;
+          display: inline-block;
+          margin: 0 2px;
+          animation: dot-bounce 1.3s infinite ease-in-out;
+        }
+        .dot:nth-child(2) {
+          animation-delay: 0.2s;
+        }
+        .dot:nth-child(3) {
+          animation-delay: 0.4s;
+        }
+      `}</style>
+      <span className="dot" />
+      <span className="dot" />
+      <span className="dot" />
+    </>
+  );
+
   const Body = () => (
     <div className="w-full">
+      {/* top-[22 / 28px] */}
+      <div className="absolute top-[22px] left-[210px]">
+        <AnimatedDots />
+      </div>
       <div className="w-full rounded-lg overflow-hidden bg-black">
         <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
           <div id={playerContainerIdRef.current} className="absolute inset-0 w-full h-full" />
@@ -105,10 +144,10 @@ export default function VideoModal() {
   );
 
   return (
-    <ModalOverlay isOpen={isOpen} onClose={closeModal}>
+    <InterviewModalOverlay isOpen={isOpen}>
       <Modal
         size="large"
-        title="레포트를 발행 중입니다..."
+        title="레포트를 발행 중입니다"
         subTitle="wait a minute! 면접왕의 레슨을 들어보는 건 어떤가요?"
         onClose={() => {
           closeModal();
@@ -116,6 +155,6 @@ export default function VideoModal() {
         }}
         body={<Body />}
       />
-    </ModalOverlay>
+    </InterviewModalOverlay>
   );
 }
