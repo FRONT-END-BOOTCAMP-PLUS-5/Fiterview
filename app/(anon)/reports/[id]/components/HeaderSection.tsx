@@ -44,14 +44,19 @@ export default function HeaderSection({ reportId }: HeaderSectionProps) {
 
   // 제목 저장 핸들러
   const handleSaveTitle = async () => {
-    if (!reportId || !editingTitle.trim()) return;
+    if (!reportId) return;
+
+    if (!editingTitle || editingTitle.length < 1) {
+      alert('최소 1글자 이상 입력해주세요.');
+      return;
+    }
 
     try {
       const response = await fetch(`/api/reports/${reportId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ title: editingTitle.trim() }),
+        body: JSON.stringify({ title: editingTitle }),
       });
 
       if (response.ok) {
@@ -80,16 +85,16 @@ export default function HeaderSection({ reportId }: HeaderSectionProps) {
     <div className="px-16 py-8 bg-slate-50">
       {/* 파일명 헤더 */}
       <div className="self-stretch flex flex-col justify-start items-start gap-2">
-        <div className="self-stretch inline-flex justify-start items-center gap-2">
+        <div className="self-stretch inline-flex justify-start items-end gap-2">
           {/* 파일명 */}
           {isEditingTitle ? (
             <input
               type="text"
               value={editingTitle}
               onChange={(e) => setEditingTitle(e.target.value)}
-              className="text-center text-slate-800 text-3xl font-bold leading-normal border-2 border-blue-500 focus:outline-none focus:border-blue-600 px-2 rounded"
-              placeholder="제목을 입력하세요"
-              style={{ width: `${editingTitle.length + 4}ch` }}
+              className="text-center text-slate-800 text-3xl font-bold leading-normal border-b-2 border-blue-500 focus:outline-none focus:border-blue-600 px-2"
+              placeholder="파일 제목"
+              style={{ width: `${Math.max(editingTitle.length + 2, 8)}ch` }}
             />
           ) : (
             <div className="text-center text-slate-800 text-3xl font-bold leading-normal flex items-center">
@@ -98,22 +103,24 @@ export default function HeaderSection({ reportId }: HeaderSectionProps) {
           )}
 
           {/* 편집 섹션 */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 h-full">
             {isEditingTitle ? (
-              <>
+              <div className="flex items-end gap-2 h-full">
                 {/* 저장 버튼 */}
-                <div className="cursor-pointer" onClick={handleSaveTitle}>
-                  <Check width={20} height={20} strokeWidth={0.5} stroke="#303030" />
+                <div className="cursor-pointer " onClick={handleSaveTitle}>
+                  <Check width={20} height={20} strokeWidth={5} className="text-blue-600" />
                 </div>
                 {/* 취소 버튼 */}
                 <div className="cursor-pointer" onClick={handleCancelTitle}>
-                  <X width={20} height={20} strokeWidth={2.3} stroke="#303030" />
+                  <X width={20} height={20} strokeWidth={2.3} stroke="#939393" />
                 </div>
-              </>
+              </div>
             ) : (
               /* 수정버튼 */
-              <div className="cursor-pointer" onClick={handleEditTitle}>
-                <Edit width={20} height={20} strokeWidth={0.5} stroke="#303030" />
+              <div className="flex h-full">
+                <div className="cursor-pointer self-end py-2" onClick={handleEditTitle}>
+                  <Edit width={20} height={20} strokeWidth={0.5} className="text-[#939393]" />
+                </div>
               </div>
             )}
           </div>
