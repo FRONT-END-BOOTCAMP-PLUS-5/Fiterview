@@ -78,26 +78,22 @@ export default function Header() {
               )}
             </li>
           ) : (
-            <>
-              <li>
-                <button
-                  type="button"
-                  className="justify-start text-[#334155] font-medium cursor-pointer"
-                  onClick={() => router.push('/signup')}
-                >
-                  회원가입
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  className="justify-start text-[#334155] font-medium cursor-pointer"
-                  onClick={() => router.push('/login')}
-                >
-                  로그인
-                </button>
-              </li>
-            </>
+            <li className="flex gap-6">
+              <button
+                type="button"
+                className="justify-start text-[#334155] font-medium cursor-pointer"
+                onClick={() => router.push('/signup')}
+              >
+                회원가입
+              </button>
+              <button
+                type="button"
+                className="justify-start text-[#334155] font-medium cursor-pointer"
+                onClick={() => router.push('/login')}
+              >
+                로그인
+              </button>
+            </li>
           )}
         </ul>
       </nav>
