@@ -2,7 +2,13 @@
 
 import FileItem from '@/app/(anon)/home/components/quick/FileItem';
 import { NoneFiles } from '@/app/(anon)/home/components/quick/NoneFiles';
-import { UploadedFilesProps } from '@/types/file';
+import { UploadedItem } from '@/types/file';
+
+interface UploadedFilesProps {
+  files: UploadedItem[];
+  onRemove?: (id: string) => void;
+  limitExceeded?: boolean;
+}
 
 export default function FilesUpload({ files, onRemove, limitExceeded }: UploadedFilesProps) {
   if (files.length === 0) {

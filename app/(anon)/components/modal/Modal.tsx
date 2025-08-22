@@ -31,16 +31,12 @@ export default function Modal({
     >
       <div className="self-stretch px-6 pt-6 flex flex-col justify-start items-end gap-4">
         <div className="self-stretch flex justify-between items-start">
-          <div className="flex flex-col">
-            <p className="self-stretch justify-start text-start text-[#1E293B] text-xl font-bold">
-              {title}
-            </p>
-            {subTitle && (
-              <p className="self-stretch justify-start text-[#64748B] text-sm">{subTitle}</p>
-            )}
+          <div className="flex flex-col justify-start items-start">
+            <p className="w-full text-start text-[#1E293B] text-xl font-bold">{title}</p>
+            {subTitle && <p className="w-full text-start text-[#64748B] text-sm">{subTitle}</p>}
           </div>
           <div
-            className="w-8 h-8 rounded-lg flex justify-center items-center cursor-pointer"
+            className="w-8 h-8 rounded-lg flex justify-end items-start cursor-pointer relative top-0"
             onClick={onClose}
           >
             <Del width={16} height={16} strokeWidth={2.5} stroke="#94A3B8" />
