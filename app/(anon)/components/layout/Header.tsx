@@ -1,10 +1,10 @@
 'use client';
 
-import Image from 'next/image';
 import { useRef, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useSessionUser } from '@/lib/auth/useSessionUser';
 import DropDown from '@/app/(anon)/components/layout/DropDown';
+import { useModalStore } from '@/stores/useModalStore';
 import LogoutModal from '@/app/(anon)/components/modal/LogoutModal';
 import { LoadingSpinner } from '@/app/(anon)/components/loading/LoadingSpinner';
 import Logo1 from '@/public/assets/icons/logo1.svg';
@@ -17,12 +17,13 @@ export default function Header() {
   const username = user?.nickname;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLLIElement>(null);
+  const { isOpen, currentStep } = useModalStore();
 
   return (
-    <header className="w-full h-20 px-9 bg-white border-b border-[#F1F5F9] inline-flex justify-between items-center">
-      <nav className="flex-1 flex justify-between items-center">
-        <div className="flex justify-start items-center gap-16">
-          <button type="button" onClick={() => router.push('/')}>
+    <header className="w-full h-20 px-9 py-7 bg-white border-b border-[#F1F5F9] inline-flex justify-between">
+      <nav className="flex-1 flex justify-between items-end">
+        <div className="flex justify-start items-end gap-16">
+          <button className="cursor-pointer" type="button" onClick={() => router.push('/')}>
             <Logo1 width={104} height={40} />
           </button>
           <ul className="flex justify-start items-center gap-6">
@@ -38,7 +39,7 @@ export default function Header() {
             <li>
               <button
                 type="button"
-                className={`text-[#334155] cursor-pointer ${pathname === '/reports' ? 'font-bold' : 'font-medium'}`}
+                className={`text-[#334155] cursor-pointer ${/^\/reports(\/[^/]+)?$/.test(pathname) ? 'font-bold' : 'font-medium'}`}
                 onClick={() => router.push('/reports')}
               >
                 기록
@@ -54,11 +55,11 @@ export default function Header() {
           ) : username ? (
             <li className="relative" ref={dropdownRef}>
               <button
-                className="flex justify-center items-center gap-2"
+                className="cursor-pointer flex justify-center items-center gap-2"
                 type="button"
                 onClick={() => setIsDropdownOpen((prev) => !prev)}
               >
-                <span className="whitespace-nowrap justify-start text-[#334155] text-[14px] font-medium cursor-default">
+                <span className="whitespace-nowrap justify-start text-[#334155] text-[14px] font-medium">
                   {username}
                 </span>
                 <Arrow
@@ -77,30 +78,26 @@ export default function Header() {
               )}
             </li>
           ) : (
-            <>
-              <li>
-                <button
-                  type="button"
-                  className="justify-start text-[#334155] font-medium cursor-pointer"
-                  onClick={() => router.push('/signup')}
-                >
-                  회원가입
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  className="justify-start text-[#334155] font-medium cursor-pointer"
-                  onClick={() => router.push('/login')}
-                >
-                  로그인
-                </button>
-              </li>
-            </>
+            <li className="flex gap-6">
+              <button
+                type="button"
+                className="justify-start text-[#334155] font-medium cursor-pointer"
+                onClick={() => router.push('/signup')}
+              >
+                회원가입
+              </button>
+              <button
+                type="button"
+                className="justify-start text-[#334155] font-medium cursor-pointer"
+                onClick={() => router.push('/login')}
+              >
+                로그인
+              </button>
+            </li>
           )}
         </ul>
       </nav>
-      <LogoutModal />
+      {isOpen && currentStep === 'logout' && <LogoutModal />}
     </header>
   );
 }

@@ -2,15 +2,7 @@
 
 import FileItem from '@/app/(anon)/interview/components/FileItem';
 import { NoneUploadFiles } from '@/app/(anon)/interview/components/NoneUploadFiles';
-import { UploadedItem } from '@/types/file';
-
-type SourceType = 'portfolio' | 'job';
-
-interface UploadedFilesProps {
-  files: UploadedItem[];
-  onRemove?: (id: string) => void;
-  limitExceeded?: boolean;
-}
+import { UploadedFilesProps } from '@/types/file';
 
 export default function UploadedFiles({ files, onRemove, limitExceeded }: UploadedFilesProps) {
   if (files.length === 0) {
