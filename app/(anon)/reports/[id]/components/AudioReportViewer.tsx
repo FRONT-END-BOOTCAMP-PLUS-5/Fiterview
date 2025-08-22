@@ -80,7 +80,7 @@ export default function AudioReportViewer({ reportId }: AudioReportViewerProps) 
   return (
     <div className=" bg-slate-50 flex flex-col justify-start items-start gap-16">
       {/* 음성 재생 컴포넌트 */}
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6 w-full">
         {/* 오디오 파일 섹션 */}
         <AudioFileSection
           status={currentStatus}
@@ -89,7 +89,7 @@ export default function AudioReportViewer({ reportId }: AudioReportViewerProps) 
         />
 
         {/* 질문 목록 */}
-        <div className="w-[840px] p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-slate-200 flex flex-col gap-4">
+        <div className="w-full p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-slate-200 flex flex-col gap-4">
           {/* 질문 목록 렌더링 */}
           {report?.questions?.map((question: any) => (
             <QuestionItem

@@ -14,7 +14,7 @@ export default function AudioFileSection({
   reportId,
 }: AudioFileSectionProps) {
   return (
-    <div className="w-[840px] p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-slate-200 flex flex-col gap-5">
+    <div className="w-full p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-slate-200 flex flex-col gap-5">
       <div className="flex flex-col gap-3">
         <div className="flex justify-between items-center">
           <div className="text-slate-800 text-lg font-bold leading-snug">면접 음성 파일</div>
