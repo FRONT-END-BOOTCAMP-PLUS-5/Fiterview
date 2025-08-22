@@ -14,6 +14,7 @@ import { transcribeAudio } from '@/hooks/useTranscribeAudio';
 import { QuestionTTSResponse } from '@/backend/application/questions/dtos/QuestionTTSResponse';
 import type { InterviewPhase } from '@/types/interview';
 import axios from 'axios';
+import { useModalStore } from '@/stores/useModalStore';
 import { useReportStatusStore } from '@/stores/useReportStatusStore';
 
 export default function InterviewClient() {
@@ -162,7 +163,7 @@ export default function InterviewClient() {
         const feedbackResult = await axios.post(`/api/reports/${reportId}/feedback`);
         console.log('피드백 생성 결과:', feedbackResult.status);
 
-        router.push('/'); //마지막 질문인 경우
+        openModal('reflection');
       } else {
         setCurrentOrder((o) => Math.min(10, o + 1));
       }
