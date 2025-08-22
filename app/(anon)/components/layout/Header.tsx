@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useSessionUser } from '@/lib/auth/useSessionUser';
 import DropDown from '@/app/(anon)/components/layout/DropDown';
+import { useModalStore } from '@/stores/useModalStore';
 import LogoutModal from '@/app/(anon)/components/modal/LogoutModal';
 import { LoadingSpinner } from '@/app/(anon)/components/loading/LoadingSpinner';
 import Logo1 from '@/public/assets/icons/logo1.svg';
@@ -16,6 +17,7 @@ export default function Header() {
   const username = user?.nickname;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLLIElement>(null);
+  const { isOpen, currentStep } = useModalStore();
 
   return (
     <header className="w-full h-20 px-9 bg-white border-b border-[#F1F5F9] inline-flex justify-between items-center">
@@ -99,7 +101,7 @@ export default function Header() {
           )}
         </ul>
       </nav>
-      <LogoutModal />
+      {isOpen && currentStep === 'logout' && <LogoutModal />}
     </header>
   );
 }
