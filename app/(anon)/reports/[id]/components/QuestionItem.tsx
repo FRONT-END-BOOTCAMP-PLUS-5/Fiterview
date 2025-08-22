@@ -94,7 +94,7 @@ export default function QuestionItem({
   return (
     <div
       onClick={isEditing ? undefined : toggleExpanded}
-      className={`w-[792px] min-h-[56px] p-4 bg-slate-50 ${isEditing ? '' : 'cursor-pointer'} rounded-lg flex flex-col justify-start items-start gap-3 ${className}`}
+      className={`w-full min-h-[56px] p-4 bg-slate-50 ${isEditing ? '' : 'cursor-pointer'} rounded-lg flex flex-col justify-start items-start gap-3 ${className}`}
     >
       {/* 질문 헤더 */}
       <div className="self-stretch flex justify-start items-center gap-4">
