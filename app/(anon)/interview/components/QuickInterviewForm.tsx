@@ -1,7 +1,7 @@
 'use client';
 
 import axios from 'axios';
-import { useUploadFiles } from '@/app/hooks/useUploadFiles';
+import { useUploadFiles } from '@/hooks/useUploadFiles';
 import { useState } from 'react';
 import { useModalStore } from '@/stores/useModalStore';
 import { useReportStore } from '@/stores/useReportStore';
@@ -9,6 +9,7 @@ import UploadOptions from '@/app/(anon)/interview/components/UploadOptions';
 import UploadedFiles from '@/app/(anon)/interview/components/UploadedFiles';
 import ErrorModal from '@/app/(anon)/components/modal/ErrorModal';
 import GenerateQuestionModal from '@/app/(anon)/components/modal/GenerateQuestionModal';
+import ReportProgressModal from '@/app/(anon)/interview/components/ReportProgressModal';
 import Sparkles from '@/public/assets/icons/sparkles.svg';
 
 interface QuickInterviewFormProps {
@@ -30,7 +31,7 @@ export default function QuickInterviewForm({
   } = useUploadFiles();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { openModal, currentStep, isOpen } = useModalStore();
-  const { reportId, setReportId } = useReportStore();
+  const { reportId, setReportId, setJobId } = useReportStore();
 
   const submitFiles = async () => {
     if (uploadedFiles.length === 0 || isSubmitting) return;
@@ -49,11 +50,18 @@ export default function QuickInterviewForm({
       if (response.data.success) {
         setUploadedFiles([]);
         setLimitExceeded(false);
-        setReportId(response.data.data.reportId);
+        const { reportId: newReportId, jobId } = response.data.data || {};
+        if (newReportId) setReportId(String(newReportId));
+        if (jobId) {
+          setJobId(String(jobId));
+          if (typeof window !== 'undefined') {
+            window.localStorage.setItem('fiterview_job_id', String(jobId));
+          }
+        }
         if (onReportCreated) {
           onReportCreated();
         }
-        openModal('generateQuestion');
+        openModal('reportProgress');
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -126,6 +134,7 @@ export default function QuickInterviewForm({
       {isOpen && currentStep === 'questionError' && (
         <ErrorModal subTitle="면접 질문 생성에 실패했습니다. 다시 시도해주세요." />
       )}
+      {isOpen && currentStep === 'reportProgress' && <ReportProgressModal />}
       {isOpen && currentStep === 'generateQuestion' && <GenerateQuestionModal />}
     </section>
   );

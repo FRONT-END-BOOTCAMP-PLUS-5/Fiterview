@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import axios from 'axios';
-import { useUploadFiles } from '@/app/hooks/useUploadFiles';
+import { useUploadFiles } from '@/hooks/useUploadFiles';
 import { useModalStore } from '@/stores/useModalStore';
 import { useReportStore } from '@/stores/useReportStore';
 import FilesUpload from '@/app/(anon)/home/components/quick/FilesUpload';
