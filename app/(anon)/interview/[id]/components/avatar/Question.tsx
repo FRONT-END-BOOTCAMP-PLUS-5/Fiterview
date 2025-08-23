@@ -1,7 +1,6 @@
 'use client';
 import MessageCircle from '@/public/assets/icons/message-circle.svg';
 import ArrowUp from '@/public/assets/icons/arrow-up.svg';
-import ArrowDown from '@/public/assets/icons/arrow-down.svg';
 import { useState } from 'react';
 
 interface QuestionProps {
@@ -30,7 +29,6 @@ export default function Question({ text }: QuestionProps) {
           </span>
         </div>
       </div>
-      {/* Smooth height + translate animation upward */}
       <div
         className={`grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(.22,.61,.36,1)] ${
           isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
@@ -38,7 +36,7 @@ export default function Question({ text }: QuestionProps) {
       >
         <div className="overflow-hidden">
           <div
-            className={`p-4 bg-white rounded-b-[8px] will-change-transform transition-all duration-300 ease-[cubic-bezier(.22,.61,.36,1)] ${
+            className={`p-4 bg-white rounded-b-[8px] border-t border-[#E2E8F0] will-change-transform transition-all duration-300 ease-[cubic-bezier(.22,.61,.36,1)] ${
               isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1'
             }`}
             style={{ transitionDelay: isOpen ? '50ms' : '0ms' }}
