@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useUploadFiles } from '@/hooks/useUploadFiles';
 import { useModalStore } from '@/stores/useModalStore';
 import { useReportStore } from '@/stores/useReportStore';
-import ReportProgressModal from '@/app/(anon)/interview/components/ReportProgressModal';
+// ReportProgressModal is mounted globally in HeaderVisibility
 import FilesUpload from '@/app/(anon)/home/components/quick/FilesUpload';
 import UploadOptions from '@/app/(anon)/interview/components/UploadOptions';
 import ErrorModal from '@/app/(anon)/components/modal/ErrorModal';
@@ -130,7 +130,7 @@ export default function InterviewForm({ onReportCreated }: QuickInterviewFormPro
       {isOpen && currentStep === 'questionError' && (
         <ErrorModal subTitle="면접 질문 생성에 실패했습니다. 다시 시도해주세요." />
       )}
-      {isOpen && currentStep === 'reportProgress' && <ReportProgressModal />}
+      {/* ReportProgressModal is mounted globally in HeaderVisibility */}
       {isOpen && currentStep === 'generateQuestion' && <GenerateQuestionModal />}
       {isOpen && currentStep === 'login' && <LoginModal />}
     </section>

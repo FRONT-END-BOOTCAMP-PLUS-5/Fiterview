@@ -9,7 +9,7 @@ import UploadOptions from '@/app/(anon)/interview/components/UploadOptions';
 import UploadedFiles from '@/app/(anon)/interview/components/UploadedFiles';
 import ErrorModal from '@/app/(anon)/components/modal/ErrorModal';
 import GenerateQuestionModal from '@/app/(anon)/components/modal/GenerateQuestionModal';
-import ReportProgressModal from '@/app/(anon)/interview/components/ReportProgressModal';
+// ReportProgressModal is mounted globally in HeaderVisibility
 import Sparkles from '@/public/assets/icons/sparkles.svg';
 
 interface QuickInterviewFormProps {
@@ -134,7 +134,7 @@ export default function QuickInterviewForm({
       {isOpen && currentStep === 'questionError' && (
         <ErrorModal subTitle="면접 질문 생성에 실패했습니다. 다시 시도해주세요." />
       )}
-      {isOpen && currentStep === 'reportProgress' && <ReportProgressModal />}
+      {/* ReportProgressModal is mounted globally in HeaderVisibility */}
       {isOpen && currentStep === 'generateQuestion' && <GenerateQuestionModal />}
     </section>
   );
