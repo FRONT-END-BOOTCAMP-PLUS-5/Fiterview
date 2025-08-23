@@ -10,7 +10,7 @@ interface TopSectionProps {
 
 export default function TopSection({ running, duration, onComplete }: TopSectionProps) {
   return (
-    <section className="flex px-[32px] flex-col justify-center items-center gap-[8px] border-b border-slate-200 bg-[#F8FAFC] py-[8px]">
+    <section className="flex px-[32px] flex-col justify-center items-center gap-[8px] border-b border-slate-200 bg-[#F8FAFC] py-[8px] cursor-default ">
       <Timer running={running} duration={duration} onComplete={onComplete} />
       <div className="flex items-center gap-[8px] w-full justify-center ">
         <span

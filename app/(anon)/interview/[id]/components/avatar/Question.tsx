@@ -10,7 +10,7 @@ interface QuestionProps {
 export default function Question({ text }: QuestionProps) {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className="absolute bottom-[52px] w-[calc(100%-104px)] mx-[52px] rounded-[8px] bg-[#F8FAFC] border border-[#E2E8F0] flex flex-col">
+    <div className="absolute bottom-[52px] w-[calc(100%-104px)] mx-[52px] rounded-[8px] bg-[#F8FAFC] border border-[#E2E8F0] flex flex-col cursor-default">
       <div className="flex justify-between items-center p-4 ">
         <div className="flex items-center gap-[8px]">
           <MessageCircle width={16} height={16} stroke="#3B82F6" />

@@ -16,14 +16,14 @@ export default function BottomSection({
   nextLabel = '다음 질문',
 }: BottomSectionProps) {
   return (
-    <section className="relative flex items-center px-[24px] py-[16px] border-t border-slate-200 bg-[#F8FAFC]">
+    <section className="relative flex items-center px-[24px] py-[16px] border-t border-slate-200 bg-[#F8FAFC] cursor-default">
       <p className="absolute left-1/2 -translate-x-1/2 text-[#64748B] text-[12px] font-medium">
         질문 {currentQuestion}/{totalQuestions}
       </p>
       <button
         onClick={onNext}
         disabled={isDisabled}
-        className="ml-auto inline-flex items-center gap-[8px] px-[16px] py-[10px] rounded-[8px] bg-[#3B82F6] text-white text-[14px] font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#2563EB]"
+        className="ml-auto inline-flex items-center gap-[8px] px-[16px] py-[10px] rounded-[8px] bg-[#3B82F6] text-white text-[14px] font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#2563EB] cursor-pointer"
       >
         {nextLabel}
         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
