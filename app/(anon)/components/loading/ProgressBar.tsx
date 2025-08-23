@@ -19,7 +19,7 @@ export default function ProgressBar({
 
   useEffect(() => {
     if (!showWalker || clampedPercent <= 0 || clampedPercent >= 100) return;
-    const id = setInterval(() => setFlip((f) => !f), 600);
+    const id = setInterval(() => setFlip((f) => !f), 1200);
     return () => clearInterval(id);
   }, [showWalker, clampedPercent]);
 
@@ -36,12 +36,12 @@ export default function ProgressBar({
             >
               <div className="absolute right-0 top-0" style={{ transform: 'translateX(18px)' }}>
                 <div
-                  className="relative px-[9px] py-[7px]"
+                  className="relative px-[9px]"
                   style={{ transform: `scaleX(${flip ? -1 : 1})`, transformOrigin: '50% 50%' }}
                 >
                   <div className="walker-bob" style={{ transformOrigin: '50% 50%' }}>
                     <div style={{ transform: 'rotate(-20deg)', transformOrigin: '50% 50%' }}>
-                      <MicLogo width={20} height={20} />
+                      <MicLogo width={24} height={24} />
                     </div>
                   </div>
                 </div>
@@ -49,7 +49,7 @@ export default function ProgressBar({
             </div>
           </div>
         )}
-        <div className="flex w-full h-[6px] bg-[#E2E8F0] rounded-[3px] overflow-hidden mt-1">
+        <div className="flex w-full h-[6px] bg-[#E2E8F0] rounded-[3px] overflow-hidden mt-3">
           <div
             className="h-full bg-[#3B82F6] transition-[width] duration-[1200ms] ease-out"
             style={{ width: `${clampedPercent}%` }}
