@@ -4,6 +4,7 @@ import Mic from '@/public/assets/icons/mic.svg';
 import { useRef, useEffect, useState } from 'react';
 import MicRecorder from 'mic-recorder-to-mp3';
 import type { RecordingStatus } from '@/types/interview';
+import MicVisualizer from '@/app/(anon)/interview/[id]/components/user/MicVisualizer';
 
 interface UserAudioProps {
   active?: boolean; // true면 자동 시작, false면 자동 정지
@@ -83,6 +84,14 @@ export default function UserAudio({
       <div className="flex items-center text-[#1E293B] text-[14px] font-medium">
         {text}
         {recordingStatus === 'recording' ? '' : '(대기)'}
+      </div>
+      <div className="flex ml-auto">
+        <MicVisualizer
+          active={recordingStatus === 'recording'}
+          barsCount={15}
+          heightPx={30}
+          colors={['#2563EB', '#3B82F6', '#1D4ED8']}
+        />
       </div>
     </div>
   );
