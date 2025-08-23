@@ -6,6 +6,7 @@ import InterviewModalOverlay from '@/app/(anon)/interview/[id]/components/modal/
 import { useModalStore } from '@/stores/useModalStore';
 import { useRouter } from 'next/navigation';
 import { YOUTUBE_URLS } from '@/constants/videourls';
+import { LoadingSpinner } from '@/app/(anon)/components/loading/LoadingSpinner';
 
 function extractVideoId(watchUrl: string): string | null {
   try {
@@ -94,46 +95,11 @@ export default function VideoModal() {
 
   if (!isOpen || currentStep !== 'video') return null;
 
-  const AnimatedDots = () => (
-    <>
-      <style jsx>{`
-        @keyframes dot-bounce {
-          0%,
-          80%,
-          100% {
-            transform: translateY(0);
-          }
-          40% {
-            transform: translateY(-4px);
-          }
-        }
-        .dot {
-          width: 4px;
-          height: 4px;
-          border-radius: 50%;
-          background: #1e293b;
-          display: inline-block;
-          margin: 0 2px;
-          animation: dot-bounce 1.3s infinite ease-in-out;
-        }
-        .dot:nth-child(2) {
-          animation-delay: 0.2s;
-        }
-        .dot:nth-child(3) {
-          animation-delay: 0.4s;
-        }
-      `}</style>
-      <span className="dot" />
-      <span className="dot" />
-      <span className="dot" />
-    </>
-  );
-
   const Body = () => (
     <div className="w-full">
       {/* top-[22 / 28px] */}
-      <div className="absolute top-[22px] left-[210px]">
-        <AnimatedDots />
+      <div className="absolute top-[35px] left-[215px]">
+        <LoadingSpinner />
       </div>
       <div className="w-full rounded-lg overflow-hidden bg-black">
         <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
