@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import Modal from '@/app/(anon)/components/modal/Modal';
 import ModalOverlay from '@/app/(anon)/components/modal/ModalOverlay';
@@ -34,7 +34,16 @@ export default function ReportProgressModal() {
         openModal('reportProgress');
       }
     }
-  }, [jobId, setJobId, isOpen, currentStep, openModal]);
+
+    // 이미 생성된 리포트가 있다면 완료 모달로 복구
+    const storedReportId = window.localStorage.getItem('fiterview_report_id');
+    if (storedReportId && !reportId) {
+      setReportId(storedReportId);
+      if (!isOpen || currentStep !== 'generateQuestion') {
+        openModal('generateQuestion');
+      }
+    }
+  }, [jobId, reportId, setJobId, setReportId, isOpen, currentStep, openModal]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -57,11 +66,17 @@ export default function ReportProgressModal() {
   useEffect(() => {
     if (serverReportId && !reportId) {
       setReportId(String(serverReportId));
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('fiterview_report_id', String(serverReportId));
+      }
     }
     if (step === 'completed' || step === 'error') {
       cancel();
       if (typeof window !== 'undefined') {
         window.localStorage.removeItem('fiterview_job_id');
+        if (serverReportId) {
+          window.localStorage.setItem('fiterview_report_id', String(serverReportId));
+        }
       }
       remove();
     }
