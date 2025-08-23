@@ -162,9 +162,8 @@ export default function InterviewClient() {
         // 피드백 생성
         const feedbackResult = await axios.post(`/api/reports/${reportId}/feedback`);
         console.log('피드백 생성 결과:', feedbackResult.status);
-        openModal('reflection');
 
-        router.push('/'); //마지막 질문인 경우
+        openModal('reflection');
       } else {
         setCurrentOrder((o) => Math.min(10, o + 1));
       }
