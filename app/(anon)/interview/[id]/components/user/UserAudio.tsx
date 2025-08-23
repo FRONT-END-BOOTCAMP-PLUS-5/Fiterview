@@ -10,15 +10,9 @@ interface UserAudioProps {
   active?: boolean; // true면 자동 시작, false면 자동 정지
   onFinish?: (blob: Blob) => void; // 정지 시 생성된 오디오 Blob 전달
   onError?: (e: Error) => void;
-  text?: string;
 }
 
-export default function UserAudio({
-  active = false,
-  onFinish,
-  onError,
-  text = '음성 인식 중...',
-}: UserAudioProps) {
+export default function UserAudio({ active = false, onFinish, onError }: UserAudioProps) {
   const recorderRef = useRef<MicRecorder | null>(null);
   // onFinish의 중복 호출을 방지하기 위한 플래그
   const hasOnFinishFiredRef = useRef(false);
@@ -80,18 +74,25 @@ export default function UserAudio({
     <div
       className={`absolute h-[64px] bottom-[52px] w-[calc(100%-104px)] rounded-[8px] bg-[#F8FAFC] border border-[#E2E8F0] p-4 flex gap-[8px] items-center cursor-default `}
     >
-      <Mic width={16} height={16} />
-      <div className="flex items-center text-[#1E293B] text-[14px] font-medium">
-        {text}
-        {recordingStatus === 'recording' ? '' : '(대기)'}
+      <Mic
+        width={16}
+        height={16}
+        className={`${recordingStatus === 'recording' ? 'text-[#3B82F6]' : 'text-slate-400'}`}
+      />
+      <div
+        className={`flex items-center text-[14px] font-semibold ${recordingStatus === 'recording' ? 'text-[#3B82F6]' : 'text-slate-400 '}`}
+      >
+        {recordingStatus === 'recording' ? '음성 인식 중...' : '질문이 끝나면 녹음됩니다'}
       </div>
       <div className="flex ml-auto">
-        <MicVisualizer
-          active={recordingStatus === 'recording'}
-          barsCount={15}
-          heightPx={30}
-          colors={['#2563EB', '#3B82F6', '#1D4ED8']}
-        />
+        {recordingStatus === 'recording' && (
+          <MicVisualizer
+            active={recordingStatus === 'recording'}
+            barsCount={15}
+            heightPx={30}
+            colors={['#2563EB', '#3B82F6', '#1D4ED8']}
+          />
+        )}
       </div>
     </div>
   );
