@@ -77,10 +77,10 @@ export default function UserAudio({
 
   return (
     <div
-      className={`absolute bottom-[52px] w-[calc(100%-104px)] rounded-[8px] bg-white border border-[#E2E8F0] p-4 flex gap-[8px] items-center`}
+      className={`absolute h-[64px] bottom-[52px] w-[calc(100%-104px)] rounded-[8px] bg-[#F8FAFC] border border-[#E2E8F0] p-4 flex gap-[8px] items-center`}
     >
       <Mic width={16} height={16} />
-      <div className="flex items-center text-[#1E293B] text-[12px] font-medium">
+      <div className="flex items-center text-[#1E293B] text-[14px] font-medium">
         {text}
         {recordingStatus === 'recording' ? '' : '(대기)'}
       </div>

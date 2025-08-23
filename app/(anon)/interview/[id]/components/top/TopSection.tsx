@@ -1,7 +1,6 @@
 'use client';
 
 import Timer from '@/app/(anon)/interview/[id]/components/top/Timer';
-import WaveAnimation from '@/public/assets/icons/wave-animation.svg';
 
 interface TopSectionProps {
   running: boolean;
@@ -22,23 +21,6 @@ export default function TopSection({ running, duration, onComplete }: TopSection
         >
           녹음 중
         </p>
-        {running ? (
-          <WaveAnimation
-            width={16}
-            height={16}
-            fill="#3B82F6"
-            strokeWidth={0.8}
-            className="text-[#3B82F6]"
-          />
-        ) : (
-          <WaveAnimation
-            width={16}
-            height={16}
-            fill="#E2E8F0"
-            strokeWidth={0.8}
-            className="text-[#E2E8F0]"
-          />
-        )}
       </div>
     </section>
   );
