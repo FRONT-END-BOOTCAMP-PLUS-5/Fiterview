@@ -147,7 +147,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             <button
               type="submit"
               disabled={!isFormReady}
@@ -156,7 +156,7 @@ export default function LoginPage() {
               {loading ? '로그인 중...' : '로그인'}
             </button>
 
-            <div className="min-h-[14.4px]">
+            <div className="min-h-[18px] -mt-2 -mb-2">
               {error && <p className="text-[12px] text-[#EF4444]">{error}</p>}
             </div>
 
