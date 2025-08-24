@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getJobProgress, getProgressByReportId } from '@/lib/server/progressStore';
+import { PROGRESS_STARTED_TIMEOUT_MS } from '@/constants/progress';
 
 function timeoutErrorResponse() {
   return NextResponse.json({
@@ -39,7 +40,7 @@ export async function GET(request: NextRequest) {
       state = getProgressByReportId(reportId);
     }
 
-    const timeoutMs = 8000;
+    const timeoutMs = PROGRESS_STARTED_TIMEOUT_MS;
     if (!state) {
       // 상태가 아직 생성되지 않은 케이스
       return NextResponse.json({ success: true, data: { step: 'started' } });

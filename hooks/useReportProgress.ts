@@ -2,15 +2,9 @@
 
 import { useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { ProgressStep } from '@/types/progress';
 
-type Step =
-  | 'started'
-  | 'extracting'
-  | 'generating'
-  | 'creating_report'
-  | 'saving_questions'
-  | 'completed'
-  | 'error';
+type Step = ProgressStep;
 
 interface ProgressResponse {
   success: boolean;

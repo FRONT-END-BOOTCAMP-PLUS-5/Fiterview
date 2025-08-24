@@ -8,15 +8,9 @@ import { useReportStore } from '@/stores/useReportStore';
 import { LoadingSpinner } from '@/app/(anon)/components/loading/LoadingSpinner';
 import ProgressBar from '@/app/(anon)/components/loading/ProgressBar';
 import { useReportProgress } from '@/hooks/useReportProgress';
+import { ProgressStep } from '@/types/progress';
 
-type Step =
-  | 'started'
-  | 'extracting'
-  | 'generating'
-  | 'creating_report'
-  | 'saving_questions'
-  | 'completed'
-  | 'error';
+type Step = ProgressStep;
 
 export default function ReportProgressModal() {
   const { isOpen, currentStep, closeModal, replaceModal, openModal } = useModalStore();

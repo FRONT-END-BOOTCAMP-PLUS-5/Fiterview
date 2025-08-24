@@ -1,14 +1,7 @@
-export type JobProgressStep =
-  | 'started'
-  | 'extracting'
-  | 'generating'
-  | 'creating_report'
-  | 'saving_questions'
-  | 'completed'
-  | 'error';
+import { ProgressStep } from '@/types/progress';
 
 export interface JobProgressState {
-  step: JobProgressStep;
+  step: ProgressStep;
   reportId?: number;
   errorMessage?: string;
   createdAtMs: number;
@@ -26,7 +19,7 @@ class InMemoryProgressStore {
 
   setJobStep(
     jobId: string,
-    step: JobProgressStep,
+    step: ProgressStep,
     extra?: { reportId?: number; errorMessage?: string }
   ) {
     const prev =
@@ -83,7 +76,7 @@ export function createJob(jobId: string) {
 
 export function setJobStep(
   jobId: string,
-  step: JobProgressStep,
+  step: ProgressStep,
   extra?: { reportId?: number; errorMessage?: string }
 ) {
   return getStore().setJobStep(jobId, step, extra);
