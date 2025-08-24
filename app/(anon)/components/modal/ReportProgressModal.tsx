@@ -15,7 +15,7 @@ type Step = ProgressStep;
 
 export default function ReportProgressModal() {
   const { isOpen, currentStep, closeModal, replaceModal, openModal } = useModalStore();
-  const { jobId, reportId, setReportId, setJobId } = useReportStore();
+  const { jobId, reportId, setReportId, setJobId, onReportCompleted } = useReportStore();
 
   // 마운트 시 작업 ID 복구
   useEffect(() => {
@@ -63,12 +63,25 @@ export default function ReportProgressModal() {
       remove();
     }
     if (step === 'completed') {
+      // 리포트 생성 완료 시 콜백 호출
+      if (onReportCompleted) {
+        onReportCompleted();
+      }
       replaceModal('generateQuestion');
     }
     if (step === 'error') {
       replaceModal('questionError');
     }
-  }, [step, serverReportId, reportId, setReportId, cancel, remove, replaceModal]);
+  }, [
+    step,
+    serverReportId,
+    reportId,
+    setReportId,
+    cancel,
+    remove,
+    replaceModal,
+    onReportCompleted,
+  ]);
 
   const handleClose = () => {
     cancel();
