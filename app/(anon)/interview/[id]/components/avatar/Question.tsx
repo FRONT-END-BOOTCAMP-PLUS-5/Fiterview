@@ -8,7 +8,7 @@ interface QuestionProps {
 }
 
 export default function Question({ text }: QuestionProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   return (
     <div className="absolute bottom-[52px] w-[calc(100%-104px)] mx-[52px] rounded-[8px] bg-[#F8FAFC] border border-[#E2E8F0] flex flex-col cursor-default">
       <div className="flex justify-between items-center p-4 ">

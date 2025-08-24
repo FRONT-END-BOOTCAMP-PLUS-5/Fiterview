@@ -3,23 +3,17 @@
 import { useEffect, useRef } from 'react';
 
 interface MicVisualizerProps {
-  active?: boolean;
-  barsCount?: number;
-  className?: string;
-  colorClassName?: string; // Tailwind bg-* class, default blue-500
+  active: boolean;
+  barsCount: number;
   heightPx?: number;
   baseScale?: number; // 0~1 사이, 기본 막대 높이(정지/저음 시)
-  colors?: string[]; // 막대별 색상 배열 (인라인 배경색 적용)
 }
 
 export default function MicVisualizer({
-  active = false,
-  barsCount = 20,
-  className = '',
-  colorClassName = 'bg-[#3B82F6]',
-  heightPx = 20,
+  active,
+  barsCount,
+  heightPx,
   baseScale = 0.35,
-  colors,
 }: MicVisualizerProps) {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -29,6 +23,7 @@ export default function MicVisualizer({
   const barsRef = useRef<HTMLSpanElement[]>([]);
 
   const clampedBase = Math.min(0.95, Math.max(0, baseScale));
+  const H = heightPx ?? 16;
 
   const start = async () => {
     try {
@@ -43,7 +38,7 @@ export default function MicVisualizer({
       const source = ctx.createMediaStreamSource(stream);
       /* 3. createAnalyser()로 분석 노드 붙이고 파라미터 설정 */
       const analyser = ctx.createAnalyser();
-      analyser.fftSize = 128; // 해상도 파라미터(크게하면 정밀하지만 반응이 느림)
+      analyser.fftSize = 64; // 해상도 파라미터(크게하면 정밀하지만 반응이 느림) 유효 값: 32, 64, 128, 256, 512, 1024
       analyser.smoothingTimeConstant = 0.8; //시간적으로 값이 덜 변동되게 하는 파라미터
       source.connect(analyser);
       analyserRef.current = analyser;
@@ -68,7 +63,8 @@ export default function MicVisualizer({
           const scale = Math.max(clampedBase, norm); // 너무 낮은 소리는 baseScale로 고정
           const el = barsRef.current[i]; // 막대 요소에 연결
           if (el) {
-            el.style.transform = `scaleY(${scale.toFixed(3)})`; // 막대 높이 조절
+            const px = Math.max(4, Math.round(H * scale));
+            el.style.height = `${px}px`; // 높이 직접 조절
           }
         }
         rafIdRef.current = requestAnimationFrame(draw);
@@ -97,7 +93,8 @@ export default function MicVisualizer({
     for (let i = 0; i < barsRef.current.length; i++) {
       const el = barsRef.current[i];
       if (el) {
-        el.style.transform = `scaleY(${clampedBase})`;
+        const px = Math.max(4, Math.round(H * clampedBase));
+        el.style.height = `${px}px`;
       }
     }
   };
@@ -109,21 +106,17 @@ export default function MicVisualizer({
   }, [active]);
 
   return (
-    <div className={`flex items-end gap-[3px] ${className}`} style={{ height: `${heightPx}px` }}>
+    <div className="flex items-center gap-[3px]" style={{ height: `${H}px` }}>
       {Array.from({ length: barsCount }).map((_, barIndex) => {
-        const bg =
-          Array.isArray(colors) && colors.length > 0 ? colors[barIndex % colors.length] : undefined;
         return (
           <span
             key={barIndex}
             ref={(el) => {
               if (el) barsRef.current[barIndex] = el;
             }}
-            className={`w-[3px] ${colorClassName}  will-change-transform rounded-[10px]`}
+            className="w-[4px] bg-[#3B82F6] rounded-full transition-[height] duration-300 ease-out"
             style={{
-              height: '100%',
-              transform: `scaleY(${clampedBase})`,
-              backgroundColor: bg,
+              height: `${Math.max(4, Math.round(H * clampedBase))}px`,
             }}
           />
         );
