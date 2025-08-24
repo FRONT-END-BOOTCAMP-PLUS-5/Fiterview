@@ -1,6 +1,6 @@
 'use client';
+import InterviewModalOverlay from '@/app/(anon)/interview/[id]/components/modal/InterviewModalOverlay';
 import Modal from '@/app/(anon)/components/modal/Modal';
-import ModalOverlay from '@/app/(anon)/components/modal/ModalOverlay';
 import { useModalStore } from '@/stores/useModalStore';
 import axios from 'axios';
 import { useParams } from 'next/navigation';
@@ -63,12 +63,13 @@ export default function ReflectionModal() {
   };
 
   return (
-    <ModalOverlay isOpen={isOpen} onClose={closeModal}>
+    <InterviewModalOverlay isOpen={isOpen}>
       <Modal
-        size="large"
+        size="medium"
         title="수고하셨습니다. 면접이 끝났어요."
         subTitle="회고는 면접 직후에 하면 더 오래 기억에 남아요."
         onClose={closeModal}
+        hideX={true}
         body={
           <textarea
             className="w-[432px] h-[132px] self-stretch px-4 py-3 bg-slate-50 rounded-lg outline outline-1 outline-offset-[-1px] outline-slate-300 resize-none align-top"
@@ -87,6 +88,6 @@ export default function ReflectionModal() {
           </div>
         }
       />
-    </ModalOverlay>
+    </InterviewModalOverlay>
   );
 }
