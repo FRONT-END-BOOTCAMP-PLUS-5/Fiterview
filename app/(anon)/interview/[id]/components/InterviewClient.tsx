@@ -131,47 +131,53 @@ export default function InterviewClient() {
   const handleFinishRecording = async (blob: Blob) => {
     setIsNextBtnDisabled(true);
     setIsUploading(true);
-    try {
-      if (lastAdvancedOrderRef.current === currentOrder) return; // 이미 처리된 거 중복 방지
-      lastAdvancedOrderRef.current = currentOrder;
-      if (!reportId) return;
-      // 녹음 파일 업로드
-      await uploadRecording({ reportId, order: currentOrder, blob });
 
-      // STT 처리 (음성을 텍스트로 변환)
-      try {
-        const sttResult = await transcribeAudio({
-          reportId,
-          order: currentOrder,
-        });
+    if (lastAdvancedOrderRef.current === currentOrder) return; // 이미 처리된 거 중복 방지
+    lastAdvancedOrderRef.current = currentOrder;
+    if (!reportId) return;
 
+    // 녹음 파일 업로드
+    await uploadRecording({ reportId, order: currentOrder, blob });
+
+    // STT 처리를 백그라운드에서 실행 (await 제거)
+    transcribeAudio({
+      reportId,
+      order: currentOrder,
+    })
+      .then((sttResult) => {
         if (sttResult.success) {
           console.log('STT 성공:', sttResult.data?.transcription.text);
         } else {
           console.error('STT 실패:', sttResult.error);
         }
-      } catch (sttError) {
+      })
+      .catch((sttError) => {
         console.error('STT 처리 중 오류:', sttError);
-      }
+      });
 
-      // 마지막 질문인 경우
-      if (currentOrder >= 10) {
-        const key = `interview:${reportId}:currentOrder`;
-        localStorage.removeItem(key);
+    // 마지막 질문인 경우
+    if (currentOrder >= 10) {
+      const key = `interview:${reportId}:currentOrder`;
+      localStorage.removeItem(key);
 
-        // 피드백 생성
-        const feedbackResult = await axios.post(`/api/reports/${reportId}/feedback`);
-        console.log('피드백 생성 결과:', feedbackResult.status);
+      // 피드백 생성도 백그라운드에서 실행
+      axios
+        .post(`/api/reports/${reportId}/feedback`)
+        .then((feedbackResult) => {
+          console.log('피드백 생성 완료:', feedbackResult.status);
+        })
+        .catch((error) => {
+          console.error('피드백 생성 실패:', error);
+        });
 
-        openModal('reflection');
-      } else {
-        setCurrentOrder((o) => Math.min(10, o + 1));
-      }
-    } catch (e) {
-      setIsNextBtnDisabled(false);
-    } finally {
-      setIsUploading(false);
+      openModal('reflection');
+    } else {
+      // 즉시 다음 질문으로 이동하여 TTS 재생 시작
+      setCurrentOrder((o) => Math.min(10, o + 1));
     }
+
+    setIsNextBtnDisabled(false);
+    setIsUploading(false);
   };
 
   return (
