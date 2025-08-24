@@ -10,7 +10,7 @@ export default function FiterviewPrepare() {
         className="self-stretch flex flex-col justify-start items-center gap-4"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-50%' }}
+        viewport={{ once: true }}
         transition={{ duration: 0.6 }}
       >
         <div className="self-stretch text-center justify-start text-[#1E293B] text-[32px] font-bold leading-10">
@@ -25,7 +25,7 @@ export default function FiterviewPrepare() {
         <motion.div
           initial={{ opacity: 0, x: -50, scale: 0.8 }}
           whileInView={{ opacity: 1, x: 0, scale: 1 }}
-          viewport={{ once: true, margin: '-50%' }}
+          viewport={{ once: true }}
           transition={{
             duration: 0.6,
             delay: 0.2,
@@ -51,7 +51,7 @@ export default function FiterviewPrepare() {
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
           whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: '-50%' }}
+          viewport={{ once: true }}
           transition={{
             duration: 0.5,
             delay: 0.6,
@@ -66,7 +66,7 @@ export default function FiterviewPrepare() {
         <motion.div
           initial={{ opacity: 0, x: -30, scale: 0.8 }}
           whileInView={{ opacity: 1, x: 0, scale: 1 }}
-          viewport={{ once: true, margin: '-50%' }}
+          viewport={{ once: true }}
           transition={{
             duration: 0.6,
             delay: 0.8,
@@ -92,7 +92,7 @@ export default function FiterviewPrepare() {
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
           whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: '-50%' }}
+          viewport={{ once: true }}
           transition={{
             duration: 0.5,
             delay: 1.2,
@@ -107,7 +107,7 @@ export default function FiterviewPrepare() {
         <motion.div
           initial={{ opacity: 0, x: -30, scale: 0.8 }}
           whileInView={{ opacity: 1, x: 0, scale: 1 }}
-          viewport={{ once: true, margin: '-50%' }}
+          viewport={{ once: true, margin: '0px' }}
           transition={{
             duration: 0.6,
             delay: 1.4,
