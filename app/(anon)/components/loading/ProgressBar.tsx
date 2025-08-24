@@ -56,7 +56,7 @@ export default function ProgressBar({
             </div>
           </div>
         )}
-        <div className="flex w-full h-[6px] bg-[#E2E8F0] rounded-[3px] overflow-hidden mt-1">
+        <div className="flex w-full h-[8px] bg-[#E2E8F0] rounded-[3px] overflow-hidden mt-1">
           <div
             className="h-full bg-[#3B82F6] transition-[width] duration-[1200ms] ease-out"
             style={{ width: `${clampedPercent}%` }}

@@ -91,7 +91,7 @@ export default function ReportProgressModal() {
     closeModal();
   };
 
-  const { title, description } = useMemo(() => getCopy(step), [step]);
+  const { title, description, icon } = useMemo(() => getCopy(step), [step]);
 
   return (
     <ModalOverlay
@@ -102,7 +102,10 @@ export default function ReportProgressModal() {
       <Modal
         title={
           <div className="flex items-center gap-2">
-            <span>{title}</span>
+            <div className="text-[12px] flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-blue-100 to-blue-500 text-white">
+              {icon}
+            </div>
+            <span className="text-lg font-semibold">{title}</span>
             {step !== 'completed' && step !== 'error' && (
               <span className="inline-flex items-center">
                 <LoadingSpinner size="small" />
@@ -122,28 +125,60 @@ export default function ReportProgressModal() {
 
 function ModalBody({ step, errorMessage }: { step?: Step; errorMessage?: string }) {
   return (
-    <div className="self-stretch inline-flex flex-col items-stretch gap-4">
-      <ProgressBar percent={getPercent(step)} showWalker={true} className="pt-1" />
+    <div className="self-stretch inline-flex flex-col items-stretch gap-6 w-full">
+      <div className="flex flex-col items-center gap-4 w-full">
+        <div className="relative w-full ">
+          <ProgressBar percent={getPercent(step)} showWalker={true} className="py-2" />
+        </div>
+      </div>
     </div>
   );
 }
 
-function getCopy(step?: Step): { title: string; description: string } {
+function getCopy(step?: Step): { title: string; description: string; icon: string } {
   switch (step) {
     case 'started':
-      return { title: '분석 준비 중', description: '업로드한 파일을 확인하고 있어요.' };
+      return {
+        title: '분석 준비 중',
+        description: '업로드한 파일을 확인하고 있어요.',
+        icon: '📋',
+      };
     case 'extracting':
-      return { title: '파일 분석 중', description: '문서에서 주요 정보를 추출하고 있어요.' };
+      return {
+        title: '파일 분석 중',
+        description: '문서에서 주요 정보를 추출하고 있어요.',
+        icon: '🔍',
+      };
     case 'generating':
-      return { title: '질문 생성 중', description: 'AI가 맞춤 질문을 생성하고 있어요.' };
+      return {
+        title: '질문 생성 중',
+        description: 'AI가 맞춤 질문을 생성하고 있어요.',
+        icon: '🤖',
+      };
     case 'creating_report':
-      return { title: '리포트 생성 중', description: '리포트를 만드는 중이에요.' };
+      return {
+        title: '리포트 생성 중',
+        description: '리포트를 만드는 중이에요.',
+        icon: '📊',
+      };
     case 'saving_questions':
-      return { title: '질문 저장 중', description: '생성된 질문을 저장하고 있어요.' };
+      return {
+        title: '질문 저장 중',
+        description: '생성된 질문을 저장하고 있어요.',
+        icon: '💾',
+      };
     case 'error':
-      return { title: '오류 발생', description: '생성 중 문제가 발생했어요.' };
+      return {
+        title: '오류 발생',
+        description: '생성 중 문제가 발생했어요.',
+        icon: '❌',
+      };
     default:
-      return { title: '진행 중', description: '잠시만 기다려주세요.' };
+      return {
+        title: '진행 중',
+        description: '잠시만 기다려주세요.',
+        icon: '⏳',
+      };
   }
 }
 
