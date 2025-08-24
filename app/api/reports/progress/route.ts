@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getJobProgress, getProgressByReportId } from '@/lib/server/progressStore';
+import { JobProgressState } from '@/lib/server/progressStore';
 import { PROGRESS_STARTED_TIMEOUT_MS } from '@/constants/progress';
 
 function timeoutErrorResponse() {
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 메모리 저장소에서 현재 진행 상태 조회
-    let state;
+    let state: JobProgressState | undefined;
     if (jobId) {
       state = getJobProgress(jobId);
     } else if (reportIdParam) {
@@ -47,7 +48,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (state.step === 'started') {
-      const updatedAtMs = (state as any).updatedAtMs as number | undefined;
+      const updatedAtMs = state.updatedAtMs as number | undefined;
       const now = Date.now();
       if (!updatedAtMs || now - updatedAtMs > timeoutMs) {
         return timeoutErrorResponse();

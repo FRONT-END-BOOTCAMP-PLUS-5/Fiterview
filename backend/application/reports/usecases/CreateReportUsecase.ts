@@ -28,8 +28,13 @@ export class CreateReportUsecase {
     onProgress?.('creating_report');
     const report = await this.reportRepository.createReport(userId);
 
-    onProgress?.('saving_questions', { reportId: report.id });
-    await this.llmAI.saveQuestions(generated, report.id);
+    try {
+      onProgress?.('saving_questions', { reportId: report.id });
+      await this.llmAI.saveQuestions(generated, report.id);
+    } catch (error) {
+      await this.reportRepository.deleteReport(report.id);
+      throw error;
+    }
 
     return { reportId: report.id };
   }

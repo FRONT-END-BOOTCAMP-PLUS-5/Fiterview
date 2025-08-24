@@ -10,3 +10,7 @@ export const PROGRESS_STEPS: ProgressStep[] = [
 ];
 
 export const PROGRESS_STARTED_TIMEOUT_MS = 8000;
+
+export const STORAGE_KEYS = {
+  FITERVIEW_JOB_ID: 'fiterview_job_id',
+} as const;

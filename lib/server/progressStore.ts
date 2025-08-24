@@ -11,6 +11,7 @@ export interface JobProgressState {
 class InMemoryProgressStore {
   private readonly jobProgressMap = new Map<string, JobProgressState>();
   private readonly reportIdToJobIdMap = new Map<number, string>();
+  private readonly ttlTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
   createJob(jobId: string) {
     const now = Date.now();
@@ -33,6 +34,10 @@ class InMemoryProgressStore {
       updatedAtMs: Date.now(),
     };
     this.jobProgressMap.set(jobId, next);
+    // 완료/에러 시 TTL 클린업 예약(2분 후 제거)
+    if (step === 'completed' || step === 'error') {
+      this.scheduleClear(jobId, 1000 * 60 * 2);
+    }
     if (extra?.reportId !== undefined) {
       this.reportIdToJobIdMap.set(extra.reportId, jobId);
     }
@@ -56,10 +61,27 @@ class InMemoryProgressStore {
     if (!jobId) return undefined;
     return this.jobProgressMap.get(jobId);
   }
+
+  clearJob(jobId: string) {
+    const state = this.jobProgressMap.get(jobId);
+    if (state?.reportId !== undefined) {
+      this.reportIdToJobIdMap.delete(state.reportId);
+    }
+    this.jobProgressMap.delete(jobId);
+    const t = this.ttlTimers.get(jobId);
+    if (t) clearTimeout(t);
+    this.ttlTimers.delete(jobId);
+  }
+
+  private scheduleClear(jobId: string, delayMs: number) {
+    const existing = this.ttlTimers.get(jobId);
+    if (existing) clearTimeout(existing);
+    const timer = setTimeout(() => this.clearJob(jobId), delayMs);
+    this.ttlTimers.set(jobId, timer);
+  }
 }
 
 declare global {
-  // eslint-disable-next-line no-var
   var __fiterview_progressStore: InMemoryProgressStore | undefined;
 }
 
@@ -92,4 +114,8 @@ export function getJobProgress(jobId: string): JobProgressState | undefined {
 
 export function getProgressByReportId(reportId: number): JobProgressState | undefined {
   return getStore().getProgressByReportId(reportId);
+}
+
+export function clearJob(jobId: string) {
+  return getStore().clearJob(jobId);
 }

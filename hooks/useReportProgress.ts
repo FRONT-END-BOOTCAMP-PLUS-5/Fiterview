@@ -43,7 +43,20 @@ export function useReportProgress(params: {
     refetchInterval: (q) => {
       const step = q.state.data?.data?.step;
       if (!step) return 250;
-      return step === 'completed' || step === 'error' ? false : 250;
+
+      switch (step) {
+        case 'extracting':
+          return 250;
+        case 'generating':
+          return 400;
+        case 'saving_questions':
+          return 250;
+        case 'completed':
+        case 'error':
+          return false; // 완료/에러 시 폴링 중단
+        default:
+          return 250; // 기본 간격 (250ms)
+      }
     },
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,

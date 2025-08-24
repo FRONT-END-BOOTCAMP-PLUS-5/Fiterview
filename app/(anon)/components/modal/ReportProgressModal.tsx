@@ -9,6 +9,7 @@ import { LoadingSpinner } from '@/app/(anon)/components/loading/LoadingSpinner';
 import ProgressBar from '@/app/(anon)/components/loading/ProgressBar';
 import { useReportProgress } from '@/hooks/useReportProgress';
 import { ProgressStep } from '@/types/progress';
+import { STORAGE_KEYS } from '@/constants/progress';
 
 type Step = ProgressStep;
 
@@ -19,7 +20,7 @@ export default function ReportProgressModal() {
   // 마운트 시 작업 ID 복구
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const stored = window.localStorage.getItem('fiterview_job_id');
+    const stored = window.localStorage.getItem(STORAGE_KEYS.FITERVIEW_JOB_ID);
     if (stored && !jobId) {
       setJobId(stored);
       if (!isOpen || currentStep !== 'reportProgress') {
@@ -38,7 +39,7 @@ export default function ReportProgressModal() {
     const activeStr = sepIndex >= 0 ? persistKey.slice(0, sepIndex) : 'false';
     const job = sepIndex >= 0 ? persistKey.slice(sepIndex + 1) : '';
     if (activeStr === 'true' && job) {
-      window.localStorage.setItem('fiterview_job_id', job);
+      window.localStorage.setItem(STORAGE_KEYS.FITERVIEW_JOB_ID, job);
     }
   }, [persistKey]);
 
@@ -57,7 +58,7 @@ export default function ReportProgressModal() {
     if (step === 'completed' || step === 'error') {
       cancel();
       if (typeof window !== 'undefined') {
-        window.localStorage.removeItem('fiterview_job_id');
+        window.localStorage.removeItem(STORAGE_KEYS.FITERVIEW_JOB_ID);
       }
       remove();
     }
@@ -72,7 +73,7 @@ export default function ReportProgressModal() {
   const handleClose = () => {
     cancel();
     if (typeof window !== 'undefined') {
-      window.localStorage.removeItem('fiterview_job_id');
+      window.localStorage.removeItem(STORAGE_KEYS.FITERVIEW_JOB_ID);
     }
     closeModal();
   };

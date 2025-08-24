@@ -24,8 +24,6 @@ export default function ProgressBar({
     return () => clearInterval(id);
   }, [showWalker, clampedPercent]);
 
-  const translateXPercent = clampedPercent <= 0 ? 0 : clampedPercent >= 100 ? -100 : -50;
-
   return (
     <div className={`flex-1 flex justify-start items-center ${className}`}>
       <div className="relative w-full pt-12">
@@ -35,7 +33,7 @@ export default function ProgressBar({
               className="relative transition-[width] duration-[1200ms] ease-out"
               style={{ width: `${clampedPercent}%` }}
             >
-              <div className="absolute right-0 " style={{ transform: 'translateX(25px)' }}>
+              <div className="absolute right-0 translate-x-6">
                 <div
                   className="relative"
                   style={{ transform: `scaleX(${flip ? -1 : 1})`, transformOrigin: '50% 50%' }}
@@ -48,14 +46,9 @@ export default function ProgressBar({
                         stroke="#CBD5E1"
                         opacity={0.25}
                         strokeWidth={1.33}
-                        style={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.5))' }}
+                        className="drop-shadow-lg"
                       />
-                      <MicLogo
-                        width={20}
-                        height={20}
-                        className="absolute"
-                        style={{ transform: 'rotate(-20deg)', transformOrigin: '50% 50%' }}
-                      />
+                      <MicLogo width={20} height={20} className="absolute -rotate-[20deg]" />
                     </div>
                   </div>
                 </div>

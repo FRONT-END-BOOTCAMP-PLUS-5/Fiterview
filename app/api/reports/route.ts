@@ -87,12 +87,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, message: '파일이 필요합니다.' }, { status: 400 });
     }
 
-    const jobId = (globalThis as any).crypto?.randomUUID
-      ? (globalThis as any).crypto.randomUUID()
-      : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const jobId = crypto.randomUUID();
     createJob(jobId);
 
-    // 응답은 즉시 반환하고, 나머지는 백그라운드에서 UseCase로 처리 (진행상태 기록)
+    // 응답은 즉시 반환 나머지는 백그라운드에서 UseCase로 처리 (진행상태 기록)
     (async () => {
       try {
         setJobStep(jobId, 'extracting');
