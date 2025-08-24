@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Input from '@/app/(anon)/components/Input';
 import EyeOff from '@/public/assets/icons/eye-off.svg';
+import { Roboto } from 'next/font/google';
+const roboto = Roboto({ subsets: ['latin'], weight: ['400', '500', '700'], display: 'swap' });
 import Logo from '@/public/assets/icons/logo1.svg';
 import Subtitle from '@/public/assets/icons/logo-subtitle.svg';
 
@@ -154,7 +156,9 @@ export default function LoginPage() {
               {loading ? '로그인 중...' : '로그인'}
             </button>
 
-            {error && <p className="text-[12px] text-[#EF4444]">{error}</p>}
+            <div className="min-h-[14.4px]">
+              {error && <p className="text-[12px] text-[#EF4444]">{error}</p>}
+            </div>
 
             <div className="inline-flex items-center justify-center gap-1">
               <p className="text-[14px] leading-[16.8px] text-[#94A3B8]">아직 계정이 없으신가요?</p>
@@ -176,8 +180,8 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Google OAuth 로그인 버튼 (unchanged) */}
-            <div>
+            {/* Google OAuth 로그인 버튼 */}
+            <div className={roboto.className}>
               <button
                 type="button"
                 onClick={async () => {
@@ -230,9 +234,9 @@ export default function LoginPage() {
                     console.error('Google 로그인 중 오류:', error);
                   }
                 }}
-                className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center justify-center w-full h-[52px] my-4 bg-white rounded-[8px] border border-[#E2E8F0] shadow px-4 text-sm cursor-pointer"
               >
-                <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 mr-5" viewBox="0 0 24 24">
                   <path
                     fill="#4285F4"
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -250,7 +254,7 @@ export default function LoginPage() {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                Google로 로그인
+                <span className="text-black/60 font-semibold">Google 계정으로 로그인</span>
               </button>
             </div>
           </div>

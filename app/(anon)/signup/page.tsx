@@ -19,8 +19,8 @@ export default function SignupPage() {
     confirmPassword: '',
   });
   const [loading, setLoading] = useState(false);
+  const [completed, setCompleted] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [agreed, setAgreed] = useState(false);
@@ -36,13 +36,15 @@ export default function SignupPage() {
     if (name === 'username') {
       setError((prev) => (prev === '이미 사용 중인 사용자명입니다.' ? '' : prev));
     }
+    if (name === 'email') {
+      setError((prev) => (prev === '이미 사용 중인 이메일입니다.' ? '' : prev));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setSuccess('');
 
     // 비밀번호 확인
     if (formData.password !== formData.confirmPassword) {
@@ -64,15 +66,12 @@ export default function SignupPage() {
         nickname: formData.nickname,
         password: formData.password,
       });
-      setSuccess('회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.');
-      setTimeout(() => {
-        router.push('/login');
-      }, 2000);
+      setCompleted(true);
+      router.push('/login');
     } catch (e: any) {
       setError(
         e?.response?.data?.error || e?.response?.data?.message || '회원가입 중 오류가 발생했습니다.'
       );
-    } finally {
       setLoading(false);
     }
   };
@@ -121,8 +120,10 @@ export default function SignupPage() {
     isPasswordValid &&
     passwordsMatch &&
     !serverUsernameDuplicate &&
+    !serverEmailDuplicate &&
     agreed &&
-    !loading;
+    !loading &&
+    !completed;
 
   return (
     <div className="w-full min-h-screen bg-[#F8FAFC] flex">
@@ -300,22 +301,19 @@ export default function SignupPage() {
               type="submit"
               disabled={!isFormReady}
               className={`${
-                isFormReady ? 'bg-[#3B82F6] text-white' : 'bg-[#E2E8F0] text-[#94A3B8]'
+                isFormReady
+                  ? 'bg-[#3B82F6] text-white cursor-pointer'
+                  : 'bg-[#E2E8F0] text-[#94A3B8] cursor-not-allowed'
               } h-[52px] rounded-[8px] inline-flex justify-center items-center text-[16px] font-semibold`}
             >
               {loading ? '처리 중...' : '회원가입'}
             </button>
 
-            {/* {error && (
-              <p className="text-[12px] text-[#EF4444]">{error}</p>
-            )} */}
-            {success && <p className="text-[12px] text-[#22C55E]">{success}</p>}
-
             <div className="inline-flex items-center justify-center gap-1">
               <p className="text-[14px] leading-[16.8px] text-[#94A3B8]">이미 계정이 있으신가요?</p>
               <Link
                 href="/login"
-                className="text-[14px] leading-[16.8px] text-[#3B82F6] font-semibold"
+                className="text-[14px] leading-[16.8px] text-[#3B82F6] font-semibold cursor-pointer"
               >
                 로그인
               </Link>

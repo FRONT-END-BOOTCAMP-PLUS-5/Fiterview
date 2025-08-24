@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
-import { Inter } from 'next/font/google';
+import { Roboto } from 'next/font/google';
 import './globals.css';
 import AuthSessionProvider from '@/app/(anon)/components/provider/AuthSessionProvider';
 import QueryProvider from '@/app/(anon)/components/provider/QueryProvider';
@@ -20,10 +20,10 @@ const gmarket = localFont({
   display: 'swap',
 });
 
-const inter = Inter({
+const roboto = Roboto({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-inter',
+  weight: ['400', '500', '700'],
+  variable: '--font-roboto',
   display: 'swap',
 });
 
@@ -49,7 +49,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`min-h-dvh ${pretendard.variable} ${gmarket.variable} ${inter.variable} antialiased`}
+        className={`min-h-dvh ${pretendard.variable} ${gmarket.variable} ${roboto.variable} antialiased`}
       >
         <AuthSessionProvider>
           <QueryProvider>

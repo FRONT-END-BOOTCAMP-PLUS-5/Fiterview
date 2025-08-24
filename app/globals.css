@@ -7,6 +7,7 @@
   --color-foreground: var(--foreground);
   --font-pretendard: var(--font-pretendard);
   --font-gmarket: var(--font-gmarket);
+  --font-roboto: var(--font-roboto);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -19,4 +20,8 @@ body {
 
 .font-gmarket {
   font-family: var(--font-gmarket), sans-serif !important;
+}
+
+.font-roboto {
+  font-family: var(--font-roboto), system-ui, -apple-system, sans-serif !important;
 }
