@@ -107,8 +107,8 @@ export async function POST(request: NextRequest) {
           userId,
           files: questionFiles as any,
           onProgress: (step, extras) => {
-            if (step === 'creating_report') setJobStep(jobId, 'creating_report');
             if (step === 'generating') setJobStep(jobId, 'generating');
+            if (step === 'creating_report') setJobStep(jobId, 'creating_report');
             if (step === 'saving_questions') setJobStep(jobId, 'saving_questions', extras);
           },
         });

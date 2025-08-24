@@ -22,11 +22,11 @@ export class CreateReportUsecase {
   ) {}
 
   async execute({ userId, files, onProgress }: CreateReportInput): Promise<CreateReportResult> {
-    onProgress?.('creating_report');
-    const report = await this.reportRepository.createReport(userId);
-
     onProgress?.('generating');
     const generated = await this.llmAI.generateQuestions(files);
+
+    onProgress?.('creating_report');
+    const report = await this.reportRepository.createReport(userId);
 
     onProgress?.('saving_questions', { reportId: report.id });
     await this.llmAI.saveQuestions(generated, report.id);

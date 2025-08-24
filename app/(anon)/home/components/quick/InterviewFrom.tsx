@@ -50,9 +50,6 @@ export default function InterviewForm({ onReportCreated }: QuickInterviewFormPro
         if (newReportId) setReportId(String(newReportId));
         if (jobId) {
           setJobId(String(jobId));
-          if (typeof window !== 'undefined') {
-            window.localStorage.setItem('fiterview_job_id', String(jobId));
-          }
         }
         if (onReportCreated) {
           onReportCreated();
