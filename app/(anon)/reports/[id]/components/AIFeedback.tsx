@@ -34,10 +34,9 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
           const data = await response.json();
           console.log('Existing feedback found:', data);
 
-          if (isFeedbackComplete(data)) {
-            setFeedback(data);
-            setIsCompleted(true);
-          }
+          // Mark as completed if feedback exists, even if some fields are empty (e.g., score can be 0)
+          setFeedback(data);
+          setIsCompleted(true);
         } else if (response.status === 409) {
           console.log('Report is not completed');
           setIsCompleted(false);
@@ -77,7 +76,7 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
               <LoadingSpinner />
             ) : isCompleted ? (
               <b className="relative leading-[28.8px]">
-                {isFeedbackComplete(feedback) ? `${feedback?.score}점` : '--점'}
+                {typeof feedback?.score === 'number' ? `${feedback?.score}점` : '--점'}
               </b>
             ) : (
               <b className="relative leading-[28.8px]">--점</b>
@@ -152,11 +151,6 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
 
         {!isCompleted && !loading && (
           <div className="text-slate-400">면접을 응시하고 AI 피드백을 받아보세요!</div>
-        )}
-        {feedback && !isFeedbackComplete(feedback) && (
-          <div className="text-orange-600 text-sm mt-2 p-2 bg-orange-50 rounded">
-            <strong>주의:</strong> 피드백 데이터가 불완전합니다. 재생성 중...
-          </div>
         )}
       </div>
     </div>
