@@ -3,7 +3,7 @@ import ReportsContent from '@/app/(anon)/reports/components/ReportsContent';
 
 export default function ReportsPage() {
   return (
-    <div className="self-stretch h-full px-52 py-8 inline-flex flex-col justify-start items-start gap-10">
+    <div className="w-full max-w-7xl mx-auto px-8 py-8 flex flex-col justify-start items-center gap-10">
       {/* 헤더 섹션 */}
       <ReportsHeader />
 
