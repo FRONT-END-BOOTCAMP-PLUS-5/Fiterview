@@ -141,7 +141,6 @@ export default function QuickInterviewForm({
       {isOpen && currentStep === 'questionError' && (
         <ErrorModal subTitle="면접 질문 생성에 실패했습니다. 다시 시도해주세요." />
       )}
-      {/* ReportProgressModal is mounted globally in HeaderVisibility */}
       {isOpen && currentStep === 'generateQuestion' && <GenerateQuestionModal />}
     </section>
   );
