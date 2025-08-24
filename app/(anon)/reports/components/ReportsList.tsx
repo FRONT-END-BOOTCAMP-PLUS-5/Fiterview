@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import ReportDetailCard from '@/app/(anon)/components/ReportDetailCard';
 import Empty from '@/public/assets/icons/empty.svg';
 import { usePagination } from '@/hooks/usePagination';
+import { LoadingSpinner } from '@/app/(anon)/components/loading/LoadingSpinner';
 
 interface ReportsListProps {
   reports: any[];
@@ -82,7 +83,14 @@ export default function ReportsList({ reports, loading }: ReportsListProps) {
       <div className="w-[933px] flex flex-col justify-start items-start gap-4">
         <div className="self-stretch inline-flex justify-start items-center gap-4">
           <div className="flex-1 justify-start text-zinc-800 text-lg font-black leading-snug">
-            {loading ? '로딩 중...' : '총 0개의 면접 기록'}
+            {loading ? (
+              <div className="flex items-center gap-2">
+                <LoadingSpinner size="small" />
+                <span>로딩 중...</span>
+              </div>
+            ) : (
+              '총 0개의 면접 기록'
+            )}
           </div>
         </div>
       </div>
