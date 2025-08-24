@@ -32,7 +32,7 @@ export default function ReportsContent() {
   }, []);
 
   return (
-    <div className="self-stretch h-full p-10 bg-white flex flex-col justify-start items-start gap-10">
+    <div className="self-stretch h-full p-10 bg-white rounded-xl  flex flex-col justify-start items-start gap-10">
       {/* 사용자 대시보드 */}
       <UserDashboard reports={reports} />
 
