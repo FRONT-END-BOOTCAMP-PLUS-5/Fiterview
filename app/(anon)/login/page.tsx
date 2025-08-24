@@ -106,11 +106,11 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="w-[400px] flex flex-col gap-8">
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <p className="text-[32px] leading-[38.4px] text-[#1E293B] font-['Gmarket_Sans'] font-medium">
+              <p className="text-[32px] leading-[38.4px] text-[#1E293B] font-gmarket font-medium">
                 로그인
               </p>
               <p className="text-[16px] leading-[19.2px] text-[#64748B] font-medium">
-                계정에 로그인하여 면접 준비를 계속하세요
+                계정에 로그인하여 AI 면접을 경험해보세요.
               </p>
             </div>
           </div>
@@ -149,7 +149,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={!isFormReady}
-              className={`${isFormReady ? 'bg-[#3B82F6] text-white' : 'bg-[#E2E8F0] text-[#94A3B8]'} h-[52px] rounded-[8px] inline-flex justify-center items-center text-[16px] font-semibold`}
+              className={`${isFormReady ? 'bg-[#3B82F6] text-white cursor-pointer' : 'bg-[#E2E8F0] text-[#94A3B8] cursor-not-allowed'} h-[52px] rounded-[8px] inline-flex justify-center items-center text-[16px] font-semibold`}
             >
               {loading ? '로그인 중...' : '로그인'}
             </button>

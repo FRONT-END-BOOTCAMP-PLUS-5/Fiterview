@@ -6,6 +6,9 @@ import Link from 'next/link';
 import Input from '@/app/(anon)/components/Input';
 import EyeOff from '@/public/assets/icons/eye-off.svg';
 import axios from 'axios';
+import MicIcon from '@/public/assets/icons/mic.svg';
+import BrainIcon from '@/public/assets/icons/brain.svg';
+import ChartIcon from '@/public/assets/icons/bar-chart.svg';
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -25,10 +28,14 @@ export default function SignupPage() {
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+    if (name === 'username') {
+      setError((prev) => (prev === '이미 사용 중인 사용자명입니다.' ? '' : prev));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -109,9 +116,11 @@ export default function SignupPage() {
     !!formData.nickname &&
     !!formData.password &&
     !!formData.confirmPassword &&
+    isUsernameValid &&
     isEmailValid &&
     isPasswordValid &&
     passwordsMatch &&
+    !serverUsernameDuplicate &&
     agreed &&
     !loading;
 
@@ -123,7 +132,7 @@ export default function SignupPage() {
           {/* Header */}
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <p className="text-[32px] leading-[38.4px] text-[#1E293B] font-['Gmarket_Sans'] text-slate-800 font-medium">
+              <p className="text-[32px] leading-[38.4px] text-[#1E293B] font-gmarket font-medium">
                 회원가입
               </p>
               <p className="text-[16px] leading-[19.2px] text-[#64748B] font-medium">
@@ -133,7 +142,7 @@ export default function SignupPage() {
           </div>
 
           {/* Form Fields */}
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-4">
             {/* Username */}
             <div className="flex flex-col gap-1">
               <p className="text-[14px] leading-[16.8px] text-[#374151] font-semibold">아이디</p>
@@ -146,20 +155,17 @@ export default function SignupPage() {
                   onChange={handleChange}
                 />
               </div>
-              {!isUsernameValid && (
-                <div className="inline-flex items-center gap-1 px-[10px]">
+              <div className="inline-flex items-center gap-1 px-[10px] min-h-[14.4px]">
+                {!isUsernameValid ? (
                   <p className="text-[#EF4444] text-[12px] leading-[14.4px]">
                     아이디는 영문 또는 숫자만 사용할 수 있습니다.
                   </p>
-                </div>
-              )}
-              {serverUsernameDuplicate && (
-                <div className="inline-flex items-center gap-1 px-[10px]">
+                ) : serverUsernameDuplicate ? (
                   <p className="text-[#EF4444] text-[12px] leading-[14.4px]">
                     이미 사용 중인 아이디입니다.
                   </p>
-                </div>
-              )}
+                ) : null}
+              </div>
             </div>
 
             {/* Password */}
@@ -176,13 +182,13 @@ export default function SignupPage() {
                   showPassword={() => setPasswordVisible((v) => !v)}
                 />
               </div>
-              {!isPasswordValid && (
-                <div className="inline-flex items-center gap-1 px-[10px]">
+              <div className="inline-flex items-center gap-1 px-[10px] min-h-[14.4px]">
+                {!isPasswordValid ? (
                   <p className="text-[#EF4444] text-[12px] leading-[14.4px]">
                     비밀번호는 8자 이상, 영문/숫자/특수문자를 포함해야 합니다.
                   </p>
-                </div>
-              )}
+                ) : null}
+              </div>
             </div>
 
             {/* Confirm Password */}
@@ -201,13 +207,13 @@ export default function SignupPage() {
                   showPassword={() => setConfirmPasswordVisible((v) => !v)}
                 />
               </div>
-              {!passwordsMatch && (
-                <div className="inline-flex items-center gap-1 px-[10px]">
+              <div className="inline-flex items-center gap-1 px-[10px] min-h-[14.4px]">
+                {!passwordsMatch ? (
                   <p className="text-[#EF4444] text-[12px] leading-[14.4px]">
                     비밀번호가 일치하지 않습니다.
                   </p>
-                </div>
-              )}
+                ) : null}
+              </div>
             </div>
 
             {/* Email */}
@@ -222,20 +228,17 @@ export default function SignupPage() {
                   onChange={handleChange}
                 />
               </div>
-              {!isEmailValid && (
-                <div className="inline-flex items-center gap-1 px-[10px]">
+              <div className="inline-flex items-center gap-1 px-[10px] min-h-[14.4px]">
+                {!isEmailValid ? (
                   <p className="text-[#EF4444] text-[12px] leading-[14.4px]">
                     이메일 형식이 맞지 않습니다.
                   </p>
-                </div>
-              )}
-              {serverEmailDuplicate && (
-                <div className="inline-flex items-center gap-1 px-[10px]">
+                ) : serverEmailDuplicate ? (
                   <p className="text-[#EF4444] text-[12px] leading-[14.4px]">
                     이미 사용 중인 이메일입니다.
                   </p>
-                </div>
-              )}
+                ) : null}
+              </div>
             </div>
 
             {/* Nickname */}
@@ -255,22 +258,26 @@ export default function SignupPage() {
 
           {/* Terms */}
           <div className="flex flex-col gap-4">
-            <label className="inline-flex items-center gap-3">
+            <label className="inline-flex items-start gap-3">
               <input
                 type="checkbox"
                 className="w-5 h-5 rounded border border-[#EF4444]"
                 checked={agreed}
-                onChange={(e) => setAgreed(e.target.checked)}
+                onChange={(e) => {
+                  setAgreed(e.target.checked);
+                }}
               />
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 mt-[1.5px]">
                 <p className="text-[14px] leading-[16.8px] text-[#374151]">
                   이용약관 및 개인정보처리방침에 동의합니다
                 </p>
-                {!agreed && (
-                  <p className="text-[12px] leading-[14.4px] text-[#EF4444]">
-                    필수 약관에 동의해주세요.
-                  </p>
-                )}
+                <div className="min-h-[14.4px]">
+                  {!agreed && (
+                    <p className="text-[12px] leading-[14.4px] text-[#EF4444]">
+                      필수 약관에 동의해주세요.
+                    </p>
+                  )}
+                </div>
               </div>
             </label>
 
@@ -319,18 +326,22 @@ export default function SignupPage() {
 
       {/* Right Panel */}
       <div className="w-1/2 bg-[#3B82F6] text-white p-20 flex justify-center items-center">
-        <div className="w-[480px] flex flex-col gap-8">
+        <div className="w-[480px] h-[242px] flex flex-col gap-8">
           <div className="flex flex-col gap-6">
-            <p className="text-[28px] leading-[33.6px] font-bold">핏터뷰 AI의 특별함</p>
+            <p className="text-[28px] leading-[33.6px] font-gmarket font-medium text-center">
+              핏터뷰 AI의 특별함
+            </p>
             <div className="flex flex-col gap-5">
               {/* Feature 1 */}
               <div className="inline-flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-[#629BF8] flex items-center justify-center">
-                  <img src="/assets/icons/mic.svg" alt="mic" className="w-6 h-6" />
+                  <MicIcon className="w-6 h-6" />
                 </div>
                 <div className="flex-1 flex flex-col gap-1">
-                  <p className="text-[14px] font-semibold">실시간 음성 분석</p>
-                  <p className="text-[14px] text-[#CBD5E1]">
+                  <p className="text-white text-[18px] font-semibold leading-[21.6px]">
+                    실시간 음성 분석
+                  </p>
+                  <p className="text-[14px] leading-[16.8px] font-normal text-[#CBD5E1]">
                     AI가 실시간으로 답변을 분석하고 피드백을 제공합니다
                   </p>
                 </div>
@@ -338,11 +349,11 @@ export default function SignupPage() {
               {/* Feature 2 */}
               <div className="inline-flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-[#629BF8] flex items-center justify-center">
-                  <img src="/assets/icons/brain.svg" alt="brain" className="w-6 h-6" />
+                  <BrainIcon className="w-6 h-6" />
                 </div>
                 <div className="flex-1 flex flex-col gap-1">
-                  <p className="text-[14px] font-semibold">맞춤형 질문 생성</p>
-                  <p className="text-[14px] text-[#CBD5E1]">
+                  <p className="text-[18px] leading-[21.6px] font-semibold">맞춤형 질문 생성</p>
+                  <p className="text-[14px] leading-[16.8px] font-normal text-[#CBD5E1]">
                     이력서와 채용공고를 분석해 개인화된 질문을 생성합니다
                   </p>
                 </div>
@@ -350,11 +361,11 @@ export default function SignupPage() {
               {/* Feature 3 */}
               <div className="inline-flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-[#629BF8] flex items-center justify-center">
-                  <img src="/assets/icons/bar-chart.svg" alt="chart" className="w-6 h-6" />
+                  <ChartIcon className="w-6 h-6" />
                 </div>
                 <div className="flex-1 flex flex-col gap-1">
-                  <p className="text-[14px] font-semibold">상세한 분석 리포트</p>
-                  <p className="text-[14px] text-[#CBD5E1]">
+                  <p className="text-[18px] leading-[21.6px] font-semibold">상세한 분석 리포트</p>
+                  <p className="text-[14px] leading-[16.8px] font-normal text-[#CBD5E1]">
                     면접 후 상세한 분석과 개선점을 제공받을 수 있습니다
                   </p>
                 </div>
