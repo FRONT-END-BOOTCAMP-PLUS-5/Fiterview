@@ -182,7 +182,7 @@ export default function InterviewClient() {
         <section className="relative flex-1 min-w-0 h-full bg-[#F1F5F9] flex flex-col items-center justify-between">
           <audio ref={setAudioElementRef} className="hidden" playsInline />
           <AiAvatar ttsAudio={ttsAudioEl} playing={isPlaying} />
-          <Question text={currentQuestionText} />
+          <Question active={isPlaying} text={currentQuestionText} />
         </section>
         {/* Right: 사용자 영역 */}
         <section className="relative flex-1 min-w-0 h-full bg-[#FAFBFC] flex flex-col items-center justify-between gap-[24px]">

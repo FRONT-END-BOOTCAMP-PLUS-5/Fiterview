@@ -1,20 +1,27 @@
 'use client';
 import MessageCircle from '@/public/assets/icons/message-circle.svg';
 import ArrowUp from '@/public/assets/icons/arrow-up.svg';
-import { useState } from 'react';
+import { act, useState } from 'react';
 
 interface QuestionProps {
   text: string;
+  active: boolean;
 }
 
-export default function Question({ text }: QuestionProps) {
+export default function Question({ text, active }: QuestionProps) {
   const [isOpen, setIsOpen] = useState(true);
   return (
-    <div className="absolute bottom-[52px] w-[calc(100%-104px)] mx-[52px] rounded-[8px] bg-[#F8FAFC] border border-[#E2E8F0] flex flex-col cursor-default">
+    <div
+      className={`absolute bottom-[52px] w-[calc(100%-104px)] mx-[52px] rounded-[8px] bg-[#F8FAFC] border ${active ? 'border-[#3B82F6] shadow-[0px_4px_16px_0px_rgba(59,130,246,0.25)]' : 'border-[#E2E8F0]'}  flex flex-col cursor-default`}
+    >
       <div className="flex justify-between items-center p-4 ">
         <div className="flex items-center gap-[8px]">
-          <MessageCircle width={16} height={16} stroke="#3B82F6" />
-          <p className="text-[14px] text-[#3B82F6] font-semibold">질문</p>
+          <MessageCircle width={16} height={16} stroke={active ? '#3B82F6' : '#94A3B8'} />
+          <p
+            className={`text-[14px] ${active ? 'text-[#3B82F6]' : 'text-[#94A3B8]'} font-semibold`}
+          >
+            질문
+          </p>
         </div>
         <div
           onClick={() => setIsOpen(!isOpen)}

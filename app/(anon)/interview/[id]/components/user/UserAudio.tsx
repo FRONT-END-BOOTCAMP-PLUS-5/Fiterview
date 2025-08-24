@@ -72,21 +72,21 @@ export default function UserAudio({ active = false, onFinish, onError }: UserAud
 
   return (
     <div
-      className={`absolute h-[64px] bottom-[52px] w-[calc(100%-104px)] rounded-[8px] bg-[#F8FAFC] border border-[#E2E8F0] p-4 flex gap-[8px] items-center cursor-default `}
+      className={`absolute h-[64px] bottom-[52px] w-[calc(100%-104px)] rounded-[8px] bg-[#F8FAFC] border ${recordingStatus === 'recording' ? 'border-[#3B82F6] shadow-[0px_4px_16px_0px_rgba(59,130,246,0.25)]' : 'border-[#E2E8F0]'}  p-4 flex gap-[8px] items-center cursor-default `}
     >
       <Mic
         width={16}
         height={16}
-        className={`${recordingStatus === 'recording' ? 'text-[#3B82F6]' : 'text-slate-400'}`}
+        className={`${recordingStatus === 'recording' ? 'text-[#3B82F6]' : 'text-[#94A3B8]'}`}
       />
       <div
-        className={`flex items-center text-[14px] font-semibold ${recordingStatus === 'recording' ? 'text-[#3B82F6]' : 'text-slate-400 '}`}
+        className={`flex items-center text-[14px] font-semibold ${recordingStatus === 'recording' ? 'text-[#3B82F6]' : 'text-[#94A3B8]'}`}
       >
         {recordingStatus === 'recording' ? '음성 인식 중...' : '대기 중...'}
       </div>
       <div className="flex ml-auto">
         {recordingStatus === 'recording' && (
-          <MicVisualizer active={recordingStatus === 'recording'} barsCount={15} heightPx={30} />
+          <MicVisualizer active={recordingStatus === 'recording'} barsCount={14} heightPx={30} />
         )}
       </div>
     </div>
