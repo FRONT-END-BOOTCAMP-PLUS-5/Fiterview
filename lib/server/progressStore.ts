@@ -9,8 +9,11 @@ export interface JobProgressState {
 }
 
 class InMemoryProgressStore {
+  // jobId를 키로 하는 작업 진행 상태 맵
   private readonly jobProgressMap = new Map<string, JobProgressState>();
+  // reportId를 키로 하는 jobId 매핑 맵 (역방향 조회용)
   private readonly reportIdToJobIdMap = new Map<number, string>();
+  // TTL(Time To Live) 타이머 맵 - 완료/에러된 작업을 자동으로 정리하기 위함
   private readonly ttlTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
   createJob(jobId: string) {
@@ -23,6 +26,7 @@ class InMemoryProgressStore {
     step: ProgressStep,
     extra?: { reportId?: number; errorMessage?: string }
   ) {
+    // 기존 상태가 없으면 기본값으로 초기화
     const prev =
       this.jobProgressMap.get(jobId) ||
       ({ step: 'started', createdAtMs: Date.now(), updatedAtMs: Date.now() } as JobProgressState);
@@ -33,8 +37,10 @@ class InMemoryProgressStore {
       reportId: extra?.reportId ?? prev.reportId,
       updatedAtMs: Date.now(),
     };
+
     this.jobProgressMap.set(jobId, next);
-    // 완료/에러 시 TTL 클린업 예약(2분 후 제거)
+
+    // 완료/에러 시 TTL 클린업 예약(2분 후 자동 제거)
     if (step === 'completed' || step === 'error') {
       this.scheduleClear(jobId, 1000 * 60 * 2);
     }
@@ -43,6 +49,7 @@ class InMemoryProgressStore {
     }
   }
 
+  // 작업과 리포트를 연결
   linkReport(jobId: string, reportId: number) {
     const now = Date.now();
     const prev =
@@ -52,6 +59,7 @@ class InMemoryProgressStore {
     this.reportIdToJobIdMap.set(reportId, jobId);
   }
 
+  //진행 상태 조회
   getJobProgress(jobId: string): JobProgressState | undefined {
     return this.jobProgressMap.get(jobId);
   }
@@ -91,6 +99,9 @@ function getStore(): InMemoryProgressStore {
   }
   return globalThis.__fiterview_progressStore;
 }
+
+// ===== 공개 함수들 =====
+// 외부에서 사용할 수 있도록 저장소 메서드들을 래핑
 
 export function createJob(jobId: string) {
   return getStore().createJob(jobId);
