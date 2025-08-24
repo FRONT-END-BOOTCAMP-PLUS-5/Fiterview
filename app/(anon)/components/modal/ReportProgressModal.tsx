@@ -70,6 +70,9 @@ export default function ReportProgressModal() {
     if (step === 'completed') {
       replaceModal('generateQuestion');
     }
+    if (step === 'error') {
+      replaceModal('questionError');
+    }
   }, [step, serverReportId, reportId, setReportId, cancel, remove, replaceModal]);
 
   const handleClose = () => {
@@ -99,6 +102,7 @@ export default function ReportProgressModal() {
             )}
           </div>
         }
+        size="medium"
         subTitle={description}
         onClose={handleClose}
         hideX={true}
@@ -112,11 +116,6 @@ function ModalBody({ step, errorMessage }: { step?: Step; errorMessage?: string 
   return (
     <div className="self-stretch inline-flex flex-col items-stretch gap-4">
       <ProgressBar percent={getPercent(step)} showWalker={true} className="pt-1" />
-      {step === 'error' && (
-        <p className="text-sm text-red-600">
-          {errorMessage ?? '오류가 발생했습니다. 다시 시도해주세요.'}
-        </p>
-      )}
     </div>
   );
 }
