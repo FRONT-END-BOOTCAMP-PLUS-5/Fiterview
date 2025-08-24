@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import TopSection from '@/app/(anon)/interview/[id]/components/top/TopSection';
 import BottomSection from '@/app/(anon)/interview/[id]/components/bottom/BottomSection';
 import AiAvatar from '@/app/(anon)/interview/[id]/components/avatar/AiAvatar';
@@ -15,17 +15,25 @@ import { QuestionTTSResponse } from '@/backend/application/questions/dtos/Questi
 import type { InterviewPhase } from '@/types/interview';
 import axios from 'axios';
 import { useModalStore } from '@/stores/useModalStore';
-import { useReportStatusStore } from '@/stores/useReportStatusStore';
 
 export default function InterviewClient() {
   const { openModal } = useModalStore();
   const { id } = useParams<{ id: string }>();
-  const router = useRouter();
   const reportId = Number(id);
-  const { updateReportStatus } = useReportStatusStore();
+  const storageKey = `interview:${reportId}:currentOrder`;
 
   const [phase, setPhase] = useState<InterviewPhase>('idle');
-  const [currentOrder, setCurrentOrder] = useState(1);
+  // 초기 렌더 시 localStorage에서 가능한 한 동기적으로 복원 (SSR 가드 포함)
+  const [currentOrder, setCurrentOrder] = useState<number>(() => {
+    if (typeof window === 'undefined') return 1;
+    try {
+      const raw = window.localStorage.getItem(storageKey);
+      const saved = Number(raw);
+      return Number.isFinite(saved) && saved >= 1 && saved <= 10 ? saved : 1;
+    } catch {
+      return 1;
+    }
+  });
   const [isNextBtnDisabled, setIsNextBtnDisabled] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const lastAdvancedOrderRef = useRef(0);
@@ -41,20 +49,18 @@ export default function InterviewClient() {
 
   // 새로고침 복원: 저장된 order 불러오기
   useEffect(() => {
-    if (!reportId) return;
-    const key = `interview:${reportId}:currentOrder`;
-    const saved = Number(localStorage.getItem(key));
+    if (!storageKey) return;
+    const saved = Number(localStorage.getItem(storageKey));
     if (Number.isFinite(saved) && saved >= 1 && saved <= 10) {
       setCurrentOrder(saved);
     }
-  }, [reportId]);
+  }, [storageKey]);
 
   // 진행 중 order 저장
   useEffect(() => {
-    if (!reportId) return;
-    const key = `interview:${reportId}:currentOrder`;
-    localStorage.setItem(key, String(currentOrder));
-  }, [reportId, currentOrder]);
+    if (!storageKey) return;
+    localStorage.setItem(storageKey, String(currentOrder));
+  }, [storageKey, currentOrder]);
 
   // 시작 버튼 클릭 후에만 TTS 허용
   const [ttsEnabled, setTtsEnabled] = useState(false);
@@ -156,8 +162,7 @@ export default function InterviewClient() {
 
       // 마지막 질문인 경우
       if (currentOrder >= 10) {
-        const key = `interview:${reportId}:currentOrder`;
-        localStorage.removeItem(key);
+        localStorage.removeItem(storageKey);
 
         // 피드백 생성
         const feedbackResult = await axios.post(`/api/reports/${reportId}/feedback`);
