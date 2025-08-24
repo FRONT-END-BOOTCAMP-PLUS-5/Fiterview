@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useMemo } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import Modal from '@/app/(anon)/components/modal/Modal';
 import ModalOverlay from '@/app/(anon)/components/modal/ModalOverlay';
 import { useModalStore } from '@/stores/useModalStore';
@@ -22,7 +21,6 @@ type Step =
 export default function ReportProgressModal() {
   const { isOpen, currentStep, closeModal, replaceModal, openModal } = useModalStore();
   const { jobId, reportId, setReportId, setJobId } = useReportStore();
-  const queryClient = useQueryClient();
 
   // 마운트 시 작업 ID 복구
   useEffect(() => {
@@ -34,26 +32,21 @@ export default function ReportProgressModal() {
         openModal('reportProgress');
       }
     }
+  }, [jobId, setJobId, isOpen, currentStep, openModal]);
 
-    // 이미 생성된 리포트가 있다면 완료 모달로 복구
-    const storedReportId = window.localStorage.getItem('fiterview_report_id');
-    if (storedReportId && !reportId) {
-      setReportId(storedReportId);
-      if (!isOpen || currentStep !== 'generateQuestion') {
-        openModal('generateQuestion');
-      }
-    }
-  }, [jobId, reportId, setJobId, setReportId, isOpen, currentStep, openModal]);
-
+  const persistKey = useMemo(
+    () => `${isOpen && currentStep === 'reportProgress'}:${jobId ?? ''}`,
+    [isOpen, currentStep, jobId]
+  );
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (jobId) {
-      window.localStorage.setItem('fiterview_job_id', jobId);
+    const sepIndex = persistKey.indexOf(':');
+    const activeStr = sepIndex >= 0 ? persistKey.slice(0, sepIndex) : 'false';
+    const job = sepIndex >= 0 ? persistKey.slice(sepIndex + 1) : '';
+    if (activeStr === 'true' && job) {
+      window.localStorage.setItem('fiterview_job_id', job);
     }
-  }, [jobId]);
-
-  // 요청 중복 제거
-  const pollingKey = useMemo(() => ['report-progress', jobId, reportId], [jobId, reportId]);
+  }, [persistKey]);
 
   // 서버 진행 상태
   const { data, isFetching, step, serverReportId, errorMessage, cancel, remove } =
@@ -66,17 +59,11 @@ export default function ReportProgressModal() {
   useEffect(() => {
     if (serverReportId && !reportId) {
       setReportId(String(serverReportId));
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem('fiterview_report_id', String(serverReportId));
-      }
     }
     if (step === 'completed' || step === 'error') {
       cancel();
       if (typeof window !== 'undefined') {
         window.localStorage.removeItem('fiterview_job_id');
-        if (serverReportId) {
-          window.localStorage.setItem('fiterview_report_id', String(serverReportId));
-        }
       }
       remove();
     }
@@ -157,8 +144,8 @@ function getPercent(step?: Step): number {
   const order: Step[] = [
     'started',
     'extracting',
-    'creating_report',
     'generating',
+    'creating_report',
     'saving_questions',
     'completed',
   ];
