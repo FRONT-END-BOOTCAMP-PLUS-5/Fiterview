@@ -43,7 +43,7 @@ export default function MicVisualizer({
       const source = ctx.createMediaStreamSource(stream);
       /* 3. createAnalyser()로 분석 노드 붙이고 파라미터 설정 */
       const analyser = ctx.createAnalyser();
-      analyser.fftSize = 512; // 해상도 파라미터(크게하면 정밀하지만 반응이 느림)
+      analyser.fftSize = 128; // 해상도 파라미터(크게하면 정밀하지만 반응이 느림)
       analyser.smoothingTimeConstant = 0.8; //시간적으로 값이 덜 변동되게 하는 파라미터
       source.connect(analyser);
       analyserRef.current = analyser;

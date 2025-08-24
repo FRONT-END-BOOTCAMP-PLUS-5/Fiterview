@@ -82,16 +82,11 @@ export default function UserAudio({ active = false, onFinish, onError }: UserAud
       <div
         className={`flex items-center text-[14px] font-semibold ${recordingStatus === 'recording' ? 'text-[#3B82F6]' : 'text-slate-400 '}`}
       >
-        {recordingStatus === 'recording' ? '음성 인식 중...' : '질문이 끝나면 녹음됩니다'}
+        {recordingStatus === 'recording' ? '음성 인식 중...' : '대기 중...'}
       </div>
       <div className="flex ml-auto">
         {recordingStatus === 'recording' && (
-          <MicVisualizer
-            active={recordingStatus === 'recording'}
-            barsCount={15}
-            heightPx={30}
-            colors={['#2563EB', '#3B82F6', '#1D4ED8']}
-          />
+          <MicVisualizer active={recordingStatus === 'recording'} barsCount={15} heightPx={30} />
         )}
       </div>
     </div>
