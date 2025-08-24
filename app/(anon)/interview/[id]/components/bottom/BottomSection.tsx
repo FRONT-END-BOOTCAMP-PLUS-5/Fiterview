@@ -1,5 +1,7 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+
 interface BottomSectionProps {
   currentQuestion: number;
   totalQuestions: number;
@@ -15,10 +17,17 @@ export default function BottomSection({
   isDisabled,
   nextLabel = '다음 질문',
 }: BottomSectionProps) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   return (
     <section className="relative flex items-center px-[24px] py-[16px] border-t border-slate-200 bg-[#F8FAFC] cursor-default">
-      <p className="absolute left-1/2 -translate-x-1/2 text-[#64748B] text-[12px] font-medium">
-        질문 {currentQuestion}/{totalQuestions}
+      <p
+        className="absolute left-1/2 -translate-x-1/2 text-[#64748B] text-[12px] font-medium"
+        suppressHydrationWarning
+      >
+        질문 {mounted ? currentQuestion : '-'} / {totalQuestions}
       </p>
       <button
         onClick={onNext}
