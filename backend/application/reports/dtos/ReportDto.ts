@@ -7,4 +7,5 @@ export interface ReportDto {
   status: ReportStatus;
   userId: number;
   reflection?: string;
+  score?: number;
 }

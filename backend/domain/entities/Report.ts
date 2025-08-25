@@ -7,4 +7,5 @@ export interface Report {
   status: ReportStatus;
   userId: number;
   reflection?: string;
+  score?: number;
 }
