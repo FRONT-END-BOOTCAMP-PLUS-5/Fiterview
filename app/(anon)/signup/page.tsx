@@ -23,8 +23,6 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  const [agreed, setAgreed] = useState(false);
-  const [marketing, setMarketing] = useState(false);
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,12 +47,6 @@ export default function SignupPage() {
     // 비밀번호 확인
     if (formData.password !== formData.confirmPassword) {
       setError('비밀번호가 일치하지 않습니다.');
-      setLoading(false);
-      return;
-    }
-
-    if (!agreed) {
-      setError('필수 약관에 동의해주세요.');
       setLoading(false);
       return;
     }
@@ -121,7 +113,6 @@ export default function SignupPage() {
     passwordsMatch &&
     !serverUsernameDuplicate &&
     !serverEmailDuplicate &&
-    agreed &&
     !loading &&
     !completed;
 
