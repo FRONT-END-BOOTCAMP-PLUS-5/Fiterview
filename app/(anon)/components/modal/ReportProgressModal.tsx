@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Modal from '@/app/(anon)/components/modal/Modal';
 import ModalOverlay from '@/app/(anon)/components/modal/ModalOverlay';
 import { useModalStore } from '@/stores/useModalStore';
@@ -16,6 +16,7 @@ type Step = ProgressStep;
 export default function ReportProgressModal() {
   const { isOpen, currentStep, closeModal, replaceModal, openModal } = useModalStore();
   const { jobId, reportId, setReportId, setJobId, onReportCompleted } = useReportStore();
+  const [sampleMessageIndex, setSampleMessageIndex] = useState(0);
 
   // 마운트 시 작업 ID 복구
   useEffect(() => {
@@ -50,6 +51,18 @@ export default function ReportProgressModal() {
       jobId,
       reportId,
     });
+
+  useEffect(() => {
+    if (step === 'generating') {
+      const interval = setInterval(() => {
+        setSampleMessageIndex((prev) => (prev + 1) % 3);
+      }, 5000);
+
+      return () => clearInterval(interval);
+    } else {
+      setSampleMessageIndex(0);
+    }
+  }, [step]);
 
   useEffect(() => {
     if (serverReportId && !reportId) {
@@ -91,7 +104,10 @@ export default function ReportProgressModal() {
     closeModal();
   };
 
-  const { title, description, icon } = useMemo(() => getCopy(step), [step]);
+  const { title, description, icon } = useMemo(
+    () => getCopy(step, sampleMessageIndex),
+    [step, sampleMessageIndex]
+  );
 
   return (
     <ModalOverlay
@@ -117,7 +133,25 @@ export default function ReportProgressModal() {
           </div>
         }
         size="medium"
-        subTitle={description}
+        subTitle={
+          step === 'generating' ? (
+            <div className="relative h-6">
+              <div className="transition-opacity duration-1000 ease-in-out">
+                {sampleMessageIndex === 0 && (
+                  <div className="h-6 opacity-100">AI가 맞춤 질문을 생성하고 있어요.</div>
+                )}
+                {sampleMessageIndex === 1 && (
+                  <div className="h-6 opacity-100">지원자의 경험을 분석하고 있어요.</div>
+                )}
+                {sampleMessageIndex === 2 && (
+                  <div className="h-6 opacity-100">면접에 꼭 필요한 질문을 준비하고 있어요.</div>
+                )}
+              </div>
+            </div>
+          ) : (
+            description
+          )
+        }
         onClose={handleClose}
         hideX={true}
         body={<ModalBody step={step} />}
@@ -138,7 +172,10 @@ function ModalBody({ step }: { step?: Step }) {
   );
 }
 
-function getCopy(step?: Step): { title: string; description: string; icon: string } {
+function getCopy(
+  step?: Step,
+  sampleMessageIndex?: number
+): { title: string; description: string; icon: string } {
   switch (step) {
     case 'started':
       return {
@@ -152,12 +189,19 @@ function getCopy(step?: Step): { title: string; description: string; icon: strin
         description: '문서에서 주요 정보를 추출하고 있어요.',
         icon: '🔍',
       };
-    case 'generating':
+    case 'generating': {
+      // 3개 샘플 문구를 2초마다 순환
+      const samples = [
+        'AI가 맞춤 질문을 생성하고 있어요.',
+        '지원자의 경험을 분석 중입니다.',
+        '면접에 꼭 필요한 질문을 준비하고 있어요.',
+      ];
       return {
         title: '질문 생성 중',
-        description: 'AI가 맞춤 질문을 생성하고 있어요.',
+        description: samples[sampleMessageIndex ?? 0],
         icon: '🤖',
       };
+    }
     case 'creating_report':
       return {
         title: '리포트 생성 중',

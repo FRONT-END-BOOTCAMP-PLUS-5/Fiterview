@@ -5,7 +5,7 @@ type ModalSize = 'large' | 'medium' | 'small';
 
 interface ModalProps {
   title: string | ReactNode;
-  subTitle?: string;
+  subTitle?: string | ReactNode;
   body?: ReactNode;
   buttons?: ReactNode;
   onClose?: () => void;
@@ -35,7 +35,12 @@ export default function Modal(props: ModalProps) {
                 {title as ReactNode}
               </div>
             )}
-            {subTitle && <p className="w-full text-start text-[#64748B] text-sm">{subTitle}</p>}
+            {subTitle &&
+              (typeof subTitle === 'string' ? (
+                <p className="w-full text-start text-[#64748B] text-sm">{subTitle}</p>
+              ) : (
+                <div className="w-full text-start text-[#64748B] text-sm">{subTitle}</div>
+              ))}
           </div>
           {!hideX && (
             <div
