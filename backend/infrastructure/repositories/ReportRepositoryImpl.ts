@@ -92,6 +92,11 @@ export class ReportRepositoryImpl implements ReportRepository {
     const reports = await prisma.report.findMany({
       where: whereClause,
       orderBy: { createdAt: 'desc' },
+      include: {
+        feedback: {
+          select: { score: true },
+        },
+      },
     });
 
     return reports.map((report) => ({
@@ -101,6 +106,7 @@ export class ReportRepositoryImpl implements ReportRepository {
       status: mapReportStatusToDomain(report.status as any),
       userId: report.userId,
       reflection: report.reflection ?? undefined,
+      score: report.feedback?.score || undefined,
     }));
   }
 
@@ -132,6 +138,11 @@ export class ReportRepositoryImpl implements ReportRepository {
     const reports = await prisma.report.findMany({
       where: whereClause,
       orderBy: { createdAt: 'desc' },
+      include: {
+        feedback: {
+          select: { score: true },
+        },
+      },
     });
 
     return reports.map((report) => ({
@@ -141,6 +152,7 @@ export class ReportRepositoryImpl implements ReportRepository {
       status: mapReportStatusToDomain(report.status as any),
       userId: report.userId,
       reflection: report.reflection ?? undefined,
+      score: report.feedback?.score || undefined,
     }));
   }
 

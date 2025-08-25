@@ -5,6 +5,10 @@ import { ReportRepository } from '@/backend/domain/repositories/ReportRepository
 export interface CreateReportInput {
   userId: number;
   files: QuestionsRequest[];
+  onProgress?: (
+    step: 'creating_report' | 'generating' | 'saving_questions',
+    extras?: { reportId?: number }
+  ) => void;
 }
 
 export interface CreateReportResult {
@@ -17,13 +21,20 @@ export class CreateReportUsecase {
     private llmAI: LlmAI
   ) {}
 
-  async execute({ userId, files }: CreateReportInput): Promise<CreateReportResult> {
-    // 1) 리포트 생성
+  async execute({ userId, files, onProgress }: CreateReportInput): Promise<CreateReportResult> {
+    onProgress?.('generating');
+    const generated = await this.llmAI.generateQuestions(files);
+
+    onProgress?.('creating_report');
     const report = await this.reportRepository.createReport(userId);
 
-    // 2) 질문 생성 및 저장
-    const generated = await this.llmAI.generateQuestions(files);
-    await this.llmAI.saveQuestions(generated, report.id);
+    try {
+      onProgress?.('saving_questions', { reportId: report.id });
+      await this.llmAI.saveQuestions(generated, report.id);
+    } catch (error) {
+      await this.reportRepository.deleteReport(report.id);
+      throw error;
+    }
 
     return { reportId: report.id };
   }

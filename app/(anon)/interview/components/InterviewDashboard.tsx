@@ -53,6 +53,7 @@ export default function InterviewDashboard() {
       <div className="flex justify-start items-start gap-10">
         <QuickInterviewForm
           onReportCreated={fetchPendingReports}
+          onReportCompleted={fetchPendingReports}
           LoginModal={isOpen && currentStep === 'login' ? <LoginModal /> : null}
         />
         <PendingInterviewsList reports={reports} loading={loading} />

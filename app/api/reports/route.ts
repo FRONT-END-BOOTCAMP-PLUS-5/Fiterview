@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { CreateReportUsecase } from '@/backend/application/reports/usecases/CreateReportUsecase';
 import { ReportRepositoryImpl } from '@/backend/infrastructure/repositories/ReportRepositoryImpl';
 import { QuestionRepositoryImpl } from '@/backend/infrastructure/repositories/QuestionRepositoryImpl';
 import { GetUserReportsUsecase } from '@/backend/application/reports/usecases/GetUserReportsUsecase';
@@ -7,13 +6,15 @@ import { GetReportsByStatusUsecase } from '@/backend/application/reports/usecase
 import { DeleteReportUsecase } from '@/backend/application/reports/usecases/DeleteReportUsecase';
 import { ReportDto } from '@/backend/application/reports/dtos/ReportDto';
 import { getUserFromSession } from '@/lib/auth/api-auth';
+import { createJob, linkReport, setJobStep } from '@/lib/server/progressStore';
+import { CreateReportUsecase } from '@/backend/application/reports/usecases/CreateReportUsecase';
 
 const reportsRepository = new ReportRepositoryImpl();
 const questionRepository = new QuestionRepositoryImpl();
 const getUserReportsUsecase = new GetUserReportsUsecase(reportsRepository);
 const getReportsByStatusUsecase = new GetReportsByStatusUsecase(reportsRepository);
-const createReportUsecase = new CreateReportUsecase(reportsRepository, questionRepository);
 const deleteReportUsecase = new DeleteReportUsecase(reportsRepository);
+const createReportUsecase = new CreateReportUsecase(reportsRepository, questionRepository);
 
 //조회
 export async function GET(request: NextRequest) {
@@ -54,6 +55,7 @@ export async function GET(request: NextRequest) {
       status: r.status,
       userId: r.userId,
       reflection: r.reflection,
+      score: r.score,
     }));
 
     return NextResponse.json({
@@ -86,17 +88,39 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, message: '파일이 필요합니다.' }, { status: 400 });
     }
 
-    // 파일 확인
-    const questionFiles = await Promise.all(
-      files.map(async (file) => ({
-        bytes: new Uint8Array(await file.arrayBuffer()),
-        fileName: file.name,
-      }))
-    );
+    const jobId = crypto.randomUUID();
+    createJob(jobId);
 
-    const result = await createReportUsecase.execute({ userId, files: questionFiles });
+    // 응답은 즉시 반환 나머지는 백그라운드에서 UseCase로 처리 (진행상태 기록)
+    (async () => {
+      try {
+        setJobStep(jobId, 'extracting');
+        const questionFiles = await Promise.all(
+          files.map(async (file) => ({
+            bytes: new Uint8Array(await file.arrayBuffer()),
+            fileName: file.name,
+          }))
+        );
 
-    return NextResponse.json({ success: true, data: result });
+        const { reportId } = await createReportUsecase.execute({
+          userId,
+          files: questionFiles as any,
+          onProgress: (step, extras) => {
+            if (step === 'generating') setJobStep(jobId, 'generating');
+            if (step === 'creating_report') setJobStep(jobId, 'creating_report');
+            if (step === 'saving_questions') setJobStep(jobId, 'saving_questions', extras);
+          },
+        });
+
+        linkReport(jobId, reportId);
+        setJobStep(jobId, 'completed', { reportId });
+      } catch (e) {
+        const message = e instanceof Error ? e.message : '알 수 없는 오류';
+        setJobStep(jobId, 'error', { errorMessage: message });
+      }
+    })();
+
+    return NextResponse.json({ success: true, data: { jobId } });
   } catch (error) {
     return NextResponse.json(
       {
