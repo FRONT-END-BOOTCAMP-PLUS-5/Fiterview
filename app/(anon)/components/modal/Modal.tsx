@@ -4,8 +4,8 @@ import Del from '@/public/assets/icons/x.svg';
 type ModalSize = 'large' | 'medium' | 'small';
 
 interface ModalProps {
-  title: string;
-  subTitle?: string;
+  title: string | ReactNode;
+  subTitle?: string | ReactNode;
   body?: ReactNode;
   buttons?: ReactNode;
   onClose?: () => void;
@@ -28,8 +28,19 @@ export default function Modal(props: ModalProps) {
       <div className="self-stretch px-6 pt-6 flex flex-col justify-start items-end gap-4">
         <div className="self-stretch flex justify-between items-start">
           <div className="flex flex-col justify-start items-start">
-            <p className="w-full text-start text-[#1E293B] text-xl font-bold">{title}</p>
-            {subTitle && <p className="w-full text-start text-[#64748B] text-sm">{subTitle}</p>}
+            {typeof title === 'string' ? (
+              <p className="w-full text-start text-[#1E293B] text-xl font-bold">{title}</p>
+            ) : (
+              <div className="w-full text-start text-[#1E293B] text-xl font-bold flex items-center gap-2">
+                {title as ReactNode}
+              </div>
+            )}
+            {subTitle &&
+              (typeof subTitle === 'string' ? (
+                <p className="w-full text-start text-[#64748B] text-sm">{subTitle}</p>
+              ) : (
+                <div className="w-full text-start text-[#64748B] text-sm">{subTitle}</div>
+              ))}
           </div>
           {!hideX && (
             <div

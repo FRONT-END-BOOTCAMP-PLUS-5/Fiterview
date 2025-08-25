@@ -20,3 +20,20 @@ body {
 .font-gmarket {
   font-family: var(--font-gmarket), sans-serif !important;
 }
+
+@keyframes bobbing {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.walker-bob {
+  animation: bobbing 0.8s ease-in-out infinite;
+  will-change: transform;
+}

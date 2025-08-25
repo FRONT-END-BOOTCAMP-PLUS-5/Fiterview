@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import axios from 'axios';
-import { useUploadFiles } from '@/app/hooks/useUploadFiles';
+import { useUploadFiles } from '@/hooks/useUploadFiles';
 import { useModalStore } from '@/stores/useModalStore';
 import { useReportStore } from '@/stores/useReportStore';
 import FilesUpload from '@/app/(anon)/home/components/quick/FilesUpload';
@@ -27,7 +27,7 @@ export default function InterviewForm({ onReportCreated }: QuickInterviewFormPro
   } = useUploadFiles();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { openModal, currentStep, isOpen } = useModalStore();
-  const { reportId, setReportId } = useReportStore();
+  const { reportId, setReportId, setJobId } = useReportStore();
 
   const submitFiles = async () => {
     if (uploadedFiles.length === 0 || isSubmitting) return;
@@ -46,11 +46,15 @@ export default function InterviewForm({ onReportCreated }: QuickInterviewFormPro
       if (response.data.success) {
         setUploadedFiles([]);
         setLimitExceeded(false);
-        setReportId(response.data.data.reportId);
+        const { reportId: newReportId, jobId } = response.data.data || {};
+        if (newReportId) setReportId(String(newReportId));
+        if (jobId) {
+          setJobId(String(jobId));
+        }
         if (onReportCreated) {
           onReportCreated();
         }
-        openModal('generateQuestion');
+        openModal('reportProgress');
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
