@@ -2,56 +2,53 @@
 import React, { useEffect } from 'react';
 import BrainIcon from '@/public/assets/icons/brain.svg';
 import { LoadingSpinner } from '@/app/(anon)/components/loading/LoadingSpinner';
+import axios from 'axios';
 
 export default function AIFeedback({ reportId }: { reportId: number }) {
   const [feedback, setFeedback] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(true);
   const [isCompleted, setIsCompleted] = React.useState(false);
 
-  const isFeedbackComplete = (feedbackData: any): boolean => {
-    return (
-      feedbackData &&
-      typeof feedbackData.score === 'number' &&
-      feedbackData.score >= 0 &&
-      feedbackData.score <= 100 &&
-      Array.isArray(feedbackData.strength) &&
-      feedbackData.strength.length > 0 &&
-      Array.isArray(feedbackData.improvement) &&
-      feedbackData.improvement.length > 0
-    );
-  };
+  const scoreIsNumber = typeof feedback?.score === 'number';
+  const progressPercent = feedback?.score ?? 0;
+  const hasStrength = Array.isArray(feedback?.strength) && feedback.strength.length > 0;
+  const hasImprovement = Array.isArray(feedback?.improvement) && feedback.improvement.length > 0;
 
   useEffect(() => {
     const fetchFeedback = async () => {
       setLoading(true);
 
       try {
-        const response = await fetch(`/api/reports/${reportId}/feedback`, {
-          method: 'GET',
+        const response = await axios.get(`/api/reports/${reportId}/feedback`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Existing feedback found:', data);
+        const data = response.data;
+        console.log('Existing feedback found:', data);
 
-          // Mark as completed if feedback exists, even if some fields are empty (e.g., score can be 0)
-          setFeedback(data);
-          setIsCompleted(true);
-        } else if (response.status === 409) {
+        setFeedback(data);
+        setIsCompleted(true);
+      } catch (err: any) {
+        if (err.response?.status === 409) {
           console.log('Report is not completed');
           setIsCompleted(false);
           return;
-        } else if (response.status === 404) {
+        } else if (err.response?.status === 404) {
           console.log('No existing feedback found');
           setIsCompleted(false);
           return;
         } else {
-          const errorText = await response.text();
-          console.error('Failed to fetch existing feedback:', response.status, errorText);
-          throw new Error(`Failed to fetch existing feedback: ${response.status} - ${errorText}`);
+          console.error(
+            'Failed to fetch existing feedback:',
+            err.response?.status,
+            err.response?.data
+          );
+          throw new Error(
+            `Failed to fetch existing feedback: ${err.response?.status} - ${err.response?.data?.error || err.message}`
+          );
         }
-      } catch (err) {
-        console.error('Error in feedback flow:', err);
       } finally {
         setLoading(false);
       }
@@ -76,7 +73,7 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
               <LoadingSpinner />
             ) : isCompleted ? (
               <b className="relative leading-[28.8px]">
-                {typeof feedback?.score === 'number' ? `${feedback?.score}점` : '--점'}
+                {scoreIsNumber ? `${feedback?.score}점` : '--점'}
               </b>
             ) : (
               <b className="relative leading-[28.8px]">--점</b>
@@ -87,7 +84,7 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
             >
               <div
                 className={`h-2 bg-blue-500 rounded transition-all duration-300`}
-                style={{ width: `${feedback?.score ?? 0}%` }}
+                style={{ width: `${progressPercent}%` }}
               ></div>
             </div>
           </div>
@@ -95,15 +92,9 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
         {isCompleted ? (
           <>
             <div className="self-stretch flex flex-col items-start justify-start gap-3 text-green-600">
-              <div
-                className={`self-stretch relative leading-[16.8px] ${isCompleted ? '' : 'hidden'} font-bold`}
-              >
-                강점
-              </div>
+              <div className={`self-stretch relative leading-[16.8px] font-bold`}>강점</div>
               <div className="self-stretch flex flex-col items-start justify-start gap-2 text-gray-700">
-                {feedback?.strength &&
-                Array.isArray(feedback.strength) &&
-                feedback.strength.length > 0 ? (
+                {hasStrength ? (
                   feedback.strength.map((strengthItem: string, index: number) => (
                     <div
                       key={index}
@@ -121,15 +112,9 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
               </div>
             </div>
             <div className="self-stretch flex flex-col items-start justify-start gap-3 text-red-600">
-              <div
-                className={`self-stretch relative leading-[16.8px] ${isCompleted ? '' : 'hidden'} font-bold`}
-              >
-                개선점
-              </div>
+              <div className={`self-stretch relative leading-[16.8px] font-bold`}>개선점</div>
               <div className="self-stretch flex flex-col items-start justify-start gap-2 text-gray-700">
-                {feedback?.improvement &&
-                Array.isArray(feedback.improvement) &&
-                feedback.improvement.length > 0 ? (
+                {hasImprovement ? (
                   feedback.improvement.map((improvementItem: string, index: number) => (
                     <div
                       key={index}
