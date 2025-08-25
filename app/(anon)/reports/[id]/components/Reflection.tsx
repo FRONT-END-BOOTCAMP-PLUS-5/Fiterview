@@ -14,6 +14,7 @@ export default function Reflection({
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [text, setText] = useState('');
+  const [tempText, setTempText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
   // test api call
@@ -22,7 +23,9 @@ export default function Reflection({
       const result = await axios.get(`/api/reports/${reportId}`, {
         data: reflection,
       });
-      setText(result.data.data.reflection ?? 'ex) 이번 면접에서 가장 잘한 점');
+      const fetched = result.data.data.reflection ?? '';
+      setText(fetched);
+      setTempText(fetched);
       setIsLoading(false);
       console.log(result.data.data.reflection);
     };
@@ -40,8 +43,9 @@ export default function Reflection({
   const handleSave = async () => {
     try {
       await axios.put(`/api/reports/${reportId}`, {
-        reflection: text,
+        reflection: tempText,
       });
+      setText(tempText);
       setIsEditing(false);
     } catch (error) {
       console.error(error);
@@ -49,6 +53,7 @@ export default function Reflection({
   };
 
   const handleCancel = () => {
+    setTempText(text);
     setIsEditing(false);
   };
 
@@ -73,9 +78,10 @@ export default function Reflection({
 
             <textarea
               className="w-full h-47 p-3 bg-slate-50 rounded-md border border-slate-200 outline-none focus:border-slate-300 text-slate-700 placeholder-slate-400"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
+              value={tempText}
+              onChange={(e) => setTempText(e.target.value)}
               disabled={!isEditing}
+              placeholder="ex) 이번 면접에서 가장 잘한 점"
             />
           </div>
 
