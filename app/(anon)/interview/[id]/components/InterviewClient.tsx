@@ -80,8 +80,11 @@ export default function InterviewClient() {
   const { audioRef, isPlaying } = useTtsAutoPlay(
     currentAudioSrc,
     () => {
-      setIsNextBtnDisabled(false);
       setPhase('recording');
+      // TTS 재생 완료 후 1초 동안 다음 버튼 비활성화
+      setTimeout(() => {
+        setIsNextBtnDisabled(false);
+      }, 1000); // 1초 대기
     },
     ttsEnabled
   );
@@ -176,7 +179,7 @@ export default function InterviewClient() {
       setCurrentOrder((o) => Math.min(10, o + 1));
     }
 
-    setIsNextBtnDisabled(false);
+    // setIsNextBtnDisabled(false);
     setIsUploading(false);
   };
 
