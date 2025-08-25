@@ -10,7 +10,7 @@ export const DEVICE_STATUS_TEXT: Record<DeviceStatus, string> = {
 };
 
 export const DEVICE_STATUS_COLOR: Record<DeviceStatus, string> = {
-  ok: 'bg-[#10B981]',
+  ok: 'bg-[#3B82F6]',
   checking: 'bg-[#F59E0B]',
   blocked: 'bg-[#EF4444]',
   'not-found': 'bg-slate-300',

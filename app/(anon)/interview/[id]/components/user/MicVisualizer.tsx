@@ -21,7 +21,7 @@ export default function MicVisualizer({
   const rafIdRef = useRef<number | null>(null);
   const visStreamRef = useRef<MediaStream | null>(null);
   const barsRef = useRef<HTMLSpanElement[]>([]);
-  const startTokenRef = useRef(0);
+  const startTokenRef = useRef(0); // 마이크 스트림마다의 번호표(토큰)
   const mountedRef = useRef(false);
 
   const clampedBase = Math.min(0.95, Math.max(0, baseScale));

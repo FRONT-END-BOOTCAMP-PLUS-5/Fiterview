@@ -22,7 +22,7 @@ export default function CheckInterview() {
   const [selectedMicrophone, setSelectedMicrophone] = useState<string>('');
   const [isReady, setIsReady] = useState(false);
   const tempStreamRef = useRef<MediaStream | null>(null);
-  const tokenRef = useRef(0);
+  const tokenRef = useRef(0); // 마이크/카메라 스트림마다의 번호표(토큰)
 
   const handleDeviceChange = (cameraId: string, microphoneId: string) => {
     setSelectedCamera(cameraId);
