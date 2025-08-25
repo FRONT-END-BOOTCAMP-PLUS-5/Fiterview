@@ -21,7 +21,7 @@ export default function ErrorModal({ subTitle }: ErrorModalProps) {
   return (
     <ModalOverlay isOpen={isOpen} onClose={closeModal}>
       <Modal
-        size="large"
+        size="medium"
         title="질문 생성 실패"
         subTitle={subTitle}
         onClose={closeModal}

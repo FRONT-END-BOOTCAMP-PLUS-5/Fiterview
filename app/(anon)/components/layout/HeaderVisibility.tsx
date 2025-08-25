@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import Header from './Header';
+import ReportProgressModal from '@/app/(anon)/components/modal/ReportProgressModal';
 
 export default function HeaderVisibility() {
   const pathname = usePathname();
@@ -13,5 +14,10 @@ export default function HeaderVisibility() {
 
   if (hideHeader) return null;
 
-  return <Header />;
+  return (
+    <>
+      <Header />
+      <ReportProgressModal />
+    </>
+  );
 }
