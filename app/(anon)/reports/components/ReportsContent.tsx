@@ -32,7 +32,7 @@ export default function ReportsContent() {
   }, []);
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-10 bg-white rounded-xl flex flex-col justify-start items-center gap-10">
+    <div className="w-full max-w-6xl h-full mx-auto p-10 bg-white rounded-xl flex flex-col justify-start items-center gap-10">
       {/* 사용자 대시보드 */}
       <UserDashboard reports={reports} />
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import ReportDetailCard from '@/app/(anon)/components/ReportDetailCard';
+import ReportDetailCard from '@/app/(anon)/reports/components/ReportDetailCard';
 import Empty from '@/public/assets/icons/empty.svg';
 import { usePagination } from '@/hooks/usePagination';
 import { LoadingSpinner } from '@/app/(anon)/components/loading/LoadingSpinner';
@@ -80,13 +80,12 @@ export default function ReportsList({ reports, loading }: ReportsListProps) {
 
   if (loading || reports.length === 0) {
     return (
-      <div className="w-[933px] flex flex-col justify-start items-start gap-4">
+      <div className="w-[933px] h-[1120px] flex flex-col justify-start items-start gap-4">
         <div className="self-stretch inline-flex justify-start items-center gap-4">
           <div className="flex-1 justify-start text-zinc-800 text-lg font-black leading-snug">
             {loading ? (
-              <div className="flex items-center gap-2">
-                <LoadingSpinner size="small" />
-                <span>로딩 중...</span>
+              <div className="flex items-center justify-center gap-2 w-full h-full">
+                <LoadingSpinner size="small" message="면접 기록을 불러오는 중" />
               </div>
             ) : (
               '총 0개의 면접 기록'
@@ -99,7 +98,7 @@ export default function ReportsList({ reports, loading }: ReportsListProps) {
 
   if (reports.length === 0) {
     return (
-      <div className="w-[933px] flex flex-col justify-start items-start gap-28">
+      <div className="w-[933px] h-[1120px] flex flex-col justify-start items-start gap-28">
         <div className="self-stretch inline-flex justify-start items-center gap-4">
           <div className="flex-1 justify-start text-zinc-800 text-lg font-black leading-snug">
             총 {reports.length}개의 면접 기록
@@ -157,7 +156,7 @@ export default function ReportsList({ reports, loading }: ReportsListProps) {
   }
 
   return (
-    <div className="w-[933px] flex flex-col justify-start items-start gap-10">
+    <div className="w-[933px] h-full flex flex-col justify-start items-start gap-10">
       <div className="self-stretch inline-flex justify-start items-center gap-4">
         <div className="flex-1 justify-start text-zinc-800 text-lg font-black leading-snug">
           총 {sortBy === null ? reports.length : sortedReports.length}개의 면접 기록
@@ -201,60 +200,62 @@ export default function ReportsList({ reports, loading }: ReportsListProps) {
       </div>
 
       {/* 리포트 목록 렌더링 */}
-      <div className="self-stretch flex flex-col gap-4">
-        {currentReports.map((report) => (
-          <ReportDetailCard key={`report-${report.id}`} report={report} />
-        ))}
-      </div>
+      <div className="min-h-[400px] max-h-[830px] w-full flex flex-col justify-between">
+        <div className="self-stretch flex flex-col gap-4 h-full">
+          {currentReports.map((report) => (
+            <ReportDetailCard key={`report-${report.id}`} report={report} />
+          ))}
+        </div>
 
-      {/* 페이지네이션 */}
-      {totalPages > 1 && (
-        <div className="self-stretch flex justify-center items-center gap-2">
-          {/* 이전 페이지 버튼 */}
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={!hasPrevPage}
-            className={`px-3 py-2 rounded-md text-sm font-medium ${
-              !hasPrevPage
-                ? 'text-slate-400 cursor-not-allowed'
-                : 'text-slate-600 hover:bg-slate-100 cursor-pointer'
-            }`}
-          >
-            이전
-          </button>
-
-          {/* 페이지 번호들 */}
-          {pageNumbers.map((page, index) => (
+        {/* 페이지네이션 */}
+        {totalPages > 0 && (
+          <div className="mt-10 self-stretch flex justify-center items-center gap-2">
+            {/* 이전 페이지 버튼 */}
             <button
-              key={index}
-              onClick={() => typeof page === 'number' && handlePageChange(page)}
-              disabled={page === '...'}
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={!hasPrevPage}
               className={`px-3 py-2 rounded-md text-sm font-medium ${
-                page === currentPage
-                  ? 'bg-blue-500 text-white'
-                  : page === '...'
-                    ? 'text-slate-400 cursor-default'
-                    : 'text-slate-600 hover:bg-slate-100 cursor-pointer'
+                !hasPrevPage
+                  ? 'text-slate-400 cursor-not-allowed'
+                  : 'text-slate-600 hover:bg-slate-100 cursor-pointer'
               }`}
             >
-              {page}
+              이전
             </button>
-          ))}
 
-          {/* 다음 페이지 버튼 */}
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={!hasNextPage}
-            className={`px-3 py-2 rounded-md text-sm font-medium ${
-              !hasNextPage
-                ? 'text-slate-400 cursor-not-allowed'
-                : 'text-slate-600 hover:bg-slate-100 cursor-pointer'
-            }`}
-          >
-            다음
-          </button>
-        </div>
-      )}
+            {/* 페이지 번호들 */}
+            {pageNumbers.map((page, index) => (
+              <button
+                key={index}
+                onClick={() => typeof page === 'number' && handlePageChange(page)}
+                disabled={page === '...'}
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  page === currentPage
+                    ? 'bg-blue-500 text-white'
+                    : page === '...'
+                      ? 'text-slate-400 cursor-default'
+                      : 'text-slate-600 hover:bg-slate-100 cursor-pointer'
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+
+            {/* 다음 페이지 버튼 */}
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={!hasNextPage}
+              className={`px-3 py-2 rounded-md text-sm font-medium ${
+                !hasNextPage
+                  ? 'text-slate-400 cursor-not-allowed'
+                  : 'text-slate-600 hover:bg-slate-100 cursor-pointer'
+              }`}
+            >
+              다음
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

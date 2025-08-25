@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { NoneReports } from '@/app/(anon)/interview/components/NoneReports';
 import { LoadingSpinner } from '@/app/(anon)/components/loading/LoadingSpinner';
-import ReportCard from '@/app/(anon)/components/ReportCard';
+import ReportCard from '@/app/(anon)/interview/components/ReportCard';
 
 type PendingReport = {
   id: number;
