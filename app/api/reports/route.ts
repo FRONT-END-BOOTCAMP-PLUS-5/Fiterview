@@ -55,6 +55,7 @@ export async function GET(request: NextRequest) {
       status: r.status,
       userId: r.userId,
       reflection: r.reflection,
+      score: r.score,
     }));
 
     return NextResponse.json({
