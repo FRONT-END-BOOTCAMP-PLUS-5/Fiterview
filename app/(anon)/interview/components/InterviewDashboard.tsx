@@ -40,7 +40,7 @@ export default function InterviewDashboard() {
   }, [fetchPendingReports]);
 
   return (
-    <div className="h-full place-self-stretch px-[208px] py-8">
+    <div className="h-full place-self-stretch px-[208px] py-8 cursor-default">
       <div className="flex flex-col mb-6 gap-2">
         <h1 className="self-stretch justify-start text-[#1E293B] text-[32px] font-semibold">
           AI 면접

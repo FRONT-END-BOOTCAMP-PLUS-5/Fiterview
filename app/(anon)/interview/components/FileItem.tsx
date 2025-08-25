@@ -4,7 +4,7 @@ import Del from '@/public/assets/icons/x.svg';
 
 export default function FileItem({ file, onRemove }: FileItemProps) {
   const { truncatedText, originalText, isTruncated } = useTruncateText(file.name, {
-    maxLength: 36,
+    maxLength: 48,
   });
 
   return (

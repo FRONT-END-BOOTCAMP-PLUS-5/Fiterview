@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useUploadFiles } from '@/hooks/useUploadFiles';
 import { useModalStore } from '@/stores/useModalStore';
@@ -95,14 +96,21 @@ export default function InterviewForm({ onReportCreated }: QuickInterviewFormPro
           onRemove={handleRemoveFile}
         />
 
-        <button
+        <motion.button
           className={`mt-6 w-full h-12 py-[14px] rounded-xl flex justify-center items-center gap-3 ${
             uploadedFiles.length === 0 || isSubmitting
               ? 'bg-slate-100 cursor-not-allowed'
-              : 'bg-blue-500 hover:bg-blue-600'
+              : 'bg-[#3B82F6] cursor-pointer'
           }`}
           onClick={submitFiles}
           disabled={uploadedFiles.length === 0 || isSubmitting}
+          whileHover={
+            uploadedFiles.length > 0 && !isSubmitting
+              ? {
+                  scale: 1.02,
+                }
+              : undefined
+          }
         >
           <Sparkles
             width={20}
@@ -117,7 +125,7 @@ export default function InterviewForm({ onReportCreated }: QuickInterviewFormPro
           >
             {isSubmitting ? '면접 질문 생성 중...' : '맞춤 면접 질문 생성하기'}
           </p>
-        </button>
+        </motion.button>
       </div>
 
       {isOpen && currentStep === 'fileError' && (
