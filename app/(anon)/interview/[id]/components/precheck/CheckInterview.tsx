@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import CheckCircle from '@/public/assets/icons/check-circle.svg';
 import NoticeList from '@/app/(anon)/interview/[id]/components/precheck/NoticeList';
 import CheckDeviceStatus from '@/app/(anon)/interview/[id]/components/precheck/CheckDeviceStatus';
@@ -21,6 +21,8 @@ export default function CheckInterview() {
   const [selectedCamera, setSelectedCamera] = useState<string>('');
   const [selectedMicrophone, setSelectedMicrophone] = useState<string>('');
   const [isReady, setIsReady] = useState(false);
+  const tempStreamRef = useRef<MediaStream | null>(null);
+  const tokenRef = useRef(0);
 
   const handleDeviceChange = (cameraId: string, microphoneId: string) => {
     setSelectedCamera(cameraId);
@@ -55,9 +57,19 @@ export default function CheckInterview() {
   // 공통 장치 목록 가져오기 로직
   useEffect(() => {
     const getDevices = async () => {
+      const myToken = ++tokenRef.current;
+      let stream: MediaStream | null = null;
       try {
         // 사용자에게 미디어 권한 요청 (장치 라벨을 가져오기 위해)
-        await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+        // 최신 토큰인지 확인 (StrictMode 재실행 대비)
+        if (myToken !== tokenRef.current) {
+          try {
+            stream.getTracks().forEach((t) => t.stop());
+          } catch (_) {}
+          return;
+        }
+        tempStreamRef.current = stream;
 
         const devices = await navigator.mediaDevices.enumerateDevices();
 
@@ -87,10 +99,41 @@ export default function CheckInterview() {
         }
       } catch (error) {
         console.error('장치 목록을 가져올 수 없습니다:', error);
+      } finally {
+        // 권한 확인용 임시 스트림 정리 (로컬 스트림과 ref 모두 정리)
+        try {
+          stream?.getTracks?.().forEach((t) => t.stop());
+        } catch (_) {}
+        if (tempStreamRef.current) {
+          try {
+            tempStreamRef.current.getTracks().forEach((t) => t.stop());
+          } catch (_) {}
+          tempStreamRef.current = null;
+        }
       }
     };
 
     getDevices();
+
+    const stopAll = () => {
+      if (tempStreamRef.current) {
+        try {
+          tempStreamRef.current.getTracks().forEach((t) => t.stop());
+        } catch (_) {}
+        tempStreamRef.current = null;
+      }
+      // 토큰 갱신하여 지연 중인 비동기 루틴 무효화
+      tokenRef.current++;
+    };
+
+    window.addEventListener('pagehide', stopAll);
+    window.addEventListener('beforeunload', stopAll);
+
+    return () => {
+      window.removeEventListener('pagehide', stopAll);
+      window.removeEventListener('beforeunload', stopAll);
+      stopAll();
+    };
   }, []);
 
   if (started) return null;
