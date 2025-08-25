@@ -101,8 +101,11 @@ export default function ReportProgressModal() {
     >
       <Modal
         title={
-          <div className="flex items-center gap-2">
-            <div className="text-[12px] flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-blue-100 to-blue-500 text-white">
+          <div className="flex items-center gap-2 mb-1.5">
+            <div
+              className="text-[15px] flex items-center justify-center w-8 h-8 rounded-full bg-[#E2E8F0]
+            ] text-white"
+            >
               {icon}
             </div>
             <span className="text-lg font-semibold">{title}</span>
@@ -117,18 +120,18 @@ export default function ReportProgressModal() {
         subTitle={description}
         onClose={handleClose}
         hideX={true}
-        body={<ModalBody step={step} errorMessage={errorMessage} />}
+        body={<ModalBody step={step} />}
       />
     </ModalOverlay>
   );
 }
 
-function ModalBody({ step, errorMessage }: { step?: Step; errorMessage?: string }) {
+function ModalBody({ step }: { step?: Step }) {
   return (
-    <div className="self-stretch inline-flex flex-col items-stretch gap-6 w-full">
+    <div className="self-stretch inline-flex flex-col items-stretch gap-6 w-full mt-2">
       <div className="flex flex-col items-center gap-4 w-full">
         <div className="relative w-full ">
-          <ProgressBar percent={getPercent(step)} showWalker={true} className="py-2" />
+          <ProgressBar percent={getPercent(step)} showWalker={true} />
         </div>
       </div>
     </div>

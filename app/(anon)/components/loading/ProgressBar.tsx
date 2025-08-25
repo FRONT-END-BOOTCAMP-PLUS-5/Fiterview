@@ -26,14 +26,14 @@ export default function ProgressBar({
 
   return (
     <div className={`flex-1 flex justify-start items-center ${className}`}>
-      <div className="relative w-full pt-12">
+      <div className="relative w-full pt-13">
         {showWalker && (
-          <div className="pointer-events-none absolute left-0 w-full z-20" style={{ top: 0 }}>
+          <div className="pointer-events-none absolute left-0 w-full z-20 top-0">
             <div
               className="relative transition-[width] duration-[1200ms] ease-out"
               style={{ width: `${clampedPercent}%` }}
             >
-              <div className="absolute right-0 translate-x-6">
+              <div className="absolute right-0 translate-x-7">
                 <div
                   className="relative"
                   style={{ transform: `scaleX(${flip ? -1 : 1})`, transformOrigin: '50% 50%' }}
@@ -41,14 +41,13 @@ export default function ProgressBar({
                   <div className="walker-bob" style={{ transformOrigin: '50% 50%' }}>
                     <div className="relative flex items-center justify-center">
                       <BackGround
-                        width={48}
-                        height={48}
+                        width={60}
+                        height={60}
                         stroke="#CBD5E1"
                         opacity={0.25}
                         strokeWidth={1.33}
-                        className="drop-shadow-lg"
                       />
-                      <MicLogo width={20} height={20} className="absolute -rotate-[20deg]" />
+                      <MicLogo width={25} height={25} className="absolute -rotate-[20deg]" />
                     </div>
                   </div>
                 </div>
@@ -56,7 +55,7 @@ export default function ProgressBar({
             </div>
           </div>
         )}
-        <div className="flex w-full h-[8px] bg-[#E2E8F0] rounded-[3px] overflow-hidden mt-1">
+        <div className="flex w-full h-[10px] bg-[#E2E8F0] rounded-[6px] overflow-hidden mt-4">
           <div
             className="h-full bg-[#3B82F6] transition-[width] duration-[1200ms] ease-out"
             style={{ width: `${clampedPercent}%` }}
