@@ -128,7 +128,7 @@ export default function SignupPage() {
   return (
     <div className="w-full min-h-screen bg-[#F8FAFC] flex">
       {/* Left Panel */}
-      <div className="w-1/2 bg-white p-20 flex justify-center items-center">
+      <div className="w-1/2 bg-white flex justify-center items-center">
         <form onSubmit={handleSubmit} className="w-[400px] flex flex-col gap-8">
           {/* Header */}
           <div className="flex flex-col gap-4">

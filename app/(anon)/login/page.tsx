@@ -6,8 +6,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Input from '@/app/(anon)/components/Input';
 import EyeOff from '@/public/assets/icons/eye-off.svg';
-import { Roboto } from 'next/font/google';
-const roboto = Roboto({ subsets: ['latin'], weight: ['400', '500', '700'], display: 'swap' });
 import Logo from '@/public/assets/icons/logo1.svg';
 import Subtitle from '@/public/assets/icons/logo-subtitle.svg';
 
@@ -181,7 +179,7 @@ export default function LoginPage() {
             </div>
 
             {/* Google OAuth 로그인 버튼 */}
-            <div className={roboto.className}>
+            <div className="font-roboto">
               <button
                 type="button"
                 onClick={async () => {
