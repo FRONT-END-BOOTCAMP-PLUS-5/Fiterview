@@ -4,20 +4,15 @@ import Mic from '@/public/assets/icons/mic.svg';
 import { useRef, useEffect, useState } from 'react';
 import MicRecorder from 'mic-recorder-to-mp3';
 import type { RecordingStatus } from '@/types/interview';
+import MicVisualizer from '@/app/(anon)/interview/[id]/components/user/MicVisualizer';
 
 interface UserAudioProps {
   active?: boolean; // true면 자동 시작, false면 자동 정지
   onFinish?: (blob: Blob) => void; // 정지 시 생성된 오디오 Blob 전달
   onError?: (e: Error) => void;
-  text?: string;
 }
 
-export default function UserAudio({
-  active = false,
-  onFinish,
-  onError,
-  text = '음성 인식 중...',
-}: UserAudioProps) {
+export default function UserAudio({ active = false, onFinish, onError }: UserAudioProps) {
   const recorderRef = useRef<MicRecorder | null>(null);
   // onFinish의 중복 호출을 방지하기 위한 플래그
   const hasOnFinishFiredRef = useRef(false);
@@ -77,12 +72,22 @@ export default function UserAudio({
 
   return (
     <div
-      className={`absolute bottom-[52px] w-[calc(100%-104px)] rounded-[8px] bg-white border border-[#E2E8F0] p-4 flex gap-[8px] items-center`}
+      className={`absolute h-[64px] bottom-[52px] w-[calc(100%-104px)] rounded-[8px] bg-[#F8FAFC] border ${recordingStatus === 'recording' ? 'border-[#3B82F6] shadow-[0px_4px_16px_0px_rgba(59,130,246,0.25)]' : 'border-[#E2E8F0]'}  p-4 flex gap-[8px] items-center cursor-default `}
     >
-      <Mic width={16} height={16} />
-      <div className="flex items-center text-[#1E293B] text-[12px] font-medium">
-        {text}
-        {recordingStatus === 'recording' ? '' : '(대기)'}
+      <Mic
+        width={16}
+        height={16}
+        className={`${recordingStatus === 'recording' ? 'text-[#3B82F6]' : 'text-[#94A3B8]'}`}
+      />
+      <div
+        className={`flex items-center text-[14px] font-semibold ${recordingStatus === 'recording' ? 'text-[#3B82F6]' : 'text-[#94A3B8]'}`}
+      >
+        {recordingStatus === 'recording' ? '음성 인식 중...' : '대기 중...'}
+      </div>
+      <div className="flex ml-auto">
+        {recordingStatus === 'recording' && (
+          <MicVisualizer active={recordingStatus === 'recording'} barsCount={14} heightPx={30} />
+        )}
       </div>
     </div>
   );
