@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import ReportDetailCard from '@/app/(anon)/reports/components/ReportDetailCard';
-import Empty from '@/public/assets/icons/empty.svg';
+import XCircle from '@/public/assets/icons/x-circle.svg';
 import { usePagination } from '@/hooks/usePagination';
 import { LoadingSpinner } from '@/app/(anon)/components/loading/LoadingSpinner';
 
@@ -78,39 +78,37 @@ export default function ReportsList({ reports, loading }: ReportsListProps) {
     itemsPerPage: 8,
   });
 
-  if (loading || reports.length === 0) {
+  if (loading) {
     return (
       <div className="w-[933px] h-[1120px] flex flex-col justify-start items-start gap-4">
         <div className="self-stretch inline-flex justify-start items-center gap-4">
           <div className="flex-1 justify-start text-zinc-800 text-lg font-black leading-snug">
-            {loading ? (
-              <div className="flex items-center justify-center gap-2 w-full h-full">
-                <LoadingSpinner size="small" message="면접 기록을 불러오는 중" />
-              </div>
-            ) : (
-              '총 0개의 면접 기록'
-            )}
+            <div className="flex items-center justify-center gap-2 w-full h-full">
+              <LoadingSpinner size="small" message="면접 기록을 불러오는 중" />
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  if (reports.length === 0) {
-    return (
-      <div className="w-[933px] h-[1120px] flex flex-col justify-start items-start gap-28">
-        <div className="self-stretch inline-flex justify-start items-center gap-4">
-          <div className="flex-1 justify-start text-zinc-800 text-lg font-black leading-snug">
-            총 {reports.length}개의 면접 기록
-          </div>
+  return (
+    <div className="w-[933px] h-full flex flex-col justify-start items-start gap-10">
+      {/* 헤더 부분 - 리포트 개수와 관계없이 동일하게 표시 */}
+      <div className="self-stretch inline-flex justify-start items-center gap-4">
+        <div className="flex-1 justify-start text-zinc-800 text-lg font-black leading-snug">
+          총 {sortBy === null ? reports.length : sortedReports.length}개의 면접 기록
+        </div>
+        {reports.length > 0 && (
           <div className="flex justify-start items-center gap-3">
             <div className="bg-slate-100 rounded-lg flex justify-start items-start gap-0.5">
-              <div
-                className={`h-8 px-3 rounded-md flex justify-center items-center ${
+              <button
+                className={`h-8 px-3 rounded-md flex justify-center items-center cursor-pointer ${
                   sortBy === 'created'
                     ? 'bg-white outline outline-1 outline-offset-[-1px] outline-slate-200'
                     : ''
                 }`}
+                onClick={() => handleSortToggle('created')}
               >
                 <div
                   className={`text-sm font-medium leading-none ${
@@ -119,13 +117,14 @@ export default function ReportsList({ reports, loading }: ReportsListProps) {
                 >
                   질문순
                 </div>
-              </div>
-              <div
-                className={`h-8 px-3 rounded-md flex justify-center items-center ${
+              </button>
+              <button
+                className={`h-8 px-3 rounded-md flex justify-center items-center cursor-pointer ${
                   sortBy === 'completed'
                     ? 'bg-white outline outline-1 outline-offset-[-1px] outline-slate-200'
                     : ''
                 }`}
+                onClick={() => handleSortToggle('completed')}
               >
                 <div
                   className={`text-sm font-medium leading-none ${
@@ -134,13 +133,18 @@ export default function ReportsList({ reports, loading }: ReportsListProps) {
                 >
                   면접순
                 </div>
-              </div>
+              </button>
             </div>
           </div>
-        </div>
-        <div className="self-stretch flex flex-col justify-center items-center gap-4">
+        )}
+      </div>
+
+      {/* 리포트 개수에 따라 다른 내용 렌더링 */}
+      {reports.length === 0 ? (
+        // Empty 상태
+        <div className="self-stretch flex flex-col justify-center items-center gap-4 py-10">
           <div className="w-20 h-20 bg-slate-50 rounded-[40px] inline-flex justify-center items-center">
-            <Empty width={80} height={80} />
+            <XCircle width={48} height={48} stroke="#CBD5E1" strokeWidth={3.3} />
           </div>
           <div className="flex flex-col justify-start items-center gap-3">
             <div className="text-center justify-start text-slate-800 text-lg font-semibold leading-snug">
@@ -151,111 +155,67 @@ export default function ReportsList({ reports, loading }: ReportsListProps) {
             </div>
           </div>
         </div>
-      </div>
-    );
-  }
+      ) : (
+        // 리포트 목록과 페이지네이션
+        <>
+          <div className="min-h-[400px] max-h-[830px] w-full flex flex-col justify-between">
+            <div className="self-stretch flex flex-col gap-4 h-full">
+              {currentReports.map((report) => (
+                <ReportDetailCard key={`report-${report.id}`} report={report} />
+              ))}
+            </div>
 
-  return (
-    <div className="w-[933px] h-full flex flex-col justify-start items-start gap-10">
-      <div className="self-stretch inline-flex justify-start items-center gap-4">
-        <div className="flex-1 justify-start text-zinc-800 text-lg font-black leading-snug">
-          총 {sortBy === null ? reports.length : sortedReports.length}개의 면접 기록
-        </div>
-        <div className="flex justify-start items-center gap-3">
-          <div className="bg-slate-100 rounded-lg flex justify-start items-start gap-0.5">
-            <button
-              className={`h-8 px-3 rounded-md flex justify-center items-center cursor-pointer ${
-                sortBy === 'created'
-                  ? 'bg-white outline outline-1 outline-offset-[-1px] outline-slate-200'
-                  : ''
-              }`}
-              onClick={() => handleSortToggle('created')}
-            >
-              <div
-                className={`text-sm font-medium leading-none ${
-                  sortBy === 'created' ? 'text-slate-800' : 'text-slate-500'
-                }`}
-              >
-                질문순
-              </div>
-            </button>
-            <button
-              className={`h-8 px-3 rounded-md flex justify-center items-center cursor-pointer ${
-                sortBy === 'completed'
-                  ? 'bg-white outline outline-1 outline-offset-[-1px] outline-slate-200'
-                  : ''
-              }`}
-              onClick={() => handleSortToggle('completed')}
-            >
-              <div
-                className={`text-sm font-medium leading-none ${
-                  sortBy === 'completed' ? 'text-slate-800' : 'text-slate-500'
-                }`}
-              >
-                면접순
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* 리포트 목록 렌더링 */}
-      <div className="min-h-[400px] max-h-[830px] w-full flex flex-col justify-between">
-        <div className="self-stretch flex flex-col gap-4 h-full">
-          {currentReports.map((report) => (
-            <ReportDetailCard key={`report-${report.id}`} report={report} />
-          ))}
-        </div>
-
-        {/* 페이지네이션 */}
-        {totalPages > 0 && (
-          <div className="mt-10 self-stretch flex justify-center items-center gap-2">
-            {/* 이전 페이지 버튼 */}
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={!hasPrevPage}
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                !hasPrevPage
-                  ? 'text-slate-400 cursor-not-allowed'
-                  : 'text-slate-600 hover:bg-slate-100 cursor-pointer'
-              }`}
-            >
-              이전
-            </button>
-
-            {/* 페이지 번호들 */}
-            {pageNumbers.map((page, index) => (
-              <button
-                key={index}
-                onClick={() => typeof page === 'number' && handlePageChange(page)}
-                disabled={page === '...'}
-                className={`px-3 py-2 rounded-md text-sm font-medium ${
-                  page === currentPage
-                    ? 'bg-blue-500 text-white'
-                    : page === '...'
-                      ? 'text-slate-400 cursor-default'
+            {/* 페이지네이션 */}
+            {totalPages > 0 && (
+              <div className="mt-10 self-stretch flex justify-center items-center gap-2">
+                {/* 이전 페이지 버튼 */}
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={!hasPrevPage}
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    !hasPrevPage
+                      ? 'text-slate-400 cursor-not-allowed'
                       : 'text-slate-600 hover:bg-slate-100 cursor-pointer'
-                }`}
-              >
-                {page}
-              </button>
-            ))}
+                  }`}
+                >
+                  이전
+                </button>
 
-            {/* 다음 페이지 버튼 */}
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={!hasNextPage}
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                !hasNextPage
-                  ? 'text-slate-400 cursor-not-allowed'
-                  : 'text-slate-600 hover:bg-slate-100 cursor-pointer'
-              }`}
-            >
-              다음
-            </button>
+                {/* 페이지 번호들 */}
+                {pageNumbers.map((page, index) => (
+                  <button
+                    key={index}
+                    onClick={() => typeof page === 'number' && handlePageChange(page)}
+                    disabled={page === '...'}
+                    className={`px-3 py-2 rounded-md text-sm font-medium ${
+                      page === currentPage
+                        ? 'bg-blue-500 text-white'
+                        : page === '...'
+                          ? 'text-slate-400 cursor-default'
+                          : 'text-slate-600 hover:bg-slate-100 cursor-pointer'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+
+                {/* 다음 페이지 버튼 */}
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={!hasNextPage}
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    !hasNextPage
+                      ? 'text-slate-400 cursor-not-allowed'
+                      : 'text-slate-600 hover:bg-slate-100 cursor-pointer'
+                  }`}
+                >
+                  다음
+                </button>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 }
