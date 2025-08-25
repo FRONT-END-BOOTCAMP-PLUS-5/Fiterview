@@ -136,18 +136,18 @@ export default function SignupPage() {
               <p className="text-[32px] leading-[38.4px] text-[#1E293B] font-gmarket font-medium">
                 회원가입
               </p>
-              <p className="text-[16px] leading-[19.2px] text-[#64748B] font-medium">
+              <p className="text-[16px] leading-[19.2px] text-[#64748B] font-semibold">
                 핏터뷰와 함께하는 스마트한 면접 준비를 시작해보세요.
               </p>
             </div>
           </div>
 
           {/* Form Fields */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
             {/* Username */}
-            <div className="flex flex-col gap-1">
-              <p className="text-[14px] leading-[16.8px] text-[#374151] font-semibold">아이디</p>
-              <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-2">
+              <p className="text-[16px] leading-[16.8px] text-[#374151] font-bold">아이디</p>
+              <div className="flex flex-col gap-2">
                 <Input
                   type="text"
                   name="username"
@@ -158,11 +158,11 @@ export default function SignupPage() {
               </div>
               <div className="inline-flex items-center gap-1 px-[10px] min-h-[14.4px]">
                 {!isUsernameValid ? (
-                  <p className="text-[#EF4444] text-[12px] leading-[14.4px]">
+                  <p className="text-[#EF4444] text-[12px] leading-[14px]">
                     아이디는 영문 또는 숫자만 사용할 수 있습니다.
                   </p>
                 ) : serverUsernameDuplicate ? (
-                  <p className="text-[#EF4444] text-[12px] leading-[14.4px]">
+                  <p className="text-[#EF4444] text-[12px] leading-[14px]">
                     이미 사용 중인 아이디입니다.
                   </p>
                 ) : null}
@@ -171,7 +171,7 @@ export default function SignupPage() {
 
             {/* Password */}
             <div className="flex flex-col gap-2">
-              <p className="text-[14px] leading-[16.8px] text-[#374151] font-semibold">비밀번호</p>
+              <p className="text-[16px] leading-[16.8px] text-[#374151] font-bold">비밀번호</p>
               <div className="inline-flex">
                 <Input
                   type={passwordVisible ? 'text' : 'password'}
@@ -194,7 +194,7 @@ export default function SignupPage() {
 
             {/* Confirm Password */}
             <div className="flex flex-col gap-2">
-              <p className="text-[14px] leading-[16.8px] text-[#374151] font-semibold">
+              <p className="text-[16px] leading-[16.8px] text-[#374151] font-bold">
                 비밀번호 재입력
               </p>
               <div className="inline-flex">
@@ -219,7 +219,7 @@ export default function SignupPage() {
 
             {/* Email */}
             <div className="flex flex-col gap-2">
-              <p className="text-[14px] leading-[16.8px] text-[#374151] font-semibold">이메일</p>
+              <p className="text-[16px] leading-[16.8px] text-[#374151] font-bold">이메일</p>
               <div className="inline-flex">
                 <Input
                   type="email"
@@ -244,7 +244,7 @@ export default function SignupPage() {
 
             {/* Nickname */}
             <div className="flex flex-col gap-2">
-              <p className="text-[14px] leading-[16.8px] text-[#374151] font-semibold">닉네임</p>
+              <p className="text-[16px] leading-[16.8px] text-[#374151] font-bold">닉네임</p>
               <div className="inline-flex">
                 <Input
                   type="text"
@@ -255,44 +255,6 @@ export default function SignupPage() {
                 />
               </div>
             </div>
-          </div>
-
-          {/* Terms */}
-          <div className="flex flex-col gap-4">
-            <label className="inline-flex items-start gap-3">
-              <input
-                type="checkbox"
-                className="w-5 h-5 rounded border border-[#EF4444]"
-                checked={agreed}
-                onChange={(e) => {
-                  setAgreed(e.target.checked);
-                }}
-              />
-              <div className="flex flex-col gap-1 mt-[1.5px]">
-                <p className="text-[14px] leading-[16.8px] text-[#374151]">
-                  이용약관 및 개인정보처리방침에 동의합니다
-                </p>
-                <div className="min-h-[14.4px]">
-                  {!agreed && (
-                    <p className="text-[12px] leading-[14.4px] text-[#EF4444]">
-                      필수 약관에 동의해주세요.
-                    </p>
-                  )}
-                </div>
-              </div>
-            </label>
-
-            <label className="inline-flex items-center gap-3">
-              <input
-                type="checkbox"
-                className="w-5 h-5 rounded border border-[#22C55E]"
-                checked={marketing}
-                onChange={(e) => setMarketing(e.target.checked)}
-              />
-              <p className="text-[14px] leading-[16.8px] text-[#374151]">
-                마케팅 정보 수신에 동의합니다 (선택)
-              </p>
-            </label>
           </div>
 
           {/* Actions */}
