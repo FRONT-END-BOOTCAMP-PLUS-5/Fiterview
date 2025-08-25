@@ -37,10 +37,33 @@ export function useTtsAutoPlay(
       setIsPlaying(false);
       callbackRef.current();
     };
-    // 에러시 다음단계
+    // 에러시: 한 번만 재시도 후 실패 시 다음단계
+    let retried = false;
+    const handleError = () => {
+      if (!retried) {
+        retried = true;
+        try {
+          el.pause();
+          el.currentTime = 0;
+          // 동일 src 재시도
+          if (el.src !== src) el.src = src;
+          if (typeof (el as any).load === 'function') {
+            (el as any).load();
+          }
+        } catch {}
+        el.play()
+          .then(() => setIsPlaying(true))
+          .catch(() => {
+            setIsPlaying(false);
+            callbackRef.current();
+          });
+      } else {
+        setIsPlaying(false);
+        callbackRef.current();
+      }
+    };
     const onError = () => {
-      setIsPlaying(false);
-      callbackRef.current();
+      handleError();
     };
     //클릭 → play → (버퍼링) → playing → (재생 중) → pause/ended
     const onPlay = () => setIsPlaying(true);
@@ -56,10 +79,10 @@ export function useTtsAutoPlay(
     el.addEventListener('pause', onPause);
     // 현재 상태를 즉시 반영
     setIsPlaying(!el.paused && !el.ended);
-    // 재생 시도
+    // 재생 시도 (실패 시 한 번 재시도)
     el.play()
       .then(() => setIsPlaying(true))
-      .catch(onError);
+      .catch(handleError);
 
     return () => {
       el.pause();

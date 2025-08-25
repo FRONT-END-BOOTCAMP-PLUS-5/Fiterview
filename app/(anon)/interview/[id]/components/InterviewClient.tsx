@@ -41,7 +41,7 @@ export default function InterviewClient() {
   const running = phase === 'recording';
 
   // 질문 TTS 조회 (훅 사용)
-  const { data, isError, error } = useGetTtsQuestions(reportId);
+  const { data, isError } = useGetTtsQuestions(reportId);
   const items = (data as any)?.data as QuestionTTSResponse[] | undefined;
   const current = items?.[currentOrder - 1];
   const currentQuestionText = current?.question ?? '질문을 불러오는 중입니다...';
@@ -196,7 +196,7 @@ export default function InterviewClient() {
         <section className="relative flex-1 min-w-0 h-full bg-[#F1F5F9] flex flex-col items-center justify-between">
           <audio ref={setAudioElementRef} className="hidden" playsInline />
           <AiAvatar ttsAudio={ttsAudioEl} playing={isPlaying} />
-          <Question active={isPlaying} text={currentQuestionText} />
+          <Question active={isPlaying} text={currentQuestionText} isError={isError} />
         </section>
         {/* Right: 사용자 영역 */}
         <section className="relative flex-1 min-w-0 h-full bg-[#FAFBFC] flex flex-col items-center justify-between gap-[24px]">
