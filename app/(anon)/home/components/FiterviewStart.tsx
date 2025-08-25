@@ -2,9 +2,11 @@
 import { motion } from 'framer-motion';
 import Start from '@/public/assets/icons/rocket.svg';
 import { useRouter } from 'next/navigation';
+import { useSessionUser } from '@/lib/auth/useSessionUser';
 
 export default function FiterviewStart() {
   const router = useRouter();
+  const { user } = useSessionUser();
 
   return (
     <div className="w-full px-28 py-20 bg-[#3B82F6] flex flex-col justify-start items-center gap-8">
@@ -49,7 +51,11 @@ export default function FiterviewStart() {
             y: 1,
             transition: { duration: 0.1, type: 'spring', stiffness: 100 },
           }}
-          onClick={() => router.push('/login')}
+          onClick={
+            user
+              ? () => window.scrollTo({ top: 0, behavior: 'smooth' })
+              : () => router.push('/login')
+          }
         >
           <motion.div
             whileHover={{
@@ -60,7 +66,7 @@ export default function FiterviewStart() {
             <Start width={20} height={20} stroke="#3B82F6" strokeWidth={1.67} />
           </motion.div>
           <p className="text-[#3B82F6] text-[16px] font-semibold leading-tight">
-            로그인하고 시작하기
+            {user ? '시작하기' : '로그인하고 시작하기'}
           </p>
         </motion.button>
       </motion.div>
