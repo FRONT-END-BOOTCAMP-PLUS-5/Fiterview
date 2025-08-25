@@ -6,12 +6,12 @@ import { act, useState } from 'react';
 interface QuestionProps {
   text: string;
   active: boolean;
-  isError: boolean;        
+  isError: boolean;
 }
 
 export default function Question({ text, active, isError }: QuestionProps) {
   const [isOpen, setIsOpen] = useState(true);
-  
+
   return (
     <div
       className={`absolute bottom-[52px] w-[calc(100%-104px)] mx-[52px] rounded-[8px] bg-[#F8FAFC] border ${active ? 'border-[#3B82F6] shadow-[0px_4px_16px_0px_rgba(59,130,246,0.25)]' : 'border-[#E2E8F0]'}  flex flex-col cursor-default`}
@@ -50,13 +50,12 @@ export default function Question({ text, active, isError }: QuestionProps) {
             }`}
             style={{ transitionDelay: isOpen ? '50ms' : '0ms' }}
           >
-            <p className="text-[14px] leading-[22px] text-[#334155] font-medium">{text}</p>
+            <p className="text-[14px] leading-[22px] text-[#334155] font-medium">
+              {isError ? '질문을 불러오지 못했습니다. 면접을 다시 시작해주세요.' : text}
+            </p>
           </div>
         </div>
       </div>
-      <p className="text-[14px] leading-[22px] text-[#334155] font-medium">
-        {isError ? '질문을 불러오지 못했습니다. 면접을 다시 시작해주세요.' : text}
-      </p>
     </div>
   );
 }
