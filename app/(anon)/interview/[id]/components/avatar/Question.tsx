@@ -50,13 +50,12 @@ export default function Question({ text, active, isError }: QuestionProps) {
             }`}
             style={{ transitionDelay: isOpen ? '50ms' : '0ms' }}
           >
-            <p className="text-[14px] leading-[22px] text-[#334155] font-medium">{text}</p>
+            <p className="text-[14px] leading-[22px] text-[#334155] font-medium">
+              {isError ? '질문을 불러오지 못했습니다. 면접을 다시 시작해주세요.' : text}
+            </p>
           </div>
         </div>
       </div>
-      <p className="text-[14px] leading-[22px] text-[#334155] font-medium">
-        {isError ? '질문을 불러오지 못했습니다. 면접을 다시 시작해주세요.' : text}
-      </p>
     </div>
   );
 }
