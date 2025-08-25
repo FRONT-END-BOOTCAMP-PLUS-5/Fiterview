@@ -178,6 +178,16 @@ export default function InterviewClient() {
           console.error('피드백 생성 실패:', error);
         });
 
+      // 모범 답변 생성
+      axios
+        .post(`/api/reports/${reportId}/sample-answer`)
+        .then((sampleAnswerResult) => {
+          console.log('샘플 답변 생성 완료:', sampleAnswerResult.status);
+        })
+        .catch((error) => {
+          console.error('샘플 답변 생성 실패:', error);
+        });
+
       openModal('reflection');
     } else {
       // 즉시 다음 질문으로 이동하여 TTS 재생 시작
