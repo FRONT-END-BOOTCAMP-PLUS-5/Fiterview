@@ -1,7 +1,7 @@
 'use client';
 
-import FileItem from '@/app/(anon)/home/components/quick/FileItem';
-import { NoneFiles } from '@/app/(anon)/home/components/quick/NoneFiles';
+import FileItem from '@/app/(anon)/components/quick/FileItem';
+import { NoneFiles } from '@/app/(anon)/components/quick/NoneFiles';
 import { UploadedFilesProps } from '@/types/file';
 
 export default function FilesUpload({ files, onRemove, limitExceeded }: UploadedFilesProps) {

@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import ReportDetailCard from '@/app/(anon)/reports/components/ReportDetailCard';
 import XCircle from '@/public/assets/icons/x-circle.svg';
 import { usePagination } from '@/hooks/usePagination';
-import { LoadingSpinner } from '@/app/(anon)/components/loading/LoadingSpinner';
+import { LoadingSpinner } from '@/app/components/loading/LoadingSpinner';
 
 interface ReportsListProps {
   reports: any[];

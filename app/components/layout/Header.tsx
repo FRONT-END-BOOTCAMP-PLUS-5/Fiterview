@@ -3,10 +3,10 @@
 import { useRef, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useSessionUser } from '@/lib/auth/useSessionUser';
-import DropDown from '@/app/(anon)/components/layout/DropDown';
+import DropDown from '@/app/components/layout/DropDown';
 import { useModalStore } from '@/stores/useModalStore';
-import LogoutModal from '@/app/(anon)/components/modal/LogoutModal';
-import { LoadingSpinner } from '@/app/(anon)/components/loading/LoadingSpinner';
+import LogoutModal from '@/app/components/modal/LogoutModal';
+import { LoadingSpinner } from '@/app/components/loading/LoadingSpinner';
 import Logo1 from '@/public/assets/icons/logo1.svg';
 import Arrow from '@/public/assets/icons/arrow-down.svg';
 

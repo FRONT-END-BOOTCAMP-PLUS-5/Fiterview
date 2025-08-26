@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Input from '@/app/(anon)/components/Input';
+import Input from '@/app/components/Input';
 import EyeOff from '@/public/assets/icons/eye-off.svg';
 import axios from 'axios';
 import MicIcon from '@/public/assets/icons/mic.svg';

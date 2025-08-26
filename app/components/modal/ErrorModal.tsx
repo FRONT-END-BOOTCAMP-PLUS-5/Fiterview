@@ -1,6 +1,6 @@
 'use client';
-import Modal from '@/app/(anon)/components/modal/Modal';
-import ModalOverlay from '@/app/(anon)/components/modal/ModalOverlay';
+import Modal from '@/app/components/modal/Modal';
+import ModalOverlay from '@/app/components/modal/ModalOverlay';
 import { useModalStore } from '@/stores/useModalStore';
 
 interface ErrorModalProps {

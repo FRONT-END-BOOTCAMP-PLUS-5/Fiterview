@@ -8,8 +8,8 @@ import { useModalStore } from '@/stores/useModalStore';
 import { useReportStore } from '@/stores/useReportStore';
 import UploadOptions from '@/app/(anon)/interview/components/UploadOptions';
 import UploadedFiles from '@/app/(anon)/interview/components/UploadedFiles';
-import ErrorModal from '@/app/(anon)/components/modal/ErrorModal';
-import GenerateQuestionModal from '@/app/(anon)/components/modal/GenerateQuestionModal';
+import ErrorModal from '@/app/components/modal/ErrorModal';
+import GenerateQuestionModal from '@/app/components/modal/GenerateQuestionModal';
 import Sparkles from '@/public/assets/icons/sparkles.svg';
 
 interface QuickInterviewFormProps {

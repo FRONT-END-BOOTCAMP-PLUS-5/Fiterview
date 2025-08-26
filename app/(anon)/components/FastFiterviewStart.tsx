@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import InterviewForm from '@/app/(anon)/home/components/quick/InterviewFrom';
+import InterviewForm from '@/app/(anon)/components/quick/InterviewFrom';
 
 export default function FastFiterviewStart() {
   return (

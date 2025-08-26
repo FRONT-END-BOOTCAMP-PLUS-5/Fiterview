@@ -6,11 +6,11 @@ import axios from 'axios';
 import { useUploadFiles } from '@/hooks/useUploadFiles';
 import { useModalStore } from '@/stores/useModalStore';
 import { useReportStore } from '@/stores/useReportStore';
-import FilesUpload from '@/app/(anon)/home/components/quick/FilesUpload';
+import FilesUpload from '@/app/(anon)/components/quick/FilesUpload';
 import UploadOptions from '@/app/(anon)/interview/components/UploadOptions';
-import ErrorModal from '@/app/(anon)/components/modal/ErrorModal';
-import LoginModal from '@/app/(anon)/components/modal/LoginModal';
-import GenerateQuestionModal from '@/app/(anon)/components/modal/GenerateQuestionModal';
+import ErrorModal from '@/app/components/modal/ErrorModal';
+import LoginModal from '@/app/components/modal/LoginModal';
+import GenerateQuestionModal from '@/app/components/modal/GenerateQuestionModal';
 import Sparkles from '@/public/assets/icons/sparkles.svg';
 
 interface QuickInterviewFormProps {

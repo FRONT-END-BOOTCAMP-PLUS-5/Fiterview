@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useModalStore } from '@/stores/useModalStore';
 import PendingInterviewsList from '@/app/(anon)/interview/components/PendingInterviewsList';
 import QuickInterviewForm from '@/app/(anon)/interview/components/QuickInterviewForm';
-import LoginModal from '@/app/(anon)/components/modal/LoginModal';
+import LoginModal from '@/app/components/modal/LoginModal';
 
 type PendingReport = {
   id: number;

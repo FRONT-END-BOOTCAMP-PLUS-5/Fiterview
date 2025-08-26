@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { signIn, useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Input from '@/app/(anon)/components/Input';
+import Input from '@/app/components/Input';
 import EyeOff from '@/public/assets/icons/eye-off.svg';
 import Logo from '@/public/assets/icons/logo1.svg';
 import Subtitle from '@/public/assets/icons/logo-subtitle.svg';
