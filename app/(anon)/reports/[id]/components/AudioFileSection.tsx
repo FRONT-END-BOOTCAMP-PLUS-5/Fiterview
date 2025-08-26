@@ -34,8 +34,9 @@ export default function AudioFileSection({
           audioUrl={
             selectedQuestion.recording
               ? `/assets/audios/${reportId}/${selectedQuestion.recording}`
-              : '/assets/audios/2/recording_2_8.mp3'
+              : undefined
           }
+          disabled={!selectedQuestion.recording}
           className="self-stretch"
         />
       )}
