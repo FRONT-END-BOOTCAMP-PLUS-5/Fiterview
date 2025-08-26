@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import Input from '@/app/(anon)/components/Input';
 import LabeledInput from '@/app/(anon)/user/components/LabeledInput';
 import StaticField from '@/app/(anon)/user/components/StaticField';
 import SubmitButton from '@/app/(anon)/user/components/SubmitButton';
@@ -10,7 +9,7 @@ import EyeOff from '@/public/assets/icons/eye-off.svg';
 import axios from 'axios';
 import Modal from '@/app/(anon)/components/modal/Modal';
 import { useRouter } from 'next/navigation';
-import ModalOverlay from '../components/modal/ModalOverlay';
+import ModalOverlay from '@/app/(anon)/components/modal/ModalOverlay';
 import { useSession } from 'next-auth/react';
 
 export default function User() {
@@ -87,7 +86,7 @@ export default function User() {
     setError('');
 
     try {
-      await axios.put('/api/auth/profile', {
+      await axios.put('/api/auth/user', {
         email,
         nickname,
         password,
