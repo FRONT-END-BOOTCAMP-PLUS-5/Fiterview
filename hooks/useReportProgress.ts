@@ -1,8 +1,9 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ProgressStep } from '@/types/progress';
+import { STORAGE_KEYS } from '@/constants/progress';
 
 type Step = ProgressStep;
 
@@ -22,8 +23,9 @@ export function useReportProgress(params: {
   enabled: boolean;
   jobId?: string | null;
   reportId?: string | null;
+  onJobIdClear?: () => void; // jobId 정리 콜백 추가
 }) {
-  const { enabled, jobId, reportId } = params;
+  const { enabled, jobId, reportId, onJobIdClear } = params;
   const queryClient = useQueryClient();
 
   const queryKey = useMemo(() => getReportProgressQueryKey(jobId, reportId), [jobId, reportId]);
@@ -39,10 +41,10 @@ export function useReportProgress(params: {
       );
       return res.data;
     },
-    enabled,
+    enabled: enabled && !!(jobId || reportId),
     refetchInterval: (q) => {
       const step = q.state.data?.data?.step;
-      if (!step) return 250;
+      if (!step) return false; // undefined 상태면 폴링 중단
 
       switch (step) {
         case 'extracting':
@@ -76,6 +78,18 @@ export function useReportProgress(params: {
 
   const cancel = () => queryClient.cancelQueries({ queryKey });
   const remove = () => queryClient.removeQueries({ queryKey });
+
+  // error 상태일 때 localStorage에서 jobId 제거
+  useEffect(() => {
+    if (jobId && typeof window !== 'undefined') {
+      const step = data?.data?.step;
+
+      if (step === 'error') {
+        window.localStorage.removeItem(STORAGE_KEYS.FITERVIEW_JOB_ID);
+        onJobIdClear?.(); // 컴포넌트의 jobId 상태도 null로 설정
+      }
+    }
+  }, [jobId, data?.data?.step, onJobIdClear]);
 
   return {
     data,
