@@ -1,4 +1,6 @@
 import { ReportRepository } from '@/backend/domain/repositories/ReportRepository';
+import fs from 'fs/promises';
+import path from 'path';
 
 export class DeleteReportUsecase {
   constructor(private reportRepository: ReportRepository) {}
@@ -13,5 +15,13 @@ export class DeleteReportUsecase {
 
     // 리포트 삭제
     await this.reportRepository.deleteReport(reportId);
+
+    // 리포트 삭제 후 녹음 파일도 삭제
+    try {
+      const targetDir = path.join(process.cwd(), 'public', 'assets', 'audios', String(reportId));
+      await fs.rm(targetDir, { recursive: true, force: true });
+    } catch (err) {
+      console.warn('DeleteReportUsecase 녹음 파일 삭제 실패', err);
+    }
   }
 }
