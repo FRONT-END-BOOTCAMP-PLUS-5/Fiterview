@@ -14,7 +14,6 @@ export class FeedbackRepositoryImpl implements FeedbackRepository {
       where: { id: feedback_report_id },
       select: { status: true },
     });
-    console.log(reportStatus);
     if (reportStatus?.status !== ReportStatus.COMPLETED) {
       throw new Error(`Report is not completed`);
     }

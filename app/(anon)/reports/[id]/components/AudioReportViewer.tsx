@@ -33,10 +33,10 @@ export default function AudioReportViewer({ reportId }: AudioReportViewerProps) 
             setSelectedQuestion(result.data.questions[0]);
           }
         } else {
-          console.error('❌ API 응답 실패:', result.message);
+          console.error('API 응답 실패:', result.message);
         }
       } catch (error) {
-        console.error('💥 API 호출 에러:', error);
+        console.error('API 호출 에러:', error);
       }
     };
 

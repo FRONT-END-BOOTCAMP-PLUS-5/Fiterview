@@ -27,7 +27,6 @@ export default function Reflection({
       setText(fetched);
       setTempText(fetched);
       setIsLoading(false);
-      console.log(result.data.data.reflection);
     };
     dbFetch();
   }, []);

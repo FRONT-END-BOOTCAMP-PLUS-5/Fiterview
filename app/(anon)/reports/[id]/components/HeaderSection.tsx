@@ -27,7 +27,7 @@ export default function HeaderSection({ reportId }: HeaderSectionProps) {
           setReport(result.data);
         }
       } catch (error) {
-        console.error('💥 API 호출 에러:', error);
+        console.error('API 호출 에러:', error);
       }
     };
 
@@ -67,11 +67,10 @@ export default function HeaderSection({ reportId }: HeaderSectionProps) {
             title: result.data.title,
           });
           setIsEditingTitle(false);
-          console.log('✅ 제목이 성공적으로 업데이트되었습니다.');
         }
       }
     } catch (error) {
-      console.error('💥 제목 업데이트 오류:', error);
+      console.error('제목 업데이트 오류:', error);
     }
   };
 

@@ -5,12 +5,6 @@ export class UpdateReportStatusUsecase {
   constructor(private readonly reportRepository: ReportRepository) {}
 
   async execute(reportId: number, status: ReportStatus): Promise<void> {
-    console.log({
-      reportId,
-      newStatus: status,
-      timestamp: new Date().toISOString(),
-    });
-
     try {
       // 현재 리포트 상태 확인
       const currentReport = await this.reportRepository.findReportById(reportId);

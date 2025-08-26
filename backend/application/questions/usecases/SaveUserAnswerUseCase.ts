@@ -33,7 +33,5 @@ export class SaveUserAnswerUseCase {
         userAnswer: transcription.text,
       },
     });
-
-    console.log(`✅ 사용자 답변이 저장되었습니다. Report ID: ${reportId}, Order: ${order}`);
   }
 }
