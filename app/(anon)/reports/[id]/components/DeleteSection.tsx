@@ -12,7 +12,7 @@ interface DeleteSectionProps {
 export default function DeleteSection({ reportId }: DeleteSectionProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
-  const { isOpen, openModal, closeModal } = useModalStore();
+  const { isOpen, currentStep, openModal, closeModal } = useModalStore();
 
   const handleDeleteClick = () => {
     openModal('delete');
@@ -68,12 +68,14 @@ export default function DeleteSection({ reportId }: DeleteSectionProps) {
       </div>
 
       {/* 삭제 확인 모달 */}
-      <DeleteModal
-        isOpen={isOpen}
-        onClose={handleClose}
-        onConfirm={handleConfirm}
-        isDeleting={isDeleting}
-      />
+      {isOpen && currentStep === 'delete' && (
+        <DeleteModal
+          isOpen={isOpen}
+          onClose={handleClose}
+          onConfirm={handleConfirm}
+          isDeleting={isDeleting}
+        />
+      )}
     </>
   );
 }

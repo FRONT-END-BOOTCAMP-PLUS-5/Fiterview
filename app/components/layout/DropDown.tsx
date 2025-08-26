@@ -2,10 +2,11 @@ import { useRouter } from 'next/navigation';
 import { useModalStore } from '@/stores/useModalStore';
 import Logout from '@/public/assets/icons/logout.svg';
 import User from '@/public/assets/icons/user.svg';
+import LogoutModal from '../modal/LogoutModal';
 
 export default function DropDown() {
   const router = useRouter();
-  const { openModal } = useModalStore();
+  const { isOpen, currentStep, openModal } = useModalStore();
 
   return (
     <nav className="w-[150px] absolute right-0 top-8 z-20 bg-white rounded-lg shadow-[0px_4px_12px_0px_rgba(0,0,0,0.10)] outline-1 outline-offset-[-1px] outline-[#E2E8F0]">
@@ -31,6 +32,7 @@ export default function DropDown() {
           </button>
         </li>
       </ul>
+      {isOpen && currentStep === 'logout' && <LogoutModal />}
     </nav>
   );
 }
