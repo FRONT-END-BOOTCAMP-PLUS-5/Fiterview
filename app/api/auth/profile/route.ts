@@ -25,10 +25,9 @@ export async function PUT(request: NextRequest) {
     const usecase = new UpdateUserUseCase(new UserRepositoryImpl());
     const result = await usecase.execute({
       id: Number(session.user.id),
-      username: '',
-      email: email ?? '',
-      password: password ?? '',
-      nickname: nickname ?? '',
+      email: email || undefined,
+      password: password || undefined,
+      nickname: nickname || undefined,
     });
 
     if (!result.success) {

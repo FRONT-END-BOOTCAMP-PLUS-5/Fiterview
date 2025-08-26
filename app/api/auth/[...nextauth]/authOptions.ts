@@ -165,11 +165,20 @@ export const authOptions = {
       token,
       user,
       account,
+      trigger,
+      session,
     }: {
-      token: JWT;
+      token: JWT & { accessToken?: string; provider?: string };
       user?: User & { accessToken?: string };
       account?: any;
+      trigger?: 'signIn' | 'signUp' | 'update';
+      session?: Session;
     }) {
+      // Support client-side session update()
+      if (trigger === 'update' && session?.user) {
+        if (session.user.email) token.email = session.user.email;
+        if (session.user.nickname) token.nickname = session.user.nickname as any;
+      }
       if (user) {
         token.id = user.id;
         token.username = user.username;
