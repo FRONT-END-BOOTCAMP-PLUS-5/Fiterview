@@ -162,18 +162,16 @@ export default function CheckDeviceStatus({
 
   return (
     <>
-      <div className="flex flex-col p-[24px] gap-[16px] bg-[#FEF9E7] rounded-[8px]">
-        <div className="flex items-center justify-between">
-          <p className="text-[16px] text-[#92400E] font-semibold cursor-default">
-            기기 연결 상태 확인
-          </p>
-          <button
-            onClick={runAll}
-            className="px-3 py-1 rounded-[6px] text-[12px] text-[#92400E] border border-[#F59E0B] cursor-pointer"
-          >
-            재확인
-          </button>
-        </div>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-gray-800  cursor-default">기기 상태 확인</h3>
+        <button
+          onClick={runAll}
+          className="px-3 py-1 rounded-[6px] text-[12px] font-medium text-[#64748B] border border-[#E2E8F0] border-solid hover:bg-[#F1F5F9] transition-colors duration-200 cursor-pointer"
+        >
+          재확인
+        </button>
+      </div>
+      <div className="flex flex-col p-[24px] gap-[16px] bg-slate-50 rounded-[8px]">
         <div className="flex justify-between">
           <div className="flex flex-col">
             <p className="text-[#64748B] text-[14px] cursor-default">카메라</p>

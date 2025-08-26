@@ -21,15 +21,26 @@ export default function MicVisualizer({
   const rafIdRef = useRef<number | null>(null);
   const visStreamRef = useRef<MediaStream | null>(null);
   const barsRef = useRef<HTMLSpanElement[]>([]);
+  const startTokenRef = useRef(0); // 마이크 스트림마다의 번호표(토큰)
+  const mountedRef = useRef(false);
 
   const clampedBase = Math.min(0.95, Math.max(0, baseScale));
   const H = heightPx ?? 16;
 
   const start = async () => {
     try {
+      // 새로운 시작 토큰 발급
+      const myToken = ++startTokenRef.current;
       /* 1. 마이크 스트림 세팅 */
       if (audioCtxRef.current) return;
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // 활성 상태가 아니거나 토큰이 변경되었으면 즉시 정리
+      if (!mountedRef.current || myToken !== startTokenRef.current || !active) {
+        try {
+          stream.getTracks().forEach((t) => t.stop());
+        } catch {}
+        return;
+      }
       visStreamRef.current = stream;
       /* 2. AudioContext 생성 후 소스 노드 생성 */
       const AC = (window as any).AudioContext || (window as any).webkitAudioContext;
@@ -38,8 +49,8 @@ export default function MicVisualizer({
       const source = ctx.createMediaStreamSource(stream);
       /* 3. createAnalyser()로 분석 노드 붙이고 파라미터 설정 */
       const analyser = ctx.createAnalyser();
-      analyser.fftSize = 64; // 해상도 파라미터(크게하면 정밀하지만 반응이 느림) 유효 값: 32, 64, 128, 256, 512, 1024
-      analyser.smoothingTimeConstant = 0.8; //시간적으로 값이 덜 변동되게 하는 파라미터
+      analyser.fftSize = 64; // 해상도 파라미터
+      analyser.smoothingTimeConstant = 0.8; //시간적으로 값이 덜 변동되게
       source.connect(analyser);
       analyserRef.current = analyser;
       /* 4. 주파수 데이터를 담을 배열 생성 */
@@ -77,6 +88,8 @@ export default function MicVisualizer({
 
   // 사용한 리소스들 해제
   const stop = () => {
+    // 다음 start 호출이 기존 비동기 작업을 무시하도록 토큰 증가
+    ++startTokenRef.current;
     if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
     rafIdRef.current = null;
     try {
@@ -98,6 +111,13 @@ export default function MicVisualizer({
       }
     }
   };
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (active) start();
