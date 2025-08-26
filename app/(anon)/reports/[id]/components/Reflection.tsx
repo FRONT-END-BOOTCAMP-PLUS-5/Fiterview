@@ -18,6 +18,20 @@ export default function Reflection({
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
+    const dbFetch = async () => {
+      const result = await axios.get(`/api/reports/${reportId}`, {
+        data: reflection,
+      });
+      const fetched = result.data.data.reflection ?? '';
+      setText(fetched);
+      setTempText(fetched);
+      setIsLoading(false);
+      console.log(result.data.data.reflection);
+    };
+    dbFetch();
+  }, []);
+
+  useEffect(() => {
     setIsLoading(false);
   }, [reflection]);
 
