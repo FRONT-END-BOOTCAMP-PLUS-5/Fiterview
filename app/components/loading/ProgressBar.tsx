@@ -33,9 +33,10 @@ export default function ProgressBar({
               initial={{ width: 0 }}
               animate={{ width: `${clampedPercent}%` }}
               transition={{
-                duration: 10,
+                duration: 3,
                 ease: 'easeOut',
                 repeat: Infinity,
+                repeatDelay: 1,
               }}
               className="relative"
             >
@@ -54,14 +55,15 @@ export default function ProgressBar({
             </motion.div>
           </div>
         )}
-        <div className="flex w-full h-[10px] bg-[#E2E8F0] rounded-[6px] overflow-hidden">
+        <div className="flex w-full h-[10px] bg-gray-100 rounded-[6px] overflow-hidden relative">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${clampedPercent}%` }}
             transition={{
-              duration: 10,
+              duration: 3,
               ease: 'easeOut',
               repeat: Infinity,
+              repeatDelay: 1,
             }}
             className="h-full bg-[#3B82F6]"
           />

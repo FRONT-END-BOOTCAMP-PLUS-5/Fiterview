@@ -31,7 +31,7 @@ body {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-3px);
+    transform: translateY(-7px);
   }
   100% {
     transform: translateY(0);
@@ -39,6 +39,6 @@ body {
 }
 
 .walker-bob {
-  animation: bobbing 0.8s ease-in-out infinite;
+  animation: bobbing 1s ease-in-out infinite;
   will-change: transform;
 }
