@@ -1,103 +1,217 @@
 'use client';
 
-import { useSession, signOut } from 'next-auth/react';
+import React, { useEffect, useMemo, useState } from 'react';
+import LabeledInput from '@/app/(anon)/user/components/LabeledInput';
+import StaticField from '@/app/(anon)/user/components/StaticField';
+import SubmitButton from '@/app/(anon)/user/components/SubmitButton';
+import { useSessionUser } from '@/lib/auth/useSessionUser';
+import EyeOff from '@/public/assets/icons/eye-off.svg';
+import axios from 'axios';
+import Modal from '@/app/(anon)/components/modal/Modal';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import ModalOverlay from '@/app/(anon)/components/modal/ModalOverlay';
+import { useSession } from 'next-auth/react';
 
-export default function UserPage() {
-  const { data: session, status } = useSession();
+export default function User() {
   const router = useRouter();
+  const { user } = useSessionUser();
+  const { data: loginSession, update: updateSession } = useSession();
+
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [nickname, setNickname] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [completed, setCompleted] = useState(false);
+  const [error, setError] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login');
+    if (user) {
+      setUsername(user.username ?? '');
+      setEmail(user.email ?? '');
+      setNickname(user.nickname ?? '');
     }
-  }, [status, router]);
+  }, [user]);
 
-  if (status === 'loading') {
+  const isGoogleLogin = (loginSession as any)?.provider === 'google';
+
+  const isPasswordValid = useMemo(() => {
+    if (!password) return true;
+    return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(password);
+  }, [password]);
+
+  const isConfirmMismatch = useMemo(() => {
+    if (!password && !confirmPassword) return false;
+    return password !== confirmPassword;
+  }, [password, confirmPassword]);
+
+  const isEmailValid = useMemo(() => {
+    if (!email) return true;
+    return /\S+@\S+\.\S+/.test(email);
+  }, [email]);
+
+  const serverEmailDuplicate = useMemo(() => error === '이미 사용 중인 이메일입니다.', [error]);
+
+  const isFormReady = useMemo(() => {
+    const passwordOk = (!password && !confirmPassword) || (isPasswordValid && !isConfirmMismatch);
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">로딩 중...</div>
-      </div>
+      !!nickname &&
+      !!email &&
+      isEmailValid &&
+      passwordOk &&
+      !serverEmailDuplicate &&
+      !loading &&
+      !completed
     );
-  }
+  }, [
+    nickname,
+    email,
+    isEmailValid,
+    password,
+    confirmPassword,
+    isPasswordValid,
+    isConfirmMismatch,
+    loading,
+    completed,
+    error,
+  ]);
 
-  if (!session || !session.user) {
-    return null;
-  }
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
 
-  // 타입 단언으로 user 객체의 타입을 명시
-  const user = session.user as {
-    id: string;
-    username?: string | null;
-    roles?: string[] | null;
+    try {
+      await axios.put('/api/auth/user', {
+        email,
+        nickname,
+        password,
+      });
+      setCompleted(true);
+      handleModalOpen();
+
+      // Update next-auth session so UI reflects updated email/nickname
+      await updateSession?.({ user: { email, nickname } });
+    } catch (e: any) {
+      setError(
+        e?.response?.data?.error ||
+          e?.response?.data?.message ||
+          '정보 수정 중 오류가 발생했습니다.'
+      );
+      setLoading(false);
+    }
   };
 
-  const handleLogout = async () => {
-    await signOut({ redirect: false });
-    router.push('/login');
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    router.push('/');
+  };
+
+  const ModalButton = () => {
+    return (
+      <button
+        className="self-stretch h-11 bg-[#3B82F6] rounded-lg inline-flex justify-center items-center cursor-pointer"
+        onClick={() => {
+          handleModalClose();
+        }}
+      >
+        <div className="text-white text-sm font-semibold">확인</div>
+      </button>
+    );
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white shadow rounded-lg p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">사용자 대시보드</h1>
-            <button
-              onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-            >
-              로그아웃
-            </button>
-          </div>
-
-          <div className="bg-gray-50 rounded-lg p-6 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">현재 로그인 정보</h2>
-            <div className="space-y-2">
-              <div className="flex">
-                <span className="font-medium text-gray-700 w-20">ID:</span>
-                <span className="text-gray-900">{user.id}</span>
+    <main className="w-full h-full px-32 py-16 flex items-center justify-center">
+      <div className="w-[1184px] flex items-end justify-end">
+        <section className="w-full px-[200px] py-[88px] bg-white rounded-[16px] border border-[#E2E8F0] flex flex-col items-center justify-between">
+          <form
+            onSubmit={onSubmit}
+            className="w-[800px] flex flex-col items-center justify-center gap-8"
+          >
+            <header className="w-full flex flex-col items-start justify-center gap-4">
+              <div className="flex flex-col gap-2">
+                <p className="text-[32px] leading-[38.4px] font-bold text-slate-800">개인정보</p>
               </div>
-              <div className="flex">
-                <span className="font-medium text-gray-700 w-20">사용자명:</span>
-                <span className="text-gray-900">{user.username}</span>
-              </div>
-              <div className="flex">
-                <span className="font-medium text-gray-700 w-20">권한:</span>
-                <span className="text-gray-900">{user.roles?.join(', ') || 'USER'}</span>
-              </div>
-            </div>
-          </div>
+            </header>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-blue-50 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-blue-900 mb-2">🎯 모의면접 시작</h3>
-              <p className="text-blue-700 mb-4">
-                새로운 모의면접을 시작하고 AI와 함께 연습해보세요.
-              </p>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
-                면접 시작하기
-              </button>
+            <div className="w-full flex flex-col items-start gap-2">
+              <StaticField label="아이디" value={username} />
+
+              <LabeledInput
+                label="비밀번호"
+                type={passwordVisible ? 'text' : 'password'}
+                name="password"
+                placeholder="비밀번호 수정을 원하시면 입력하세요"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                icon={<EyeOff />}
+                showPassword={() => setPasswordVisible((v) => !v)}
+                disabled={isGoogleLogin}
+                required={false}
+                error={
+                  !isPasswordValid
+                    ? '비밀번호는 8자 이상, 영문/숫자/특수문자를 포함해야 합니다.'
+                    : null
+                }
+              />
+
+              <LabeledInput
+                label="비밀번호 재입력"
+                type={confirmPasswordVisible ? 'text' : 'password'}
+                name="confirmPassword"
+                placeholder="비밀번호 수정을 원하시면 다시 입력하세요"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                icon={<EyeOff />}
+                showPassword={() => setConfirmPasswordVisible((v) => !v)}
+                disabled={isGoogleLogin}
+                required={false}
+                error={isConfirmMismatch ? '비밀번호가 일치하지 않습니다.' : null}
+              />
+
+              <LabeledInput
+                label="이메일"
+                type="email"
+                name="email"
+                placeholder="이메일을 입력하세요"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isGoogleLogin}
+                error={!isEmailValid ? '이메일 형식이 맞지 않습니다.' : null}
+              />
+
+              <LabeledInput
+                label="닉네임"
+                type="text"
+                name="nickname"
+                placeholder="닉네임을 입력하세요"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                disabled={isGoogleLogin}
+              />
             </div>
 
-            <div className="bg-green-50 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-green-900 mb-2">📊 면접 결과 보기</h3>
-              <p className="text-blue-700 mb-4">이전 모의면접 결과와 피드백을 확인해보세요.</p>
-              <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium">
-                결과 보기
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-8 bg-yellow-50 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-yellow-900 mb-2">ℹ️ 테스트 정보</h3>
-            <p className="text-yellow-700">
-              이 페이지는 로그인 테스트를 위한 페이지입니다. 실제 기능은 아직 구현되지 않았습니다.
-            </p>
-          </div>
-        </div>
+            <SubmitButton isFormReady={isFormReady} isGoogleLogin={isGoogleLogin} />
+          </form>
+        </section>
       </div>
-    </div>
+      <ModalOverlay isOpen={isModalOpen} onClose={handleModalClose}>
+        <Modal
+          title="회원정보가 수정되었습니다."
+          buttons={<ModalButton />}
+          onClose={handleModalClose}
+          size="medium"
+          hideX={true}
+        />
+      </ModalOverlay>
+    </main>
   );
 }
