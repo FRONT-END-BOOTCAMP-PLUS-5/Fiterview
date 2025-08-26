@@ -34,7 +34,7 @@ export class GenerateSampleAnswerUsecase {
     }
 
     // 2) Build input from questions
-    const input = questions.map((q) => q.question).join('\n');
+    const input = questions.map((q: QuestionRow) => q.question).join('\n');
 
     // 3) Create DTO for LLM
     const llmDto = new GenerateSampleAnswersDto(reportId, dto.model, dto.instructions, input);
