@@ -17,7 +17,6 @@ export default function Header() {
   const username = user?.nickname;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLLIElement>(null);
-  const { isOpen, currentStep } = useModalStore();
 
   return (
     <header className="w-full h-20 px-9 py-7 bg-white border-b border-[#F1F5F9] inline-flex justify-between">
@@ -97,7 +96,6 @@ export default function Header() {
           )}
         </ul>
       </nav>
-      {isOpen && currentStep === 'logout' && <LogoutModal />}
     </header>
   );
 }

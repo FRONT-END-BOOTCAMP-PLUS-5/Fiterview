@@ -8,8 +8,9 @@ import ProgressBar from '@/app/(anon)/reports/[id]/components/ProgressBar';
 interface AudioPlayerProps {
   questionNumber: string;
   questionText: string;
-  audioUrl: string;
+  audioUrl: string | undefined;
   className?: string;
+  disabled?: boolean;
 }
 
 export default function AudioPlayer({
@@ -17,6 +18,7 @@ export default function AudioPlayer({
   questionText,
   audioUrl,
   className = '',
+  disabled,
 }: AudioPlayerProps) {
   // 오디오 재생 상태 관리
   const [isPlaying, setIsPlaying] = useState(false);
@@ -164,8 +166,14 @@ export default function AudioPlayer({
           {/* 재생/일시정지 버튼 */}
           <button
             onClick={togglePlayPause}
-            disabled={isLoading}
-            className="w-12 h-12 bg-blue-500 rounded-3xl flex justify-center items-center cursor-pointer hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isLoading || disabled}
+            className={`w-12 h-12 rounded-3xl flex justify-center items-center transition-colors ${
+              disabled
+                ? 'bg-slate-300 cursor-not-allowed opacity-50'
+                : isLoading
+                  ? 'bg-blue-500 cursor-not-allowed opacity-50'
+                  : 'bg-blue-500 cursor-pointer hover:bg-blue-600'
+            }`}
           >
             {isLoading ? (
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -180,10 +188,10 @@ export default function AudioPlayer({
           <div className="flex-1 inline-flex flex-col justify-center items-start">
             {/* 질문 번호 및 텍스트 */}
             <div className="self-stretch inline-flex justify-start items-start gap-1">
-              <div className="justify-start text-slate-800 text-sm font-semibold leading-normal  whitespace-pre-line">
+              <div className="justify-start text-slate-800 text-sm font-semibold leading-normal whitespace-pre-line">
                 {questionNumber}
               </div>
-              <div className="justify-start text-slate-800 text-sm font-semibold leading-normal  whitespace-pre-line">
+              <div className="justify-start text-slate-800 text-sm font-semibold leading-normal whitespace-pre-line">
                 {questionText}
               </div>
             </div>
@@ -199,7 +207,7 @@ export default function AudioPlayer({
         </div>
       </div>
 
-      <audio ref={audioRef} src={audioUrl} preload="metadata" />
+      {audioUrl && <audio ref={audioRef} src={audioUrl} preload="metadata" />}
     </div>
   );
 }

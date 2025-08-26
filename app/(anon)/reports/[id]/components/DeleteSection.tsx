@@ -12,7 +12,7 @@ interface DeleteSectionProps {
 export default function DeleteSection({ reportId }: DeleteSectionProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
-  const { isOpen, openModal, closeModal } = useModalStore();
+  const { isOpen, currentStep, openModal, closeModal } = useModalStore();
 
   const handleDeleteClick = () => {
     openModal('delete');
@@ -34,20 +34,16 @@ export default function DeleteSection({ reportId }: DeleteSectionProps) {
       if (response.ok) {
         const result = await response.json();
         if (result.success) {
-          console.log('리포트 삭제 성공:', result.message);
           // 삭제 성공 시 리포트 목록 페이지로 이동
           router.push('/reports');
         } else {
-          console.error('삭제 실패:', result.message);
           alert('삭제에 실패했습니다: ' + result.message);
         }
       } else {
         const errorData = await response.json();
-        console.error('삭제 실패:', errorData.message);
         alert('삭제에 실패했습니다: ' + errorData.message);
       }
     } catch (error) {
-      console.error('삭제 중 오류 발생:', error);
       alert('삭제 중 오류가 발생했습니다.');
     } finally {
       setIsDeleting(false);
@@ -68,12 +64,14 @@ export default function DeleteSection({ reportId }: DeleteSectionProps) {
       </div>
 
       {/* 삭제 확인 모달 */}
-      <DeleteModal
-        isOpen={isOpen}
-        onClose={handleClose}
-        onConfirm={handleConfirm}
-        isDeleting={isDeleting}
-      />
+      {isOpen && currentStep === 'delete' && (
+        <DeleteModal
+          isOpen={isOpen}
+          onClose={handleClose}
+          onConfirm={handleConfirm}
+          isDeleting={isDeleting}
+        />
+      )}
     </>
   );
 }

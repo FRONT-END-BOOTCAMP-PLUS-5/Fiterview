@@ -22,11 +22,7 @@ export default function AudioReportViewer({ reportId }: AudioReportViewerProps) 
           credentials: 'include', // 쿠키 포함하여 인증 정보 전달
         });
 
-        console.log('📡 API 응답 상태:', response.status, response.statusText);
-        console.log('📡 API 응답 헤더:', Object.fromEntries(response.headers.entries()));
-
         const result = await response.json();
-        console.log('📄 API 응답 데이터:', result);
 
         if (result.success) {
           setReport(result.data);
@@ -45,7 +41,6 @@ export default function AudioReportViewer({ reportId }: AudioReportViewerProps) 
     };
 
     if (reportId) {
-      console.log('🚀 useEffect 실행, reportId:', reportId);
       fetchReportData();
     }
   }, [reportId]);
