@@ -3,6 +3,12 @@ import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/G
 import { DeliverSampleAnswersDto } from '@/backend/application/questions/dtos/DeliverSampleAnswersDto';
 import { Gpt4oLlmAI } from '@/backend/infrastructure/AI/Gpt4oLlmAI';
 
+interface QuestionRow {
+  id: number;
+  order: number | null;
+  question: string;
+}
+
 export class GenerateSampleAnswerUsecase {
   constructor(
     private readonly prisma: PrismaClient,
@@ -13,7 +19,7 @@ export class GenerateSampleAnswerUsecase {
     const reportId = dto.reportId;
 
     // 1) Fetch up to 10 questions under the report, ordered
-    const questions = await this.prisma.question.findMany({
+    const questions: QuestionRow[] = await this.prisma.question.findMany({
       where: { reportId },
       select: { id: true, order: true, question: true },
       orderBy: { order: 'asc' },
@@ -28,7 +34,7 @@ export class GenerateSampleAnswerUsecase {
     }
 
     // 2) Build input from questions
-    const input = questions.map((q) => `${q.question}`).join('\n');
+    const input = questions.map((q: QuestionRow) => q.question).join('\n');
 
     // 3) Create DTO for LLM
     const llmDto = new GenerateSampleAnswersDto(reportId, dto.model, dto.instructions, input);
