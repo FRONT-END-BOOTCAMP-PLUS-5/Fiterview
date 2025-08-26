@@ -66,11 +66,15 @@ export default function LoginPage() {
   if (status === 'loading')
     return (
       <div className="w-full min-h-screen bg-[#F8FAFC] flex justify-center items-center">
-        <LoadingSpinner size="large" message="로그인 중..." />
+        <LoadingSpinner size="medium" message="로딩 중" />
       </div>
     );
   if (status === 'authenticated' && session) {
-    return <div>로그인 중...</div>;
+    return (
+      <div className="w-full min-h-screen bg-[#F8FAFC] flex justify-center items-center">
+        <LoadingSpinner size="medium" message="로그인 중" />
+      </div>
+    );
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
