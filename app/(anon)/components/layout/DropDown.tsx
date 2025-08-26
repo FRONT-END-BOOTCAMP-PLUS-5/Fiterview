@@ -14,7 +14,7 @@ export default function DropDown() {
           <button
             type="button"
             className="w-full px-4 py-3 gap-3 flex items-center justify-center rounded-t-[8px] hover:bg-[#F1F5F9] active:bg-[#E2E8F0]"
-            onClick={() => router.push('/user')}
+            onClick={() => router.push('/mypage')}
           >
             <User width={18} height={18} stroke="#334155" strokeWidth={1.5} />
             <span className="w-full text-start text-[#334155] text-sm font-medium">마이페이지</span>

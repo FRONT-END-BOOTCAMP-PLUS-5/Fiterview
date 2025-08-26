@@ -61,7 +61,7 @@ export default function LoginPage() {
   // 로그인 성공 후 리다이렉트
   useEffect(() => {
     if (redirecting) {
-      router.push('/user');
+      router.push('/');
     }
   }, [redirecting, router]);
 
