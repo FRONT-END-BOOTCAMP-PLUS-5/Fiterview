@@ -19,7 +19,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       reportId: questions_report_idNumber,
       model: 'gpt-4o',
       instructions:
-        'Return a JSON array of best answers to each question. Format: ["Best answer 1", "Best answer 2", "Best answer 3"]. Each answer should be a string that provides a comprehensive and well-structured response to the corresponding question.',
+        'Return a JSON array of best answers to each question. Format: ["Best answer 1", "Best answer 2", "Best answer 3"]. Each answer should be a string that provides a comprehensive and well-structured response that is comprised of 3~5 sentences to the corresponding question.',
       input: '',
       maxOutputTokens: 1000,
     };
