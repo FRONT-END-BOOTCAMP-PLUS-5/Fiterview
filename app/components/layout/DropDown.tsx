@@ -9,12 +9,12 @@ export default function DropDown() {
   const { isOpen, currentStep, openModal } = useModalStore();
 
   return (
-    <nav className="w-[150px] absolute right-0 top-8 z-20 bg-white rounded-lg shadow-[0px_4px_12px_0px_rgba(0,0,0,0.10)] outline-1 outline-offset-[-1px] outline-[#E2E8F0]">
+    <nav className="w-[150px] absolute right-0 top-8 z-20 bg-white rounded-lg shadow-[0px_4px_12px_0px_rgba(0,0,0,0.10)] outline-1 outline-offset-[-1px] outline-[#E2E8F0] ">
       <ul className="flex flex-col">
         <li>
           <button
             type="button"
-            className="w-full px-4 py-3 gap-3 flex items-center justify-center rounded-t-[8px] hover:bg-[#F1F5F9] active:bg-[#E2E8F0]"
+            className="w-full px-4 py-3 gap-3 flex items-center justify-center rounded-t-[8px] hover:bg-[#F1F5F9] active:bg-[#E2E8F0] cursor-pointer"
             onClick={() => router.push('/user')}
           >
             <User width={18} height={18} stroke="#334155" strokeWidth={1.5} />
@@ -24,7 +24,7 @@ export default function DropDown() {
         <li>
           <button
             type="button"
-            className="w-full px-4 py-3 gap-3 flex items-center justify-center rounded-b-[8px] hover:bg-[#F1F5F9] active:bg-[#E2E8F0]"
+            className="w-full px-4 py-3 gap-3 flex items-center justify-center rounded-b-[8px] hover:bg-[#F1F5F9] active:bg-[#E2E8F0] cursor-pointer"
             onClick={() => openModal('logout')}
           >
             <Logout width={18} height={18} stroke="#EF4444" strokeWidth={1.5} />
