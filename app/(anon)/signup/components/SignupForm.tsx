@@ -1,5 +1,5 @@
-import SignupInputs from './SignupInputs';
-import SignupButton from './SignupButton';
+import SignupInputs from '@/app/(anon)/signup/components/SignupInputs';
+import SignupButton from '@/app/(anon)/signup/components/SignupButton';
 
 interface SignupFormProps {
   formData: {

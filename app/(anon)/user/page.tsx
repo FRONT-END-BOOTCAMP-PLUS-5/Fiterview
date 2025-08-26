@@ -7,9 +7,9 @@ import SubmitButton from '@/app/(anon)/user/components/SubmitButton';
 import { useSessionUser } from '@/lib/auth/useSessionUser';
 import EyeOff from '@/public/assets/icons/eye-off.svg';
 import axios from 'axios';
-import Modal from '@/app/(anon)/components/modal/Modal';
+import Modal from '@/app/components/modal/Modal';
 import { useRouter } from 'next/navigation';
-import ModalOverlay from '@/app/(anon)/components/modal/ModalOverlay';
+import ModalOverlay from '@/app/components/modal/ModalOverlay';
 import { useSession } from 'next-auth/react';
 
 export default function User() {

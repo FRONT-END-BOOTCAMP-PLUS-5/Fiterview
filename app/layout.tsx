@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import { Roboto } from 'next/font/google';
-import './globals.css';
+import '@/app/globals.css';
 import AuthSessionProvider from '@/app/components/provider/AuthSessionProvider';
 import QueryProvider from '@/app/components/provider/QueryProvider';
 import HeaderVisibility from '@/app/components/layout/HeaderVisibility';

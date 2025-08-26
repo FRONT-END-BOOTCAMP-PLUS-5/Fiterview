@@ -1,8 +1,8 @@
-import LoginInputs from './LoginInputs';
-import LoginButton from './LoginButton';
-import SignupLink from './SignupLink';
-import Divider from './Divider';
-import GoogleOAuthButton from './GoogleOAuthButton';
+import LoginInputs from '@/app/(anon)/login/components/LoginInputs';
+import LoginButton from '@/app/(anon)/login/components/LoginButton';
+import SignupLink from '@/app/(anon)/login/components/SignupLink';
+import Divider from '@/app/(anon)/login/components/Divider';
+import GoogleOAuthButton from '@/app/(anon)/login/components/GoogleOAuthButton';
 
 interface LoginFormProps {
   username: string;

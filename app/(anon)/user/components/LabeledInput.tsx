@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Input, { InputProps } from '@/app/(anon)/components/Input';
+import Input, { InputProps } from '@/app/components/Input';
 
 interface LabeledInputProps extends InputProps {
   label: string;
