@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import LoginHeader from './components/LoginHeader';
-import LoginForm from './components/LoginForm';
+import LoginHeader from '@/app/(anon)/login/components/LoginHeader';
+import LoginForm from '@/app/(anon)/login/components/LoginForm';
 import { LoadingSpinner } from '@/app/components/loading/LoadingSpinner';
 
 export default function LoginPage() {

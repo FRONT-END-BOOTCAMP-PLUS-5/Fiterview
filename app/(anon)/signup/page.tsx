@@ -3,8 +3,8 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import SignupForm from './components/SignupForm';
-import SignupFeatures from './components/SignupFeatures';
+import SignupForm from '@/app/(anon)/signup/components/SignupForm';
+import SignupFeatures from '@/app/(anon)/signup/components/SignupFeatures';
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
