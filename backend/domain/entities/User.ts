@@ -1,4 +1,4 @@
-import { Report } from './Report';
+import { Report } from '@/backend/domain/entities/Report';
 
 export interface User {
   id?: number;

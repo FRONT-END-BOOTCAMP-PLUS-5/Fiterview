@@ -1,7 +1,7 @@
 import { QuestionsRequest } from '@/backend/domain/dtos/QuestionsRequest';
 import { QuestionsResponse } from '@/backend/domain/dtos/QuestionsResponse';
 import { Question } from '@/backend/domain/entities/Question';
-import { Feedback } from '../entities/Feedback';
+import { Feedback } from '@/backend/domain/entities/Feedback';
 import { RequestFeedbackDto } from '@/backend/application/feedbacks/dtos/RequestFeedbackDto';
 import { GenerateSampleAnswersDto } from '@/backend/application/questions/dtos/GenerateSampleAnswersDto';
 

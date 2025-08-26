@@ -1,4 +1,4 @@
-import { Report, ReportStatus } from '../entities/Report';
+import { Report, ReportStatus } from '@/backend/domain/entities/Report';
 
 export interface ReportRepository {
   createReport(userId: number): Promise<Report>;

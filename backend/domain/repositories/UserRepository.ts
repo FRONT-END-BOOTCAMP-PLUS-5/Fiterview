@@ -1,4 +1,4 @@
-import { User } from '../entities/User';
+import { User } from '@/backend/domain/entities/User';
 
 export interface UserRepository {
   // 사용자 조회

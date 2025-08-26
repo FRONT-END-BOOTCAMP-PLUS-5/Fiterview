@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useModalStore } from '@/stores/useModalStore';
-import DeleteModal from './DeleteModal';
+import DeleteModal from '@/app/(anon)/reports/[id]/components/DeleteModal';
 
 interface DeleteSectionProps {
   reportId: string;

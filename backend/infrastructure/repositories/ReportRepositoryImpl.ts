@@ -1,7 +1,10 @@
 import { Report, ReportStatus } from '@/backend/domain/entities/Report';
 import { ReportRepository } from '@/backend/domain/repositories/ReportRepository';
 import prisma from '@/utils/prisma';
-import { mapReportStatusToDb, mapReportStatusToDomain } from '../mappers/ReportStatusMapper';
+import {
+  mapReportStatusToDb,
+  mapReportStatusToDomain,
+} from '@/backend/infrastructure/mappers/ReportStatusMapper';
 import { Prisma, ReportStatus as PrismaReportStatus } from '@prisma/client';
 
 export class ReportRepositoryImpl implements ReportRepository {
