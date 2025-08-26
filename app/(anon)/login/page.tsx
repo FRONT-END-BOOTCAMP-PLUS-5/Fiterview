@@ -221,7 +221,7 @@ export default function LoginPage() {
                       try {
                         // Google OAuth 로그인 시도 (계정 선택 강제)
                         await signIn('google', {
-                          callbackUrl: '/user',
+                          callbackUrl: '/',
                           prompt: 'select_account',
                         });
                       } catch (error) {

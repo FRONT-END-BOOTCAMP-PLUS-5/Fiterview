@@ -2,6 +2,9 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import Input from '@/app/(anon)/components/Input';
+import LabeledInput from '@/app/(anon)/user/components/LabeledInput';
+import StaticField from '@/app/(anon)/user/components/StaticField';
+import SubmitButton from '@/app/(anon)/user/components/SubmitButton';
 import { useSessionUser } from '@/lib/auth/useSessionUser';
 import EyeOff from '@/public/assets/icons/eye-off.svg';
 import axios from 'axios';
@@ -141,114 +144,63 @@ export default function User() {
             </header>
 
             <div className="w-full flex flex-col items-start gap-2">
-              {/* 아이디 */}
-              <div className="w-full flex flex-col gap-2">
-                <p className="text-sm leading-[16.8px] font-semibold text-gray-700">아이디</p>
-                <div className="w-full flex py-[12px] px-[16px] bg-[#F8FAFC] justify-center rounded-[8px] border border-[#CBD5E1]">
-                  <span className="w-full text-[16px] font-normal text-[#928A8A] truncate">
-                    {username || '-'}
-                  </span>
-                </div>
-                <div className="inline-flex items-center gap-1 px-[10px] min-h-[14.4px]" />
-              </div>
+              <StaticField label="아이디" value={username} />
 
-              {/* 비밀번호 */}
-              <div className="w-full flex flex-col gap-2">
-                <p className="text-sm leading-[16.8px] font-semibold text-gray-700">비밀번호</p>
-                <Input
-                  type={passwordVisible ? 'text' : 'password'}
-                  name="password"
-                  placeholder="비밀번호 수정을 원하시면 입력하세요"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  icon={<EyeOff />}
-                  showPassword={() => setPasswordVisible((v) => !v)}
-                  disabled={isGoogleLogin}
-                  required={false}
-                />
-                <div className="w-full inline-flex items-center gap-1 px-[10px] min-h-[14.4px]">
-                  {!isPasswordValid ? (
-                    <p className="text-[#EF4444] text-[12px] leading-[14.4px]">
-                      비밀번호는 8자 이상, 영문/숫자/특수문자를 포함해야 합니다.
-                    </p>
-                  ) : null}
-                </div>
-              </div>
+              <LabeledInput
+                label="비밀번호"
+                type={passwordVisible ? 'text' : 'password'}
+                name="password"
+                placeholder="비밀번호 수정을 원하시면 입력하세요"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                icon={<EyeOff />}
+                showPassword={() => setPasswordVisible((v) => !v)}
+                disabled={isGoogleLogin}
+                required={false}
+                error={
+                  !isPasswordValid
+                    ? '비밀번호는 8자 이상, 영문/숫자/특수문자를 포함해야 합니다.'
+                    : null
+                }
+              />
 
-              {/* 비밀번호 재입력 */}
-              <div className="w-full flex flex-col gap-2">
-                <p className="text-sm leading-[16.8px] font-semibold text-gray-700">
-                  비밀번호 재입력
-                </p>
-                <Input
-                  type={confirmPasswordVisible ? 'text' : 'password'}
-                  name="confirmPassword"
-                  placeholder="비밀번호 수정을 원하시면 다시 입력하세요"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  icon={<EyeOff />}
-                  showPassword={() => setConfirmPasswordVisible((v) => !v)}
-                  disabled={isGoogleLogin}
-                  required={false}
-                />
-                <div className="w-full inline-flex items-center gap-1 px-[10px] min-h-[14.4px]">
-                  {isConfirmMismatch ? (
-                    <p className="text-[#EF4444] text-[12px] leading-[14.4px]">
-                      비밀번호가 일치하지 않습니다.
-                    </p>
-                  ) : null}
-                </div>
-              </div>
+              <LabeledInput
+                label="비밀번호 재입력"
+                type={confirmPasswordVisible ? 'text' : 'password'}
+                name="confirmPassword"
+                placeholder="비밀번호 수정을 원하시면 다시 입력하세요"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                icon={<EyeOff />}
+                showPassword={() => setConfirmPasswordVisible((v) => !v)}
+                disabled={isGoogleLogin}
+                required={false}
+                error={isConfirmMismatch ? '비밀번호가 일치하지 않습니다.' : null}
+              />
 
-              {/* 이메일 */}
-              <div className="w-full flex flex-col gap-2">
-                <p className="text-sm leading-[16.8px] font-semibold text-gray-700">이메일</p>
-                <Input
-                  type="email"
-                  name="email"
-                  placeholder="이메일을 입력하세요"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isGoogleLogin}
-                />
-                <div className="inline-flex items-center gap-1 px-[10px] min-h-[14.4px]">
-                  {!isEmailValid ? (
-                    <p className="text-[#EF4444] text-[12px] leading-[14.4px]">
-                      이메일 형식이 맞지 않습니다.
-                    </p>
-                  ) : null}
-                </div>
-              </div>
+              <LabeledInput
+                label="이메일"
+                type="email"
+                name="email"
+                placeholder="이메일을 입력하세요"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isGoogleLogin}
+                error={!isEmailValid ? '이메일 형식이 맞지 않습니다.' : null}
+              />
 
-              {/* 닉네임 */}
-              <div className="w-full flex flex-col gap-2">
-                <p className="text-sm leading-[16.8px] font-semibold text-gray-700">닉네임</p>
-                <Input
-                  type="text"
-                  name="nickname"
-                  placeholder="닉네임을 입력하세요"
-                  value={nickname}
-                  onChange={(e) => setNickname(e.target.value)}
-                  disabled={isGoogleLogin}
-                />
-              </div>
+              <LabeledInput
+                label="닉네임"
+                type="text"
+                name="nickname"
+                placeholder="닉네임을 입력하세요"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                disabled={isGoogleLogin}
+              />
             </div>
 
-            <button
-              type="submit"
-              disabled={!isFormReady || isGoogleLogin}
-              className={`${
-                isFormReady
-                  ? `bg-[#3B82F6] text-white ${
-                      isGoogleLogin
-                        ? 'bg-[#E2E8F0] text-[#94A3B8] cursor-not-allowed'
-                        : 'cursor-pointer'
-                    }`
-                  : 'bg-[#E2E8F0] text-[#94A3B8] cursor-not-allowed'
-              } w-full h-[52px] rounded-[8px] inline-flex items-center justify-center text-[16px] leading-[19.2px] font-semibold`}
-            >
-              {isGoogleLogin ? '구글 로그인 계정은 수정할 수 없습니다.' : '수정하기'}
-            </button>
+            <SubmitButton isFormReady={isFormReady} isGoogleLogin={isGoogleLogin} />
           </form>
         </section>
       </div>
