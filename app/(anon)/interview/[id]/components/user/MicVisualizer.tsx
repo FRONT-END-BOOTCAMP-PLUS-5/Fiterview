@@ -21,7 +21,7 @@ export default function MicVisualizer({
   const rafIdRef = useRef<number | null>(null);
   const visStreamRef = useRef<MediaStream | null>(null);
   const barsRef = useRef<HTMLSpanElement[]>([]);
-  const startTokenRef = useRef(0); // 마이크 스트림마다의 번호표(토큰)
+  const requestNumRef = useRef(0); // 마이크 스트림마다의 번호표
   const mountedRef = useRef(false);
 
   const clampedBase = Math.min(0.95, Math.max(0, baseScale));
@@ -29,13 +29,13 @@ export default function MicVisualizer({
 
   const start = async () => {
     try {
-      // 새로운 시작 토큰 발급
-      const myToken = ++startTokenRef.current;
+      // 최신 요청인지 확인
+      const requestNum = ++requestNumRef.current;
       /* 1. 마이크 스트림 세팅 */
       if (audioCtxRef.current) return;
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      // 활성 상태가 아니거나 토큰이 변경되었으면 즉시 정리
-      if (!mountedRef.current || myToken !== startTokenRef.current || !active) {
+      // 활성 상태가 아니거나 요청 번호가 달라졌으면 즉시 정리
+      if (!mountedRef.current || requestNum !== requestNumRef.current || !active) {
         try {
           stream.getTracks().forEach((t) => t.stop());
         } catch {}
@@ -88,8 +88,8 @@ export default function MicVisualizer({
 
   // 사용한 리소스들 해제
   const stop = () => {
-    // 다음 start 호출이 기존 비동기 작업을 무시하도록 토큰 증가
-    ++startTokenRef.current;
+    // 중복 대비 요청 번호 증가
+    ++requestNumRef.current;
     if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
     rafIdRef.current = null;
     try {

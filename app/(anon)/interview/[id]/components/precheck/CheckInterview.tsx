@@ -22,7 +22,7 @@ export default function CheckInterview() {
   const [selectedMicrophone, setSelectedMicrophone] = useState<string>('');
   const [isReady, setIsReady] = useState(false);
   const tempStreamRef = useRef<MediaStream | null>(null);
-  const tokenRef = useRef(0); // 마이크/카메라 스트림마다의 번호표(토큰)
+  const requestNumRef = useRef(0); // 마이크/카메라 스트림마다의 번호표
 
   const handleDeviceChange = (cameraId: string, microphoneId: string) => {
     setSelectedCamera(cameraId);
@@ -57,13 +57,13 @@ export default function CheckInterview() {
   // 공통 장치 목록 가져오기 로직
   useEffect(() => {
     const getDevices = async () => {
-      const myToken = ++tokenRef.current;
+      const requestNum = ++requestNumRef.current;
       let stream: MediaStream | null = null;
       try {
         // 사용자에게 미디어 권한 요청 (장치 라벨을 가져오기 위해)
         stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-        // 최신 토큰인지 확인 (StrictMode 재실행 대비)
-        if (myToken !== tokenRef.current) {
+        // 최신 요청인지 확인
+        if (requestNum !== requestNumRef.current) {
           try {
             stream.getTracks().forEach((t) => t.stop());
           } catch (_) {}
@@ -123,7 +123,7 @@ export default function CheckInterview() {
         tempStreamRef.current = null;
       }
       // 토큰 갱신하여 지연 중인 비동기 루틴 무효화
-      tokenRef.current++;
+      requestNumRef.current++;
     };
 
     window.addEventListener('pagehide', stopAll);
