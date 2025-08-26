@@ -17,21 +17,6 @@ export default function Reflection({
   const [tempText, setTempText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
-  // test api call
-  useEffect(() => {
-    const dbFetch = async () => {
-      const result = await axios.get(`/api/reports/${reportId}`, {
-        data: reflection,
-      });
-      const fetched = result.data.data.reflection ?? '';
-      setText(fetched);
-      setTempText(fetched);
-      setIsLoading(false);
-      console.log(result.data.data.reflection);
-    };
-    dbFetch();
-  }, []);
-
   useEffect(() => {
     setIsLoading(false);
   }, [reflection]);
