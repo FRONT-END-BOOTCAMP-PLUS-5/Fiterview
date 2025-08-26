@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useUploadFiles } from '@/hooks/useUploadFiles';
 import { useModalStore } from '@/stores/useModalStore';
 import { useReportStore } from '@/stores/useReportStore';
+import { useSessionUser } from '@/lib/auth/useSessionUser';
 import FilesUpload from '@/app/(anon)/components/quick/FilesUpload';
 import UploadOptions from '@/app/(anon)/interview/components/UploadOptions';
 import ErrorModal from '@/app/components/modal/ErrorModal';
@@ -29,9 +30,16 @@ export default function InterviewForm({ onReportCreated }: QuickInterviewFormPro
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { openModal, currentStep, isOpen } = useModalStore();
   const { reportId, setReportId, setJobId } = useReportStore();
+  const { user } = useSessionUser();
 
   const submitFiles = async () => {
     if (uploadedFiles.length === 0 || isSubmitting) return;
+
+    // 로그인 상태 체크
+    if (!user) {
+      openModal('login');
+      return;
+    }
 
     try {
       setIsSubmitting(true);
