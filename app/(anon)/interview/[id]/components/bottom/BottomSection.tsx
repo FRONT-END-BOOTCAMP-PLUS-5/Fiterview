@@ -1,6 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import ArrowRight from '@/public/assets/icons/arrow-right.svg';
+import Exit from '@/public/assets/icons/exit.svg';
+import { useRouter } from 'next/navigation';
 
 interface BottomSectionProps {
   currentQuestion: number;
@@ -15,14 +18,25 @@ export default function BottomSection({
   totalQuestions,
   onNext,
   isDisabled,
-  nextLabel = '다음 질문',
+  nextLabel,
 }: BottomSectionProps) {
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+  const handleExit = () => {
+    router.push('/interview');
+  };
   useEffect(() => {
     setMounted(true);
   }, []);
   return (
-    <section className="relative flex items-center px-[24px] py-[16px] border-t border-slate-200 bg-[#F8FAFC] cursor-default">
+    <section className="relative flex justify-between items-center px-[24px] py-[16px] border-t border-slate-200 bg-[#F8FAFC] cursor-default">
+      <button
+        className="inline-flex items-center gap-[8px] px-[16px] py-[10px] rounded-[8px] bg-[#F8FAFC] text-[#3B82F6] text-[14px] font-semibold cursor-pointer"
+        onClick={handleExit}
+      >
+        <Exit width={18} height={18} strokeWidth={0.5} />
+        나가기
+      </button>
       <p
         className="absolute left-1/2 -translate-x-1/2 text-[#64748B] text-[12px] font-medium"
         suppressHydrationWarning
@@ -32,16 +46,10 @@ export default function BottomSection({
       <button
         onClick={onNext}
         disabled={isDisabled}
-        className="ml-auto inline-flex items-center gap-[8px] px-[16px] py-[10px] rounded-[8px] bg-[#3B82F6] text-white text-[14px] font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#2563EB] cursor-pointer"
+        className="inline-flex items-center gap-[8px] px-[16px] py-[10px] rounded-[8px] bg-[#3B82F6] text-white text-[14px] font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#2563EB] cursor-pointer"
       >
-        {nextLabel}
-        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-          <path
-            fillRule="evenodd"
-            d="M10.293 15.707a1 1 0 010-1.414L12.586 12H4a1 1 0 110-2h8.586l-2.293-2.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-            clipRule="evenodd"
-          />
-        </svg>
+        {mounted ? nextLabel : '다음 질문'}
+        <ArrowRight width={16} height={16} />
       </button>
     </section>
   );
