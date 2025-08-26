@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import { Roboto } from 'next/font/google';
-import './globals.css';
-import AuthSessionProvider from '@/app/(anon)/components/provider/AuthSessionProvider';
-import QueryProvider from '@/app/(anon)/components/provider/QueryProvider';
-import HeaderVisibility from '@/app/(anon)/components/layout/HeaderVisibility';
-import FooterVisibility from '@/app/(anon)/components/layout/FooterVisibility';
+import '@/app/globals.css';
+import AuthSessionProvider from '@/app/components/provider/AuthSessionProvider';
+import QueryProvider from '@/app/components/provider/QueryProvider';
+import HeaderVisibility from '@/app/components/layout/HeaderVisibility';
+import FooterVisibility from '@/app/components/layout/FooterVisibility';
 
 const pretendard = localFont({
   src: '../public/fonts/PretendardVariable.woff2',

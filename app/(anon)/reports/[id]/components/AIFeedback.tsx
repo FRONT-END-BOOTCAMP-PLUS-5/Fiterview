@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect } from 'react';
 import BrainIcon from '@/public/assets/icons/brain.svg';
-import { LoadingSpinner } from '@/app/(anon)/components/loading/LoadingSpinner';
+import { LoadingSpinner } from '@/app/components/loading/LoadingSpinner';
 import axios from 'axios';
 
 export default function AIFeedback({ reportId }: { reportId: number }) {

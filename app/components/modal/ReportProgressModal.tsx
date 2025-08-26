@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import Modal from '@/app/(anon)/components/modal/Modal';
-import ModalOverlay from '@/app/(anon)/components/modal/ModalOverlay';
+import Modal from '@/app/components/modal/Modal';
+import ModalOverlay from '@/app/components/modal/ModalOverlay';
 import { useModalStore } from '@/stores/useModalStore';
 import { useReportStore } from '@/stores/useReportStore';
-import { LoadingSpinner } from '@/app/(anon)/components/loading/LoadingSpinner';
-import ProgressBar from '@/app/(anon)/components/loading/ProgressBar';
+import { LoadingSpinner } from '@/app/components/loading/LoadingSpinner';
+import ProgressBar from '@/app/components/loading/ProgressBar';
 import { useReportProgress } from '@/hooks/useReportProgress';
 import { ProgressStep } from '@/types/progress';
 import { STORAGE_KEYS } from '@/constants/progress';

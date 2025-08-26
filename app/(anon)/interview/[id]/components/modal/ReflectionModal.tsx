@@ -1,6 +1,6 @@
 'use client';
 import InterviewModalOverlay from '@/app/(anon)/interview/[id]/components/modal/InterviewModalOverlay';
-import Modal from '@/app/(anon)/components/modal/Modal';
+import Modal from '@/app/components/modal/Modal';
 import { useModalStore } from '@/stores/useModalStore';
 import axios from 'axios';
 import { useParams } from 'next/navigation';

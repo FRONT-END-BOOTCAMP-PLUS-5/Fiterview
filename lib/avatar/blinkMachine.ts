@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import { BlinkIndices, BlinkState, BlinkParams } from '@/types/avatar';
-import { CONTINUOUS_SLOW_BLINK, sampleBlinkParams, setBlinkAmountUnified } from './blink';
+import {
+  CONTINUOUS_SLOW_BLINK,
+  sampleBlinkParams,
+  setBlinkAmountUnified,
+} from '@/lib/avatar/blink';
 
 type Ctx = {
   t: number;

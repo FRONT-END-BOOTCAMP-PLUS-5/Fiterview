@@ -2,7 +2,7 @@ import { QuestionRepository } from '@/backend/domain/repositories/QuestionReposi
 import { Question, AudioFileInfo } from '@/backend/domain/entities/Question';
 import { QuestionsResponse } from '@/backend/domain/dtos/QuestionsResponse';
 import { QuestionsRequest } from '@/backend/domain/dtos/QuestionsRequest';
-import { QuestionGenerator } from '../AI/GeminiLlmAI';
+import { QuestionGenerator } from '@/backend/infrastructure/AI/GeminiLlmAI';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import prisma from '@/utils/prisma';

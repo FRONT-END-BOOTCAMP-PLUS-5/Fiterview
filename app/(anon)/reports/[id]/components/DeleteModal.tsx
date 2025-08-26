@@ -1,7 +1,7 @@
 'use client';
 
-import Modal from '@/app/(anon)/components/modal/Modal';
-import ModalOverlay from '@/app/(anon)/components/modal/ModalOverlay';
+import Modal from '@/app/components/modal/Modal';
+import ModalOverlay from '@/app/components/modal/ModalOverlay';
 import AlertTriangle from '@/public/assets/icons/alert-triangle.svg';
 
 interface DeleteModalProps {

@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useMemo, useRef } from 'react';
-import Modal from '@/app/(anon)/components/modal/Modal';
+import Modal from '@/app/components/modal/Modal';
 import InterviewModalOverlay from '@/app/(anon)/interview/[id]/components/modal/InterviewModalOverlay';
 import { useModalStore } from '@/stores/useModalStore';
 import { useRouter } from 'next/navigation';
 import { YOUTUBE_URLS } from '@/constants/videourls';
-import { LoadingSpinner } from '@/app/(anon)/components/loading/LoadingSpinner';
+import { LoadingSpinner } from '@/app/components/loading/LoadingSpinner';
 
 function extractVideoId(watchUrl: string): string | null {
   try {

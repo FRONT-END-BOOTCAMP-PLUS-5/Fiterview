@@ -23,7 +23,7 @@ export default function Modal(props: ModalProps) {
 
   return (
     <div
-      className={`${sizeClasses[size]} bg-white rounded-[16px] shadow-[0px_8px_32px_0px_rgba(0,0,0,0.13)] inline-flex flex-col justify-start items-start gap-3`}
+      className={`${sizeClasses[size]} bg-white rounded-[10px] shadow-[0px_8px_32px_0px_rgba(0,0,0,0.13)] inline-flex flex-col justify-start items-start gap-3`}
     >
       <div className="self-stretch px-6 pt-6 flex flex-col justify-start items-end gap-4">
         <div className="self-stretch flex justify-between items-start">
@@ -44,7 +44,7 @@ export default function Modal(props: ModalProps) {
           </div>
           {!hideX && (
             <div
-              className="w-8 h-8 rounded-lg flex justify-end items-start cursor-pointer relative top-0"
+              className="w-8 h-8 flex justify-end items-start cursor-pointer relative top-0"
               onClick={onClose}
             >
               <Del width={16} height={16} strokeWidth={2.5} stroke="#94A3B8" />

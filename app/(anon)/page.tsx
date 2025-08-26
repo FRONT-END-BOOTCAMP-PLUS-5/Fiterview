@@ -1,7 +1,7 @@
-import FastFiterviewStart from '@/app/(anon)/home/components/FastFiterviewStart';
-import FiterviewPrepare from '@/app/(anon)/home/components/FiterviewPrepare';
-import FiterviewStart from '@/app/(anon)/home/components/FiterviewStart';
-import FiterviewStrength from './home/components/FiterviewStrength';
+import FastFiterviewStart from '@/app/(anon)/components/FastFiterviewStart';
+import FiterviewPrepare from '@/app/(anon)/components/FiterviewPrepare';
+import FiterviewStart from '@/app/(anon)/components/FiterviewStart';
+import FiterviewStrength from '@/app/(anon)/components/FiterviewStrength';
 
 export default function Page() {
   return (

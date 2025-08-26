@@ -1,4 +1,4 @@
-import { Feedback } from '../entities/Feedback';
+import { Feedback } from '@/backend/domain/entities/Feedback';
 
 export interface FeedbackRepository {
   getFeedback(feedback_report_id: number): Promise<Feedback>;

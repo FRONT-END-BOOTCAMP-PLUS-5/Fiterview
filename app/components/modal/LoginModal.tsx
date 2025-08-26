@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import ModalOverlay from '@/app/(anon)/components/modal/ModalOverlay';
-import Modal from '@/app/(anon)/components/modal/Modal';
+import ModalOverlay from '@/app/components/modal/ModalOverlay';
+import Modal from '@/app/components/modal/Modal';
 import { useModalStore } from '@/stores/useModalStore';
 
 export default function LoginModal() {
