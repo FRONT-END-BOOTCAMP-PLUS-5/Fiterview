@@ -11,10 +11,11 @@ export default function ErrorModal({ subTitle }: ErrorModalProps) {
   const { isOpen, closeModal } = useModalStore();
 
   const ModalButton = () => (
-    <button className="self-stretch h-11 bg-[#3B82F6] rounded-lg inline-flex justify-center items-center">
-      <div className="text-white text-sm font-semibold cursor-pointer" onClick={closeModal}>
-        확인
-      </div>
+    <button
+      className="self-stretch h-11 bg-[#3B82F6] rounded-lg inline-flex justify-center items-center cursor-pointer"
+      onClick={closeModal}
+    >
+      <div className="text-white text-sm font-semibold">확인</div>
     </button>
   );
 
