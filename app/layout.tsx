@@ -1,6 +1,11 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
-import './globals.css';
+import { Roboto } from 'next/font/google';
+import '@/app/globals.css';
+import AuthSessionProvider from '@/app/components/provider/AuthSessionProvider';
+import QueryProvider from '@/app/components/provider/QueryProvider';
+import HeaderVisibility from '@/app/components/layout/HeaderVisibility';
+import FooterVisibility from '@/app/components/layout/FooterVisibility';
 
 const pretendard = localFont({
   src: '../public/fonts/PretendardVariable.woff2',
@@ -12,6 +17,13 @@ const pretendard = localFont({
 const gmarket = localFont({
   src: '../public/fonts/GmarketSansTTFBold.ttf',
   variable: '--font-gmarket',
+  display: 'swap',
+});
+
+const roboto = Roboto({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-roboto',
   display: 'swap',
 });
 
@@ -36,7 +48,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${pretendard.variable} ${gmarket.variable} antialiased`}>{children}</body>
+      <body
+        className={`min-h-dvh ${pretendard.variable} ${gmarket.variable} ${roboto.variable} antialiased`}
+      >
+        <AuthSessionProvider>
+          <QueryProvider>
+            <HeaderVisibility />
+            {children}
+            <FooterVisibility />
+          </QueryProvider>
+        </AuthSessionProvider>
+      </body>
     </html>
   );
 }

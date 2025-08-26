@@ -1,3 +1,5 @@
-export default function Page() {
-  return <div></div>;
+import InterviewDashboard from '@/app/(anon)/interview/components/InterviewDashboard';
+
+export default function InterviewPage() {
+  return <InterviewDashboard />;
 }

@@ -1,12 +1,13 @@
 @import 'tailwindcss';
 
 :root {
-  --background: #ffffff;
+  --background: #f8fafc;
   --foreground: #202020;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-pretendard: var(--font-pretendard);
   --font-gmarket: var(--font-gmarket);
+  --font-roboto: var(--font-roboto);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -19,4 +20,25 @@ body {
 
 .font-gmarket {
   font-family: var(--font-gmarket), sans-serif !important;
+}
+
+.font-roboto {
+  font-family: var(--font-roboto), system-ui, -apple-system, sans-serif !important;
+}
+
+@keyframes bobbing {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.walker-bob {
+  animation: bobbing 0.8s ease-in-out infinite;
+  will-change: transform;
 }
