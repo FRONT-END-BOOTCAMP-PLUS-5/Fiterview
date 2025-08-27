@@ -17,13 +17,11 @@ export default function GenerateQuestionModal() {
         <button
           className="flex-1 h-11 px-5 bg-white rounded-lg outline-1 outline-offset-[-1px] outline-[#CBD5E1] flex justify-center items-center cursor-pointer"
           onClick={() => {
-            console.log('질문지만 볼래요 클릭, reportId:', reportId);
             closeModal();
             if (reportId) {
-              console.log('router.push 호출:', `/reports/${reportId}`);
               router.push(`/reports/${reportId}`);
             } else {
-              console.log('reportId가 없습니다');
+              alert('리포트를 찾을 수 없습니다.');
             }
           }}
         >
@@ -32,13 +30,11 @@ export default function GenerateQuestionModal() {
         <button
           className="flex-1 h-11 px-5 bg-[#3B82F6] rounded-lg flex justify-center items-center cursor-pointer"
           onClick={() => {
-            console.log('면접장으로 이동하기 클릭, reportId:', reportId);
             closeModal();
             if (reportId) {
-              console.log('router.push 호출:', `/interview/${reportId}`);
               router.push(`/interview/${reportId}`);
             } else {
-              console.log('reportId가 없습니다');
+              alert('리포트를 찾을 수 없습니다.');
             }
           }}
         >
@@ -63,7 +59,7 @@ export default function GenerateQuestionModal() {
 
 function ModalBody() {
   return (
-    <div className="self-stretch inline-flex flex-col items-start gap-4">
+    <div className="self-stretch inline-flex flex-col items-start gap-4 overflow-hidden">
       <div className="self-stretch inline-flex justify-center items-center">
         <div className="w-16 h-16 relative bg-slate-200 rounded-[32px] flex justify-center items-center">
           <Check width={32} height={32} stroke="#3B82F6" strokeWidth={2.67} />

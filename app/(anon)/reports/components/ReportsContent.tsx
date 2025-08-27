@@ -1,15 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSessionUser } from '@/lib/auth/useSessionUser';
 import UserDashboard from '@/app/(anon)/reports/components/UserDashboard';
 import ReportsList from '@/app/(anon)/reports/components/ReportsList';
 
 export default function ReportsContent() {
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useSessionUser();
 
   useEffect(() => {
     const fetchReports = async () => {
+      if (!user) {
+        setReports([]);
+        setLoading(false);
+        return;
+      }
+
       try {
         const response = await fetch('/api/reports', {
           credentials: 'include',
@@ -29,7 +37,7 @@ export default function ReportsContent() {
     };
 
     fetchReports();
-  }, []);
+  }, [user]);
 
   return (
     <div className="w-full max-w-6xl h-full mx-auto p-10 bg-white rounded-xl flex flex-col justify-start items-center gap-10">
