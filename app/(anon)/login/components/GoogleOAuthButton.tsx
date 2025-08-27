@@ -3,12 +3,8 @@ import { signIn, signOut } from 'next-auth/react';
 export default function GoogleOAuthButton() {
   const handleGoogleLogin = async () => {
     try {
-      console.log('Google 로그인 시작 - 현재 세션 정리 중...');
-
       // 기존 세션 정리
       await signOut({ redirect: false });
-
-      console.log('NextAuth 세션 정리 완료 - 브라우저 캐시 정리 중...');
 
       // 강제로 브라우저 캐시 정리
       if (typeof window !== 'undefined') {
@@ -30,12 +26,9 @@ export default function GoogleOAuthButton() {
             gapi.auth2.getAuthInstance().signOut();
           }
         }
-
-        console.log('브라우저 캐시 정리 완료');
       }
 
       // 잠시 대기 후 Google OAuth 로그인
-      console.log('Google OAuth 로그인 시도 중...');
       setTimeout(async () => {
         try {
           // Google OAuth 로그인 시도 (계정 선택 강제)

@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Brain from '@/public/assets/icons/brain.svg';
+import Chart from '@/public/assets/icons/chart.svg';
 import Chat from '@/public/assets/icons/message-circle.svg';
 import Target from '@/public/assets/icons/target.svg';
 
@@ -34,7 +34,7 @@ export default function FiterviewStrength() {
           }}
         >
           <StrengthCard
-            icon={<Brain width={28} height={28} stroke="#475569" strokeWidth={2.33} />}
+            icon={<Chart width={28} height={28} strokeWidth={0} stroke="#3B82F6" />}
             title="종합 AI 분석"
             description={
               <>

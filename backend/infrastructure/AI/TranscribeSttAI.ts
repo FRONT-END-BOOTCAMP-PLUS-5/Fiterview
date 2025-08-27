@@ -17,14 +17,13 @@ export class TranscribeSttAI implements SttAI {
         ...(audioRequest.language && { language: audioRequest.language }),
         response_format: 'json',
       });
-      console.log('✅ OpenAI API 응답 완료');
 
       return {
         text: transcription.text,
         language: audioRequest.language || 'auto',
       };
     } catch (error) {
-      console.error('❌ OpenAI STT Error:', error);
+      console.error('OpenAI STT Error:', error);
 
       // 구체적인 에러 메시지 제공
       if (error instanceof Error) {

@@ -50,7 +50,6 @@ export default function ReflectionModal() {
       await axios.put(`/api/reports/${reportId}`, {
         reflection: reflection,
       });
-      console.log('reflection submitted');
       replaceModal('video');
     } catch (error) {
       console.error(error);

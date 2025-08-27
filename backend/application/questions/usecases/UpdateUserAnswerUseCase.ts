@@ -31,7 +31,5 @@ export class UpdateUserAnswerUseCase {
         userAnswer,
       },
     });
-
-    console.log(`✅ 사용자 답변이 업데이트되었습니다. Report ID: ${reportId}, Order: ${order}`);
   }
 }

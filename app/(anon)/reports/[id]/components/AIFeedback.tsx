@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useState } from 'react';
-import BrainIcon from '@/public/assets/icons/brain.svg';
+import React, { useEffect, useState } from 'react';
+import Light from '@/public/assets/icons/light.svg';
 import { LoadingSpinner } from '@/app/components/loading/LoadingSpinner';
 import axios from 'axios';
 import { useReportStatusStore } from '@/stores/useReportStatusStore';
@@ -57,9 +57,9 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
   }, [reportId, currentStatus]);
 
   return (
-    <div className="w-full relative rounded-xl bg-white border border-slate-200 box-border flex flex-col items-start justify-start p-6 gap-5 text-left text-lg text-slate-800 font-['Inter']">
+    <div className="w-full relative rounded-xl bg-white border border-slate-200 box-border flex flex-col items-start justify-start p-6 gap-5 text-left text-lg text-slate-800">
       <div className="self-stretch flex flex-row items-center justify-start gap-2">
-        <BrainIcon className="w-5 h-5 relative overflow-hidden flex-shrink-0 text-[#3B82F6]" />
+        <Light width={20} height={20} strokeWidth={0.2} stroke="#3B82F6" />
         <b className="flex-1 relative leading-[21.6px]">AI 피드백</b>
       </div>
       <div className="self-stretch flex flex-col items-start justify-start gap-4 text-sm text-slate-500">

@@ -19,7 +19,7 @@ export class TranscribeAudioUseCase {
 
       return transcription;
     } catch (error) {
-      console.error('❌ STT 처리 실패:', error);
+      console.error('STT 처리 실패:', error);
       throw error;
     }
   }
