@@ -32,11 +32,11 @@ export default function AudioFileSection({
           questionNumber={`Q${selectedQuestion.order}`}
           questionText={selectedQuestion.question}
           audioUrl={
-            selectedQuestion.order
-              ? `/assets/audios/${reportId}/recording_${reportId}_${selectedQuestion.order}.mp3`
+            selectedQuestion.recording
+              ? `/assets/audios/${reportId}/${selectedQuestion.recording}`
               : undefined
           }
-          disabled={!selectedQuestion.order}
+          disabled={!selectedQuestion.recording}
           className="self-stretch"
         />
       )}
