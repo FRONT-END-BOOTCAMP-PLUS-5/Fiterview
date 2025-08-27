@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import ArrowDown from '@/public/assets/icons/arrow-down.svg';
 import ArrowUp from '@/public/assets/icons/arrow-up.svg';
-import { ReportStatus } from '@prisma/client';
+import { ReportStatus } from '@/types/report';
 
 interface QuestionItemProps {
   questionNumber: number;
@@ -173,7 +173,7 @@ export default function QuestionItem({
           {showSampleAnswer && (
             <div className="self-stretch justify-start text-blue-500 text-sm font-normal leading-snug">
               {sampleAnswer ||
-                (reportStatus === ReportStatus.COMPLETED
+                (reportStatus === 'COMPLETED'
                   ? '모범 답안이 존재하지 않습니다'
                   : '면접 후에 모범 답안이 공개됩니다.')}
             </div>
