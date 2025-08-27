@@ -23,7 +23,11 @@ body {
 }
 
 .font-roboto {
-  font-family: var(--font-roboto), system-ui, -apple-system, sans-serif !important;
+  font-family:
+    var(--font-roboto),
+    system-ui,
+    -apple-system,
+    sans-serif !important;
 }
 
 @keyframes bobbing {
@@ -31,7 +35,7 @@ body {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
   }
   100% {
     transform: translateY(0);
@@ -39,6 +43,6 @@ body {
 }
 
 .walker-bob {
-  animation: bobbing 0.8s ease-in-out infinite;
+  animation: bobbing 1.2s ease-in-out infinite;
   will-change: transform;
 }

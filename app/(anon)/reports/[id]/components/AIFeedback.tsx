@@ -1,13 +1,16 @@
 'use client';
 import React, { useEffect } from 'react';
 import Light from '@/public/assets/icons/light.svg';
+
 import { LoadingSpinner } from '@/app/components/loading/LoadingSpinner';
 import axios from 'axios';
+import { useReportStatusStore } from '@/stores/useReportStatusStore';
 
 export default function AIFeedback({ reportId }: { reportId: number }) {
-  const [feedback, setFeedback] = React.useState<any>(null);
-  const [loading, setLoading] = React.useState(true);
-  const [isCompleted, setIsCompleted] = React.useState(false);
+  const [feedback, setFeedback] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const { currentStatus } = useReportStatusStore();
 
   const scoreIsNumber = typeof feedback?.score === 'number';
   const progressPercent = feedback?.score ?? 0;
@@ -49,10 +52,10 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
       }
     };
 
-    if (reportId) {
+    if (reportId && currentStatus !== 'PENDING') {
       fetchFeedback();
     }
-  }, [reportId]);
+  }, [reportId, currentStatus]);
 
   return (
     <div className="w-full relative rounded-xl bg-white border border-slate-200 box-border flex flex-col items-start justify-start p-6 gap-5 text-left text-lg text-slate-800">

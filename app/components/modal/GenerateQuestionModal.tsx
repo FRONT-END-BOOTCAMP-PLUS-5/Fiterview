@@ -21,7 +21,7 @@ export default function GenerateQuestionModal() {
             if (reportId) {
               router.push(`/reports/${reportId}`);
             } else {
-              console.log('reportId가 없습니다');
+              alert('리포트를 찾을 수 없습니다.');
             }
           }}
         >
@@ -34,7 +34,7 @@ export default function GenerateQuestionModal() {
             if (reportId) {
               router.push(`/interview/${reportId}`);
             } else {
-              console.log('reportId가 없습니다');
+              alert('리포트를 찾을 수 없습니다.');
             }
           }}
         >
@@ -59,7 +59,7 @@ export default function GenerateQuestionModal() {
 
 function ModalBody() {
   return (
-    <div className="self-stretch inline-flex flex-col items-start gap-4">
+    <div className="self-stretch inline-flex flex-col items-start gap-4 overflow-hidden">
       <div className="self-stretch inline-flex justify-center items-center">
         <div className="w-16 h-16 relative bg-slate-200 rounded-[32px] flex justify-center items-center">
           <Check width={32} height={32} stroke="#3B82F6" strokeWidth={2.67} />

@@ -17,7 +17,6 @@ export default function Reflection({
   const [tempText, setTempText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
-  // test api call
   useEffect(() => {
     const dbFetch = async () => {
       const result = await axios.get(`/api/reports/${reportId}`, {

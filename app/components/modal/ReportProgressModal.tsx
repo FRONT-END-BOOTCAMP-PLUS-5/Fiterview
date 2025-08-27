@@ -15,7 +15,8 @@ type Step = ProgressStep;
 
 export default function ReportProgressModal() {
   const { isOpen, currentStep, closeModal, replaceModal, openModal } = useModalStore();
-  const { jobId, reportId, setReportId, setJobId, onReportCompleted } = useReportStore();
+  const { jobId, reportId, setReportId, setJobId, clearJobId, onReportCompleted } =
+    useReportStore();
   const [sampleMessageIndex, setSampleMessageIndex] = useState(0);
 
   // 마운트 시 작업 ID 복구
@@ -50,6 +51,7 @@ export default function ReportProgressModal() {
       enabled: isOpen && currentStep === 'reportProgress' && (!!jobId || !!reportId),
       jobId,
       reportId,
+      onJobIdClear: () => clearJobId(),
     });
 
   useEffect(() => {
@@ -199,7 +201,7 @@ function getCopy(
       return {
         title: '질문 생성 중',
         description: samples[sampleMessageIndex ?? 0],
-        icon: '🤖',
+        icon: '💡',
       };
     }
     case 'creating_report':
@@ -217,7 +219,7 @@ function getCopy(
     case 'error':
       return {
         title: '오류 발생',
-        description: '생성 중 문제가 발생했어요.',
+        description: '작업을 진행할 수 없습니다. 다시 시도해주세요.',
         icon: '❌',
       };
     default:

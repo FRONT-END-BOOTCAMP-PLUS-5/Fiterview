@@ -6,6 +6,7 @@ import { useUploadFiles } from '@/hooks/useUploadFiles';
 import { useState, useEffect } from 'react';
 import { useModalStore } from '@/stores/useModalStore';
 import { useReportStore } from '@/stores/useReportStore';
+import { useSessionUser } from '@/lib/auth/useSessionUser';
 import UploadOptions from '@/app/(anon)/interview/components/UploadOptions';
 import UploadedFiles from '@/app/(anon)/interview/components/UploadedFiles';
 import ErrorModal from '@/app/components/modal/ErrorModal';
@@ -34,6 +35,7 @@ export default function QuickInterviewForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { openModal, currentStep, isOpen } = useModalStore();
   const { reportId, setReportId, setJobId, setOnReportCompleted } = useReportStore();
+  const { user } = useSessionUser();
 
   useEffect(() => {
     if (onReportCompleted) {
@@ -46,6 +48,11 @@ export default function QuickInterviewForm({
 
   const submitFiles = async () => {
     if (uploadedFiles.length === 0 || isSubmitting) return;
+
+    if (!user) {
+      openModal('login');
+      return;
+    }
 
     try {
       setIsSubmitting(true);
