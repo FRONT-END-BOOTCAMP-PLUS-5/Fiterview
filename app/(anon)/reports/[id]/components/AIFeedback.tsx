@@ -1,7 +1,6 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Light from '@/public/assets/icons/light.svg';
-
 import { LoadingSpinner } from '@/app/components/loading/LoadingSpinner';
 import axios from 'axios';
 import { useReportStatusStore } from '@/stores/useReportStatusStore';
