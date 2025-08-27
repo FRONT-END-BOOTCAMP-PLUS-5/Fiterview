@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import ArrowDown from '@/public/assets/icons/arrow-down.svg';
 import ArrowUp from '@/public/assets/icons/arrow-up.svg';
+import { ReportStatus } from '@/types/report';
 
 interface QuestionItemProps {
   questionNumber: number;
@@ -13,6 +14,7 @@ interface QuestionItemProps {
   showActions?: boolean;
   className?: string;
   reportId?: number;
+  reportStatus?: ReportStatus;
   onQuestionSelect?: () => void;
   onUserAnswerUpdate?: (questionOrder: number, newUserAnswer: string) => void;
 }
@@ -26,6 +28,7 @@ export default function QuestionItem({
   showActions = false,
   className = '',
   reportId,
+  reportStatus,
   onQuestionSelect,
   onUserAnswerUpdate,
 }: QuestionItemProps) {
@@ -169,7 +172,10 @@ export default function QuestionItem({
           {/* 모범 답안 */}
           {showSampleAnswer && (
             <div className="self-stretch justify-start text-blue-500 text-sm font-normal leading-snug">
-              {sampleAnswer || '모범 답안이 존재하지 않습니다'}
+              {sampleAnswer ||
+                (reportStatus === 'COMPLETED'
+                  ? '모범 답안이 존재하지 않습니다'
+                  : '면접 후에 모범 답안이 공개됩니다.')}
             </div>
           )}
 
