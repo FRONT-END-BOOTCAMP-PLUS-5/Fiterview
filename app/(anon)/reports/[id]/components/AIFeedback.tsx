@@ -26,28 +26,23 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
         });
 
         const data = response.data;
-        console.log('Existing feedback found:', data);
 
         setFeedback(data);
         setIsCompleted(true);
       } catch (err: any) {
         if (err.response?.status === 409) {
-          console.log('Report is not completed');
           setIsCompleted(false);
           return;
         } else if (err.response?.status === 404) {
-          console.log('No existing feedback found');
+          alert('No existing feedback found');
           setIsCompleted(false);
           return;
         } else {
-          console.error(
-            'Failed to fetch existing feedback:',
-            err.response?.status,
-            err.response?.data
-          );
-          throw new Error(
+          alert(
             `Failed to fetch existing feedback: ${err.response?.status} - ${err.response?.data?.error || err.message}`
           );
+          setIsCompleted(false);
+          return;
         }
       } finally {
         setLoading(false);
