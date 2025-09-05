@@ -7,14 +7,16 @@ export interface UploadedItem {
   type: string;
   source: SourceType;
 }
-export interface FileItemProps {
-  file: UploadedItem;
-  onRemove?: (id: string) => void;
+export interface RemoveHandler {
+  onRemove: (id: string) => void;
 }
-export interface UploadedFilesProps {
+export interface FileItemProps extends RemoveHandler {
+  file: UploadedItem;
+  maxLength: number;
+}
+export interface UploadedFilesProps extends RemoveHandler {
   files: UploadedItem[];
-  onRemove?: (id: string) => void;
-  limitExceeded?: boolean;
+  limitExceeded: boolean;
 }
 export interface UploadOptionsProps {
   onAddFiles: (files: File[], source: SourceType) => void;

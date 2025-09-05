@@ -8,10 +8,12 @@ import { useModalStore } from '@/stores/useModalStore';
 import { useReportStore } from '@/stores/useReportStore';
 import { useSessionUser } from '@/lib/auth/useSessionUser';
 import UploadOptions from '@/app/(anon)/interview/components/UploadOptions';
-import UploadedFiles from '@/app/(anon)/interview/components/UploadedFiles';
+import FilesList from '@/app/components/question/FilesList';
+import FileItem from '@/app/components/question/FileItem';
 import ErrorModal from '@/app/components/modal/ErrorModal';
 import GenerateQuestionModal from '@/app/components/modal/GenerateQuestionModal';
 import Sparkles from '@/public/assets/icons/sparkles.svg';
+import { NoneFiles } from '@/app/components/question/NoneFiles';
 
 interface QuickInterviewFormProps {
   onReportCreated?: () => void;
@@ -111,14 +113,20 @@ export default function QuickInterviewForm({
       <UploadOptions onAddFiles={handleAddFiles} />
 
       <div className="h-full self-stretch flex flex-col justify-start items-start gap-4 mt-10">
-        <UploadedFiles
+        <FilesList
           files={uploadedFiles}
-          limitExceeded={limitExceeded}
           onRemove={handleRemoveFile}
+          maxFileLength={48}
+          limitExceeded={limitExceeded}
+          emptyComponent={<NoneFiles iconSize={48} gapSize={3} iconBgSize={20} />}
+          fileItemComponent={FileItem}
+          noneContainerClass="self-stretch flex flex-col justify-start items-start gap-2 h-[328px]"
+          containerClass="self-stretch flex flex-col justify-start items-start gap-2 h-[328px]"
+          warningClass="text-red-500 text-xs pl-1"
         />
 
         <motion.button
-          className={`mt-6 w-full h-12 py-[14px] rounded-xl flex justify-center items-center gap-3 ${
+          className={`w-full h-12 rounded-xl flex justify-center items-center gap-3 ${
             uploadedFiles.length === 0 || isSubmitting
               ? 'bg-slate-100 cursor-not-allowed'
               : 'bg-[#3B82F6] cursor-pointer'

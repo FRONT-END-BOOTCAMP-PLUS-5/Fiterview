@@ -7,12 +7,14 @@ import { useUploadFiles } from '@/hooks/useUploadFiles';
 import { useModalStore } from '@/stores/useModalStore';
 import { useReportStore } from '@/stores/useReportStore';
 import { useSessionUser } from '@/lib/auth/useSessionUser';
-import FilesUpload from '@/app/(anon)/components/quick/FilesUpload';
 import UploadOptions from '@/app/(anon)/interview/components/UploadOptions';
 import ErrorModal from '@/app/components/modal/ErrorModal';
 import LoginModal from '@/app/components/modal/LoginModal';
 import GenerateQuestionModal from '@/app/components/modal/GenerateQuestionModal';
 import Sparkles from '@/public/assets/icons/sparkles.svg';
+import { NoneFiles } from '@/app/components/question/NoneFiles';
+import FileItem from '@/app/components/question/FileItem';
+import FilesList from '@/app/components/question/FilesList';
 
 interface QuickInterviewFormProps {
   onReportCreated?: () => void;
@@ -31,6 +33,10 @@ export default function InterviewForm({ onReportCreated }: QuickInterviewFormPro
   const { openModal, currentStep, isOpen } = useModalStore();
   const { reportId, setReportId, setJobId } = useReportStore();
   const { user } = useSessionUser();
+  const gridClass =
+    uploadedFiles.length === 1
+      ? 'grid grid-cols-1 gap-2 w-full h-full'
+      : 'grid grid-cols-2 gap-2 w-full h-full';
 
   const submitFiles = async () => {
     if (uploadedFiles.length === 0 || isSubmitting) return;
@@ -98,10 +104,16 @@ export default function InterviewForm({ onReportCreated }: QuickInterviewFormPro
       <UploadOptions onAddFiles={handleAddFiles} />
 
       <div className="min-h-[227px] self-stretch flex flex-col justify-between items-start">
-        <FilesUpload
+        <FilesList
           files={uploadedFiles}
-          limitExceeded={limitExceeded}
           onRemove={handleRemoveFile}
+          maxFileLength={32}
+          limitExceeded={limitExceeded}
+          emptyComponent={<NoneFiles iconSize={32} gapSize={2} iconBgSize={14} />}
+          fileItemComponent={FileItem}
+          noneContainerClass="self-stretch flex flex-col justify-start items-start gap-2 h-[147px]"
+          containerClass={gridClass}
+          warningClass="text-start text-red-500 text-xs pl-1 col-span-2"
         />
 
         <motion.button
