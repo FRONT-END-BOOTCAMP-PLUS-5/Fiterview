@@ -7,7 +7,6 @@ import { useUploadFiles } from '@/hooks/useUploadFiles';
 import { useModalStore } from '@/stores/useModalStore';
 import { useReportStore } from '@/stores/useReportStore';
 import { useSessionUser } from '@/lib/auth/useSessionUser';
-import UploadOptions from '@/app/(anon)/interview/components/UploadOptions';
 import ErrorModal from '@/app/components/modal/ErrorModal';
 import LoginModal from '@/app/components/modal/LoginModal';
 import GenerateQuestionModal from '@/app/components/modal/GenerateQuestionModal';
@@ -15,6 +14,7 @@ import Sparkles from '@/public/assets/icons/sparkles.svg';
 import { NoneFiles } from '@/app/components/question/NoneFiles';
 import FileItem from '@/app/components/question/FileItem';
 import FilesList from '@/app/components/question/FilesList';
+import FilesOptions from '@/app/components/question/FilesOptions';
 
 interface QuickInterviewFormProps {
   onReportCreated?: () => void;
@@ -101,7 +101,7 @@ export default function InterviewForm({ onReportCreated }: QuickInterviewFormPro
         <h2 className="justify-start text-[#1E293B] text-[20px] font-semibold">빠른 AI 면접</h2>
       </div>
 
-      <UploadOptions onAddFiles={handleAddFiles} />
+      <FilesOptions onAddFiles={handleAddFiles} />
 
       <div className="min-h-[227px] self-stretch flex flex-col justify-between items-start">
         <FilesList
