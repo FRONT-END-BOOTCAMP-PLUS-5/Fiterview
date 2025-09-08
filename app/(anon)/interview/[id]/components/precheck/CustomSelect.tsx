@@ -41,7 +41,8 @@ export default function CustomSelect({
   };
 
   const displayLabel = selected ? selected.label : placeholder;
-  const { truncatedText, originalText, isTruncated } = useTruncateText(displayLabel, {
+  const { truncatedText, originalText, isTruncated } = useTruncateText({
+    text: displayLabel,
     maxLength: 25,
   });
 
