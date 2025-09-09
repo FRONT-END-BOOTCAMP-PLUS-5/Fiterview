@@ -3,6 +3,8 @@
 import { useEffect } from 'react';
 import { DEVICE_STATUS_COLOR, DEVICE_STATUS_TEXT } from '@/constants/devicestatus';
 import { useMediaStore } from '@/stores/useMediaStore';
+import Notice from '@/public/assets/icons/notice.svg';
+import NoticeDeviceAuth from '@/app/(anon)/interview/[id]/components/precheck/NoticeDeviceAuth';
 
 // MediaDevices 상태 표시
 export default function CheckDeviceStatus() {
@@ -34,7 +36,24 @@ export default function CheckDeviceStatus() {
   return (
     <>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-800  cursor-default">기기 상태 확인</h3>
+        <div className="relative group flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-gray-800 cursor-default">기기 상태 확인</h3>
+          <Notice
+            width={20}
+            height={20}
+            strokeWidth={1.6}
+            className="stroke-[#6FA5DA] opacity-50 cursor-pointer"
+            tabIndex={0}
+            aria-describedby="device-auth-tip"
+          />
+          <div
+            id="device-auth-tip"
+            role="tooltip"
+            className="hidden group-hover:block group-focus-within:block"
+          >
+            <NoticeDeviceAuth />
+          </div>
+        </div>
         <button
           onClick={handleRecheck}
           className="px-3 py-1 rounded-[6px] text-[12px] font-medium text-[#64748B] border border-[#E2E8F0] border-solid hover:bg-[#F1F5F9] transition-colors duration-200 cursor-pointer"
