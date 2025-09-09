@@ -1,5 +1,6 @@
 'use client';
 
+import { useMediaStore } from '@/stores/useMediaStore';
 import { useEffect, useRef } from 'react';
 
 interface MicVisualizerProps {
@@ -19,34 +20,24 @@ export default function MicVisualizer({
   const analyserRef = useRef<AnalyserNode | null>(null);
   const freqDataRef = useRef<Uint8Array | null>(null);
   const rafIdRef = useRef<number | null>(null);
-  const visStreamRef = useRef<MediaStream | null>(null);
   const barsRef = useRef<HTMLSpanElement[]>([]);
-  const requestNumRef = useRef(0); // 마이크 스트림마다의 번호표
-  const mountedRef = useRef(false);
+
+  // 전역 마이크 스트림 사용
+  const { micStream } = useMediaStore();
 
   const clampedBase = Math.min(0.95, Math.max(0, baseScale));
   const H = heightPx ?? 16;
 
   const start = async () => {
     try {
-      // 최신 요청인지 확인
-      const requestNum = ++requestNumRef.current;
       /* 1. 마이크 스트림 세팅 */
-      if (audioCtxRef.current) return;
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      // 활성 상태가 아니거나 요청 번호가 달라졌으면 즉시 정리
-      if (!mountedRef.current || requestNum !== requestNumRef.current || !active) {
-        try {
-          stream.getTracks().forEach((t) => t.stop());
-        } catch {}
-        return;
-      }
-      visStreamRef.current = stream;
+      if (!micStream) return;
+
       /* 2. AudioContext 생성 후 소스 노드 생성 */
       const AC = (window as any).AudioContext || (window as any).webkitAudioContext;
       const ctx: AudioContext = new AC();
       audioCtxRef.current = ctx;
-      const source = ctx.createMediaStreamSource(stream);
+      const source = ctx.createMediaStreamSource(micStream);
       /* 3. createAnalyser()로 분석 노드 붙이고 파라미터 설정 */
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 64; // 해상도 파라미터
@@ -88,8 +79,6 @@ export default function MicVisualizer({
 
   // 사용한 리소스들 해제
   const stop = () => {
-    // 중복 대비 요청 번호 증가
-    ++requestNumRef.current;
     if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
     rafIdRef.current = null;
     try {
@@ -98,10 +87,7 @@ export default function MicVisualizer({
     audioCtxRef.current = null;
     analyserRef.current = null;
     freqDataRef.current = null;
-    if (visStreamRef.current) {
-      visStreamRef.current.getTracks().forEach((t) => t.stop());
-      visStreamRef.current = null;
-    }
+
     // 막대 높이 초기화
     for (let i = 0; i < barsRef.current.length; i++) {
       const el = barsRef.current[i];
@@ -113,17 +99,10 @@ export default function MicVisualizer({
   };
 
   useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (active) start();
+    if (active && micStream) start();
     else stop();
     return () => stop();
-  }, [active]);
+  }, [active, micStream]);
 
   return (
     <div className="flex items-center gap-[3px]" style={{ height: `${H}px` }}>

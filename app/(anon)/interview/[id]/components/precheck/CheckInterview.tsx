@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import CheckCircle from '@/public/assets/icons/check-circle.svg';
 import NoticeList from '@/app/(anon)/interview/[id]/components/precheck/NoticeList';
 import CheckDeviceStatus from '@/app/(anon)/interview/[id]/components/precheck/CheckDeviceStatus';
@@ -8,6 +8,7 @@ import ChooseDevice from '@/app/(anon)/interview/[id]/components/precheck/Choose
 import Play from '@/public/assets/icons/play.svg';
 import X from '@/public/assets/icons/x.svg';
 import { useRouter } from 'next/navigation';
+import { useMediaStore } from '@/stores/useMediaStore';
 
 type DeviceInfo = {
   deviceId: string;
@@ -16,25 +17,32 @@ type DeviceInfo = {
 export default function CheckInterview() {
   const router = useRouter();
   const [started, setStarted] = useState(false);
-  const [availableCameras, setAvailableCameras] = useState<DeviceInfo[]>([]);
-  const [availableMicrophones, setAvailableMicrophones] = useState<DeviceInfo[]>([]);
-  const [selectedCamera, setSelectedCamera] = useState<string>('');
-  const [selectedMicrophone, setSelectedMicrophone] = useState<string>('');
-  const [isReady, setIsReady] = useState(false);
-  const tempStreamRef = useRef<MediaStream | null>(null);
-  const requestNumRef = useRef(0); // 마이크/카메라 스트림마다의 번호표
+  const {
+    cameras,
+    mics,
+    selectedCamId,
+    selectedMicId,
+    setSelectedCam,
+    setSelectedMic,
+    camStatus,
+    micStatus,
+    netStatus,
+    initDevices,
+    runAllChecks,
+    cleanup,
+  } = useMediaStore();
+  const isReady = camStatus === 'ok' && micStatus === 'ok' && netStatus === 'ok';
 
   const handleDeviceChange = (cameraId: string, microphoneId: string) => {
-    setSelectedCamera(cameraId);
-    setSelectedMicrophone(microphoneId);
-  };
-
-  const handleStatusChange = (s: { mic: string; cam: string; net: string }) => {
-    // 카메라, 마이크가 모두 정상일 때만 활성화
-    setIsReady(s.mic === 'ok' && s.cam === 'ok');
+    setSelectedCam(cameraId);
+    setSelectedMic(microphoneId);
+    runAllChecks();
   };
 
   const handleStart = useCallback(() => {
+    if (!isReady) {
+      return;
+    }
     try {
       const AudioCtx = (window as any).AudioContext || (window as any).webkitAudioContext;
       if (AudioCtx) {
@@ -48,93 +56,17 @@ export default function CheckInterview() {
     // TTS 활성화 신호 브로드캐스트
     window.dispatchEvent(new CustomEvent('fiterview:start'));
     setStarted(true);
-  }, []);
+  }, [isReady]);
 
   const handleCancel = () => {
     router.push('/interview');
   };
 
-  // 공통 장치 목록 가져오기 로직
+  // 공통 장치 목록/상태 초기화
   useEffect(() => {
-    const getDevices = async () => {
-      const requestNum = ++requestNumRef.current;
-      let stream: MediaStream | null = null;
-      try {
-        // 사용자에게 미디어 권한 요청 (장치 라벨을 가져오기 위해)
-        stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-        // 최신 요청인지 확인
-        if (requestNum !== requestNumRef.current) {
-          try {
-            stream.getTracks().forEach((t) => t.stop());
-          } catch (_) {}
-          return;
-        }
-        tempStreamRef.current = stream;
-
-        const devices = await navigator.mediaDevices.enumerateDevices();
-
-        const cameras = devices
-          .filter((device) => device.kind === 'videoinput')
-          .map((device) => ({
-            deviceId: device.deviceId,
-            label: device.label || `카메라 ${device.deviceId.slice(0, 8)}`,
-          }));
-
-        const microphones = devices
-          .filter((device) => device.kind === 'audioinput')
-          .map((device) => ({
-            deviceId: device.deviceId,
-            label: device.label || `마이크 ${device.deviceId.slice(0, 8)}`,
-          }));
-
-        setAvailableCameras(cameras);
-        setAvailableMicrophones(microphones);
-
-        // 기본값 설정
-        if (cameras.length > 0) {
-          setSelectedCamera(cameras[0].deviceId);
-        }
-        if (microphones.length > 0) {
-          setSelectedMicrophone(microphones[0].deviceId);
-        }
-      } catch (error) {
-        console.error('장치 목록을 가져올 수 없습니다:', error);
-      } finally {
-        // 권한 확인용 임시 스트림 정리 (로컬 스트림과 ref 모두 정리)
-        try {
-          stream?.getTracks?.().forEach((t) => t.stop());
-        } catch (_) {}
-        if (tempStreamRef.current) {
-          try {
-            tempStreamRef.current.getTracks().forEach((t) => t.stop());
-          } catch (_) {}
-          tempStreamRef.current = null;
-        }
-      }
-    };
-
-    getDevices();
-
-    const stopAll = () => {
-      if (tempStreamRef.current) {
-        try {
-          tempStreamRef.current.getTracks().forEach((t) => t.stop());
-        } catch (_) {}
-        tempStreamRef.current = null;
-      }
-      // 토큰 갱신하여 지연 중인 비동기 루틴 무효화
-      requestNumRef.current++;
-    };
-
-    window.addEventListener('pagehide', stopAll);
-    window.addEventListener('beforeunload', stopAll);
-
-    return () => {
-      window.removeEventListener('pagehide', stopAll);
-      window.removeEventListener('beforeunload', stopAll);
-      stopAll();
-    };
-  }, []);
+    initDevices().then(runAllChecks);
+    return () => cleanup();
+  }, [initDevices, runAllChecks, cleanup]);
 
   if (started) return null;
 
@@ -157,21 +89,15 @@ export default function CheckInterview() {
         </section>
         <section>
           <ChooseDevice
-            availableCameras={availableCameras}
-            availableMicrophones={availableMicrophones}
-            selectedCamera={selectedCamera}
-            selectedMicrophone={selectedMicrophone}
+            availableCameras={cameras as DeviceInfo[]}
+            availableMicrophones={mics as DeviceInfo[]}
+            selectedCamera={selectedCamId || ''}
+            selectedMicrophone={selectedMicId || ''}
             onDeviceChange={handleDeviceChange}
           />
         </section>
         <section>
-          <CheckDeviceStatus
-            availableCameras={availableCameras}
-            availableMicrophones={availableMicrophones}
-            selectedCamera={selectedCamera}
-            selectedMicrophone={selectedMicrophone}
-            onStatusChange={handleStatusChange}
-          />
+          <CheckDeviceStatus />
         </section>
         <section className="flex justify-center gap-[16px]">
           <button

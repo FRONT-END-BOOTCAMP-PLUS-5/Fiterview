@@ -12,7 +12,7 @@ export const DEVICE_STATUS_TEXT: Record<DeviceStatus, string> = {
 export const DEVICE_STATUS_COLOR: Record<DeviceStatus, string> = {
   ok: 'bg-[#3B82F6]',
   checking: 'bg-[#3B82F6] opacity-50',
-  blocked: 'bg-[#EF4444]',
+  blocked: 'bg-slate-300',
   'not-found': 'bg-slate-300',
   offline: 'bg-[#EF4444]',
   error: 'bg-[#EF4444]',

@@ -1,152 +1,27 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { DEVICE_STATUS_COLOR, DEVICE_STATUS_TEXT } from '@/constants/devicestatus';
-import type { DeviceStatus as Status } from '@/types/interview';
+import { useMediaStore } from '@/stores/useMediaStore';
 
-type DeviceInfo = {
-  deviceId: string;
-  label: string;
-};
+// MediaDevices 상태 표시
+export default function CheckDeviceStatus() {
+  const { camStatus, micStatus, netStatus, runAllChecks, checkNetwork } = useMediaStore();
 
-interface CheckDeviceStatusProps {
-  availableCameras: DeviceInfo[];
-  availableMicrophones: DeviceInfo[];
-  selectedCamera: string;
-  selectedMicrophone: string;
-  onStatusChange?: (statuses: { mic: Status; cam: Status; net: Status }) => void;
-}
-
-function stopStream(stream: MediaStream | null) {
-  if (!stream) return;
-  for (const track of stream.getTracks()) {
-    track.stop();
-  }
-}
-
-// MediaDevices API를 사용하여 마이크,카메라,네트워크 연결 상태를 확인
-export default function CheckDeviceStatus({
-  availableCameras,
-  availableMicrophones,
-  selectedCamera,
-  selectedMicrophone,
-  onStatusChange,
-}: CheckDeviceStatusProps) {
-  const [micStatus, setMicStatus] = useState<Status>('checking');
-  const [camStatus, setCamStatus] = useState<Status>('checking');
-  const [netStatus, setNetStatus] = useState<Status>('checking');
-
-  async function checkMicrophone() {
-    try {
-      if (!navigator.mediaDevices?.enumerateDevices || !navigator.mediaDevices?.getUserMedia) {
-        setMicStatus('not-found');
-        return;
-      }
-
-      // 선택된 마이크가 있는지 확인
-      if (!selectedMicrophone || availableMicrophones.length === 0) {
-        setMicStatus('not-found');
-        return;
-      }
-
-      let stream: MediaStream | null = null;
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          audio: { deviceId: selectedMicrophone },
-        });
-        setMicStatus('ok');
-      } catch (err: unknown) {
-        const message = (err as Error)?.name || '';
-        if (message === 'NotAllowedError' || message === 'SecurityError') setMicStatus('blocked');
-        else if (message === 'NotFoundError' || message === 'OverconstrainedError')
-          setMicStatus('not-found');
-        else setMicStatus('error');
-      } finally {
-        stopStream(stream);
-      }
-    } catch {
-      setMicStatus('error');
+  const handleRecheck = async () => {
+    if (camStatus === 'blocked' || micStatus === 'blocked') {
+    } else {
+      await runAllChecks();
     }
-  }
-
-  async function checkCamera() {
-    try {
-      if (!navigator.mediaDevices?.enumerateDevices || !navigator.mediaDevices?.getUserMedia) {
-        setCamStatus('not-found');
-        return;
-      }
-
-      // 선택된 카메라가 있는지 확인
-      if (!selectedCamera || availableCameras.length === 0) {
-        setCamStatus('not-found');
-        return;
-      }
-
-      let stream: MediaStream | null = null;
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { deviceId: selectedCamera },
-        });
-        setCamStatus('ok');
-      } catch (err: unknown) {
-        const message = (err as Error)?.name || '';
-        if (message === 'NotAllowedError' || message === 'SecurityError') setCamStatus('blocked');
-        else if (message === 'NotFoundError' || message === 'OverconstrainedError')
-          setCamStatus('not-found');
-        else setCamStatus('error');
-      } finally {
-        stopStream(stream);
-      }
-    } catch {
-      setCamStatus('error');
-    }
-  }
-
-  async function checkNetwork() {
-    try {
-      if (!navigator.onLine) {
-        setNetStatus('offline');
-        return;
-      }
-
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 5000); //5초 요청 후 취소
-      try {
-        // 인터넷 연결 상태 확인
-        const res = await fetch(`/assets/icons/frame.svg?t=${Date.now()}`, {
-          method: 'GET',
-          cache: 'no-store',
-          signal: controller.signal,
-        });
-        setNetStatus(res.ok ? 'ok' : navigator.onLine ? 'error' : 'offline');
-      } catch {
-        setNetStatus('offline');
-      } finally {
-        clearTimeout(timer);
-      }
-    } catch {
-      setNetStatus('error');
-    }
-  }
-
-  /*
-  장치 연결 상태 재확인 함수
-  */
-  async function runAll() {
-    setMicStatus('checking');
-    setCamStatus('checking');
-    setNetStatus('checking');
-    await Promise.allSettled([checkMicrophone(), checkCamera(), checkNetwork()]);
-  }
-
+  };
+  // 네트워크 상태만 이벤트 기반으로 갱신 (디바이스 검사는 부모가 호출)
   useEffect(() => {
-    runAll();
-
+    checkNetwork();
     function handleOnline() {
       checkNetwork();
     }
     function handleOffline() {
-      setNetStatus('offline');
+      checkNetwork();
     }
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
@@ -154,18 +29,14 @@ export default function CheckDeviceStatus({
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [selectedCamera, selectedMicrophone]); // 선택된 장치가 변경될 때마다 재확인
-
-  useEffect(() => {
-    onStatusChange?.({ mic: micStatus, cam: camStatus, net: netStatus });
-  }, [micStatus, camStatus, netStatus, onStatusChange]);
+  }, [checkNetwork]);
 
   return (
     <>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-800  cursor-default">기기 상태 확인</h3>
         <button
-          onClick={runAll}
+          onClick={handleRecheck}
           className="px-3 py-1 rounded-[6px] text-[12px] font-medium text-[#64748B] border border-[#E2E8F0] border-solid hover:bg-[#F1F5F9] transition-colors duration-200 cursor-pointer"
         >
           재확인
@@ -179,7 +50,7 @@ export default function CheckDeviceStatus({
               <span
                 className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[camStatus]}`}
               ></span>
-              <p className="text-[#64748B] text-[14px] cursor-default">
+              <p className="w-[96px] text-[#64748B] text-[14px] cursor-default">
                 {DEVICE_STATUS_TEXT[camStatus]}
               </p>
             </span>
@@ -190,7 +61,7 @@ export default function CheckDeviceStatus({
               <span
                 className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[micStatus]}`}
               ></span>
-              <p className="text-[#64748B] text-[14px] cursor-default">
+              <p className="w-[96px] text-[#64748B] text-[14px] cursor-default">
                 {DEVICE_STATUS_TEXT[micStatus]}
               </p>
             </span>
@@ -201,7 +72,7 @@ export default function CheckDeviceStatus({
               <span
                 className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[netStatus]}`}
               ></span>
-              <p className="text-[#64748B] text-[14px] cursor-default">
+              <p className="w-[96px] text-[#64748B] text-[14px] cursor-default">
                 {DEVICE_STATUS_TEXT[netStatus]}
               </p>
             </span>
