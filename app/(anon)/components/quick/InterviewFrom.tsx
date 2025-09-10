@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useUploadFiles } from '@/hooks/useUploadFiles';
@@ -31,6 +31,18 @@ export default function InterviewForm({ onReportCreated }: QuickInterviewFormPro
   const { openModal, currentStep, isOpen } = useModalStore();
   const { reportId, setReportId, setJobId } = useReportStore();
   const { user } = useSessionUser();
+  console.log('user', user);
+  useEffect(() => {
+    async function insertTestFile() {
+      if (user?.username === 'test2') {
+        const response = await fetch('/assets/file/김피터_포트폴리오.pdf');
+        const blob = await response.blob();
+        const file = new File([blob], '김피터_포트폴리오.pdf', { type: 'application/pdf' });
+        handleAddFiles([file], 'portfolio');
+      }
+    }
+    insertTestFile();
+  }, [user]);
 
   const submitFiles = async () => {
     if (uploadedFiles.length === 0 || isSubmitting) return;
