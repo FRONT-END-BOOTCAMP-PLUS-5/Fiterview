@@ -6,6 +6,7 @@ import AuthSessionProvider from '@/app/components/provider/AuthSessionProvider';
 import QueryProvider from '@/app/components/provider/QueryProvider';
 import HeaderVisibility from '@/app/components/layout/HeaderVisibility';
 import FooterVisibility from '@/app/components/layout/FooterVisibility';
+import MediaStreamCleanup from '@/app/components/layout/MediaStreamCleanup';
 
 const pretendard = localFont({
   src: '../public/fonts/PretendardVariable.woff2',
@@ -54,6 +55,7 @@ export default function RootLayout({
         <AuthSessionProvider>
           <QueryProvider>
             <HeaderVisibility />
+            <MediaStreamCleanup />
             {children}
             <FooterVisibility />
           </QueryProvider>

@@ -31,12 +31,14 @@ export default function CheckInterview() {
     runAllChecks,
     cleanup,
   } = useMediaStore();
-  const isReady = camStatus === 'ok' && micStatus === 'ok' && netStatus === 'ok';
+  const [checking, setChecking] = useState(true);
+  const isReady = !checking && camStatus === 'ok' && micStatus === 'ok' && netStatus === 'ok';
 
   const handleDeviceChange = (cameraId: string, microphoneId: string) => {
     setSelectedCam(cameraId);
     setSelectedMic(microphoneId);
-    runAllChecks();
+    setChecking(true);
+    runAllChecks().finally(() => setChecking(false));
   };
 
   const handleStart = useCallback(() => {
@@ -64,8 +66,25 @@ export default function CheckInterview() {
 
   // 공통 장치 목록/상태 초기화
   useEffect(() => {
-    initDevices().then(runAllChecks);
-    return () => cleanup();
+    let cancelled = false;
+    const run = async () => {
+      setChecking(true);
+      // 이전 세션 잔여 스트림/상태 정리 후 새로 점검 시작
+      try {
+        cleanup();
+      } catch {}
+      try {
+        await initDevices();
+        await runAllChecks();
+      } finally {
+        if (!cancelled) setChecking(false);
+      }
+    };
+    run();
+    return () => {
+      cancelled = true;
+      cleanup();
+    };
   }, [initDevices, runAllChecks, cleanup]);
 
   if (started) return null;
@@ -97,7 +116,7 @@ export default function CheckInterview() {
           />
         </section>
         <section>
-          <CheckDeviceStatus />
+          <CheckDeviceStatus checking={checking} />
         </section>
         <section className="flex justify-center gap-[16px]">
           <button

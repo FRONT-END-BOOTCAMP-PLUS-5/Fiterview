@@ -6,17 +6,27 @@ import { useMediaStore } from '@/stores/useMediaStore';
 import Notice from '@/public/assets/icons/notice.svg';
 import NoticeDeviceAuth from '@/app/(anon)/interview/[id]/components/precheck/NoticeDeviceAuth';
 
-// MediaDevices 상태 표시
-export default function CheckDeviceStatus() {
+interface CheckDeviceStatusProps {
+  checking?: boolean;
+}
+
+export default function CheckDeviceStatus({ checking = false }: CheckDeviceStatusProps) {
   const { camStatus, micStatus, netStatus, runAllChecks, checkNetwork } = useMediaStore();
 
+  // 표시용 상태 (연결 체크 중에는 '확인중' 노출)
+  const viewCam = checking ? 'checking' : camStatus;
+  const viewMic = checking ? 'checking' : micStatus;
+  const viewNet = checking ? 'checking' : netStatus;
+
   const handleRecheck = async () => {
+    if (checking) return;
     if (camStatus === 'blocked' || micStatus === 'blocked') {
+      alert('마이크나 카메라 권한이 없습니다. 권한을 확인해주세요.');
     } else {
       await runAllChecks();
     }
   };
-  // 네트워크 상태만 이벤트 기반으로 갱신 (디바이스 검사는 부모가 호출)
+  // 네트워크 상태 갱신 (디바이스 검사는 부모가 호출)
   useEffect(() => {
     checkNetwork();
     function handleOnline() {
@@ -56,7 +66,8 @@ export default function CheckDeviceStatus() {
         </div>
         <button
           onClick={handleRecheck}
-          className="px-3 py-1 rounded-[6px] text-[12px] font-medium text-[#64748B] border border-[#E2E8F0] border-solid hover:bg-[#F1F5F9] transition-colors duration-200 cursor-pointer"
+          disabled={checking}
+          className="px-3 py-1 rounded-[6px] text-[12px] font-medium text-[#64748B] border border-[#E2E8F0] border-solid hover:bg-[#F1F5F9] transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           재확인
         </button>
@@ -67,10 +78,10 @@ export default function CheckDeviceStatus() {
             <p className="text-[#64748B] text-[14px] cursor-default">카메라</p>
             <span className="mt-[8px] flex items-center">
               <span
-                className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[camStatus]}`}
+                className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[viewCam]}`}
               ></span>
               <p className="w-[96px] text-[#64748B] text-[14px] cursor-default">
-                {DEVICE_STATUS_TEXT[camStatus]}
+                {DEVICE_STATUS_TEXT[viewCam]}
               </p>
             </span>
           </div>
@@ -78,10 +89,10 @@ export default function CheckDeviceStatus() {
             <p className="text-[#64748B] text-[14px] cursor-default">마이크</p>
             <span className="mt-[8px] flex items-center">
               <span
-                className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[micStatus]}`}
+                className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[viewMic]}`}
               ></span>
               <p className="w-[96px] text-[#64748B] text-[14px] cursor-default">
-                {DEVICE_STATUS_TEXT[micStatus]}
+                {DEVICE_STATUS_TEXT[viewMic]}
               </p>
             </span>
           </div>
@@ -89,10 +100,10 @@ export default function CheckDeviceStatus() {
             <p className="text-[#64748B] text-[14px] cursor-default">인터넷</p>
             <span className="mt-[8px] flex items-center">
               <span
-                className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[netStatus]}`}
+                className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[viewNet]}`}
               ></span>
               <p className="w-[96px] text-[#64748B] text-[14px] cursor-default">
-                {DEVICE_STATUS_TEXT[netStatus]}
+                {DEVICE_STATUS_TEXT[viewNet]}
               </p>
             </span>
           </div>
