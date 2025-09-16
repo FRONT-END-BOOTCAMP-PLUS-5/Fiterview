@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useUploadFiles } from '@/hooks/useUploadFiles';
@@ -30,6 +30,7 @@ export default function InterviewForm({ onReportCreated }: QuickInterviewFormPro
     setLimitExceeded,
   } = useUploadFiles();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasAttemptedSeed, setHasAttemptedSeed] = useState(false);
   const { openModal, currentStep, isOpen } = useModalStore();
   const { reportId, setReportId, setJobId } = useReportStore();
   const { user } = useSessionUser();
@@ -38,9 +39,15 @@ export default function InterviewForm({ onReportCreated }: QuickInterviewFormPro
       ? 'grid grid-cols-1 gap-2 w-full h-full'
       : 'grid grid-cols-2 gap-2 w-full h-full';
 
+  const isTestFileUploaded = useCallback(() => {
+    return uploadedFiles.some((file) => file.name === '김피터_포트폴리오.pdf');
+  }, [uploadedFiles]);
+
   useEffect(() => {
     async function insertTestFile() {
-      if (user?.username === 'test2') {
+      if (hasAttemptedSeed) return;
+      setHasAttemptedSeed(true);
+      if (user?.username === 'test2' && !isTestFileUploaded()) {
         const response = await fetch('/assets/file/김피터_포트폴리오.pdf');
         const blob = await response.blob();
         const file = new File([blob], '김피터_포트폴리오.pdf', { type: 'application/pdf' });
@@ -48,12 +55,11 @@ export default function InterviewForm({ onReportCreated }: QuickInterviewFormPro
       }
     }
     insertTestFile();
-  }, [user]);
+  }, [user?.username, handleAddFiles, isTestFileUploaded, hasAttemptedSeed]);
 
   const submitFiles = async () => {
     if (uploadedFiles.length === 0 || isSubmitting) return;
 
-    // 로그인 상태 체크
     if (!user) {
       openModal('login');
       return;

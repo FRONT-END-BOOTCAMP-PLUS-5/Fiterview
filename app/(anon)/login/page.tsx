@@ -8,8 +8,8 @@ import LoginForm from '@/app/(anon)/login/components/LoginForm';
 import { LoadingSpinner } from '@/app/components/loading/LoadingSpinner';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('test2');
-  const [password, setPassword] = useState('!test1234');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { data: session, status } = useSession();
