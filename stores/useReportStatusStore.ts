@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import apiClient from '@/lib/api/axiosInstance';
 import { ReportStatus } from '@/types/report';
 
 interface ReportStatusState {
@@ -17,17 +18,9 @@ export const useReportStatusStore = create<ReportStatusState>((set, get) => ({
 
   updateReportStatus: async (reportId: string, status: ReportStatus) => {
     try {
-      const response = await fetch(`/api/reports/${reportId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status }),
-      });
+      const response = await apiClient.put(`/api/reports/${reportId}`, { status });
 
-      if (response.ok) {
-        set({ currentStatus: status });
-      }
+      set({ currentStatus: status });
     } catch (error) {
       console.error('Failed to update report status:', error);
     }

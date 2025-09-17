@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import apiClient from '@/lib/api/axiosInstance';
 import { useModalStore } from '@/stores/useModalStore';
 import DeleteModal from '@/app/(anon)/reports/[id]/components/DeleteModal';
 
@@ -26,22 +27,14 @@ export default function DeleteSection({ reportId }: DeleteSectionProps) {
     try {
       setIsDeleting(true);
 
-      const response = await fetch(`/api/reports?id=${reportId}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
+      const response = await apiClient.delete(`/api/reports?id=${reportId}`);
 
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          // 삭제 성공 시 리포트 목록 페이지로 이동
-          router.push('/reports');
-        } else {
-          alert('삭제에 실패했습니다: ' + result.message);
-        }
+      const result = response.data;
+      if (result.success) {
+        // 삭제 성공 시 리포트 목록 페이지로 이동
+        router.push('/reports');
       } else {
-        const errorData = await response.json();
-        alert('삭제에 실패했습니다: ' + errorData.message);
+        alert('삭제에 실패했습니다: ' + result.message);
       }
     } catch (error) {
       alert('삭제 중 오류가 발생했습니다.');

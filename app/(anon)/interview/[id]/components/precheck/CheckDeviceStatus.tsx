@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import apiClient from '@/lib/api/axiosInstance';
 import { DEVICE_STATUS_COLOR, DEVICE_STATUS_TEXT } from '@/constants/devicestatus';
 import type { DeviceStatus as Status } from '@/types/interview';
 
@@ -113,12 +114,10 @@ export default function CheckDeviceStatus({
       const timer = setTimeout(() => controller.abort(), 5000); //5초 요청 후 취소
       try {
         // 인터넷 연결 상태 확인
-        const res = await fetch(`/assets/icons/frame.svg?t=${Date.now()}`, {
-          method: 'GET',
-          cache: 'no-store',
+        const res = await apiClient.get(`/assets/icons/frame.svg?t=${Date.now()}`, {
           signal: controller.signal,
         });
-        setNetStatus(res.ok ? 'ok' : navigator.onLine ? 'error' : 'offline');
+        setNetStatus(res.status === 200 ? 'ok' : navigator.onLine ? 'error' : 'offline');
       } catch {
         setNetStatus('offline');
       } finally {
