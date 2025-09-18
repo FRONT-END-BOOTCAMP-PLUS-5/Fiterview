@@ -9,4 +9,5 @@ export interface ReportRepository {
   findReportsByStatus(userId: number, status: ReportStatus): Promise<Report[]>;
   findReportById(reportId: number): Promise<Report | null>;
   deleteReport(reportId: number): Promise<void>;
+  updateReportOrder(reportId: number, currentOrder: number): Promise<void>;
 }
