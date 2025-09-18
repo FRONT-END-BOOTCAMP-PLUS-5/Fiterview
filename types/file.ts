@@ -21,3 +21,9 @@ export interface UploadedFilesProps extends RemoveHandler {
 export interface UploadOptionsProps {
   onAddFiles: (files: File[], source: SourceType) => void;
 }
+
+export interface QuickInterviewFormProps {
+  onReportCreated?: () => void;
+  onReportCompleted?: () => void;
+  LoginModal?: React.ReactNode;
+}

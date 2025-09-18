@@ -1,10 +1,7 @@
+import { SourceType, UploadOptionsProps } from '@/types/file';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-type UploadKind = 'portfolio' | 'job';
-
-type AddFilesHandler = (files: File[], kind: UploadKind) => void;
-
-export function useDragAndPasteUpload(onAddFiles: AddFilesHandler) {
+export function useDragAndPasteUpload(onAddFiles: (files: File[], sourceType: SourceType) => void) {
   const [isDragging, setIsDragging] = useState(false);
   const pasteImageCounterRef = useRef(1);
 
@@ -44,7 +41,6 @@ export function useDragAndPasteUpload(onAddFiles: AddFilesHandler) {
     [onAddFiles, splitFilesByType, renameIfGenericImage]
   );
 
-  // Paste handler
   useEffect(() => {
     const handlePaste = (e: ClipboardEvent) => {
       const items = e.clipboardData?.items;
@@ -64,18 +60,27 @@ export function useDragAndPasteUpload(onAddFiles: AddFilesHandler) {
     return () => window.removeEventListener('paste', handlePaste as unknown as EventListener);
   }, [handleFiles]);
 
-  // Drag & drop handlers to spread on a container
+  const dragCounter = useRef(0);
+
   const onDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
   }, []);
 
   const onDragEnter = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    setIsDragging(true);
+    e.stopPropagation();
+    dragCounter.current += 1;
+    if (dragCounter.current === 1) {
+      setIsDragging(true);
+    }
   }, []);
 
   const onDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    if (e.currentTarget === e.target) {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter.current -= 1;
+    if (dragCounter.current === 0) {
       setIsDragging(false);
     }
   }, []);
@@ -83,7 +88,10 @@ export function useDragAndPasteUpload(onAddFiles: AddFilesHandler) {
   const onDrop = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
+      e.stopPropagation();
+      dragCounter.current = 0;
       setIsDragging(false);
+
       const fileList = e.dataTransfer?.files;
       if (!fileList || fileList.length === 0) return;
       handleFiles(Array.from(fileList));
