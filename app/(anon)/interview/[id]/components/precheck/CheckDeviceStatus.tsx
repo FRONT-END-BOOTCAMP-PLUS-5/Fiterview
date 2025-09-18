@@ -17,6 +17,11 @@ export default function CheckDeviceStatus({ checking = false }: CheckDeviceStatu
   const viewCam = checking ? 'checking' : camStatus;
   const viewMic = checking ? 'checking' : micStatus;
   const viewNet = checking ? 'checking' : netStatus;
+  const DeviceStatusItems = [
+    { key: 'cam', label: '카메라', view: viewCam },
+    { key: 'mic', label: '마이크', view: viewMic },
+    { key: 'net', label: '인터넷', view: viewNet },
+  ];
 
   const handleRecheck = async () => {
     if (checking) return;
@@ -74,39 +79,19 @@ export default function CheckDeviceStatus({ checking = false }: CheckDeviceStatu
       </div>
       <div className="flex flex-col p-[24px] gap-[16px] bg-slate-50 rounded-[8px]">
         <div className="flex justify-between">
-          <div className="flex flex-col">
-            <p className="text-[#64748B] text-[14px] cursor-default">카메라</p>
-            <span className="mt-[8px] flex items-center">
-              <span
-                className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[viewCam]}`}
-              ></span>
-              <p className="w-[96px] text-[#64748B] text-[14px] cursor-default">
-                {DEVICE_STATUS_TEXT[viewCam]}
-              </p>
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-[#64748B] text-[14px] cursor-default">마이크</p>
-            <span className="mt-[8px] flex items-center">
-              <span
-                className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[viewMic]}`}
-              ></span>
-              <p className="w-[96px] text-[#64748B] text-[14px] cursor-default">
-                {DEVICE_STATUS_TEXT[viewMic]}
-              </p>
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-[#64748B] text-[14px] cursor-default">인터넷</p>
-            <span className="mt-[8px] flex items-center">
-              <span
-                className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[viewNet]}`}
-              ></span>
-              <p className="w-[96px] text-[#64748B] text-[14px] cursor-default">
-                {DEVICE_STATUS_TEXT[viewNet]}
-              </p>
-            </span>
-          </div>
+          {DeviceStatusItems.map(({ key, label, view }) => (
+            <div key={key} className="flex flex-col">
+              <p className="text-[#64748B] text-[14px] cursor-default">{label}</p>
+              <span className="mt-[8px] flex items-center">
+                <span
+                  className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[view]}`}
+                ></span>
+                <p className="w-[96px] text-[#64748B] text-[14px] cursor-default">
+                  {DEVICE_STATUS_TEXT[view]}
+                </p>
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </>
