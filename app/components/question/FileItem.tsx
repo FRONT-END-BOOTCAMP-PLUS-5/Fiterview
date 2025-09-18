@@ -2,9 +2,10 @@ import { FileItemProps } from '@/types/file';
 import { useTruncateText } from '@/hooks/useTruncateText';
 import Del from '@/public/assets/icons/x.svg';
 
-export default function FileItem({ file, onRemove }: FileItemProps) {
-  const { truncatedText, originalText, isTruncated } = useTruncateText(file.name, {
-    maxLength: 32,
+export default function FileItem({ file, maxLength, onRemove }: FileItemProps) {
+  const { truncatedText, originalText, isTruncated } = useTruncateText({
+    text: file.name,
+    maxLength,
   });
 
   return (
@@ -18,7 +19,7 @@ export default function FileItem({ file, onRemove }: FileItemProps) {
             {truncatedText}
           </span>
         </div>
-        <button type="button" onClick={() => onRemove?.(file.id)}>
+        <button className="cursor-pointer" type="button" onClick={() => onRemove(file.id)}>
           <Del width={16} height={16} stroke="#A0A0A0" strokeWidth={1.33} />
         </button>
       </div>

@@ -3,10 +3,11 @@ import { useMemo } from 'react';
 interface UseTruncateTextOptions {
   maxLength: number;
   suffix?: string;
+  text: string;
 }
 
-export function useTruncateText(text: string, options: UseTruncateTextOptions) {
-  const { maxLength, suffix = '...' } = options;
+export function useTruncateText(options: UseTruncateTextOptions) {
+  const { text, maxLength, suffix = '...' } = options;
 
   const truncatedText = useMemo(() => {
     if (text.length <= maxLength) {
