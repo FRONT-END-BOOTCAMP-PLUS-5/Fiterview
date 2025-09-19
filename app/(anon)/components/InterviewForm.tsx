@@ -128,7 +128,7 @@ export default function InterviewForm({
           className={`relative w-full ${
             isDragging ? 'bg-slate-100 border-2 border-dashed border-[#3B82F6] rounded-xl' : ''
           }`}
-          title="파일을 드래그하거나 클립보드에서 붙여넣기(Ctrl+V)하세요"
+          title="파일을 드래그하거나 클립보드에서 붙여넣기(Ctrl+V)하세요."
         >
           {isDragging && (
             <div className="absolute inset-0 flex items-center justify-center bg-slate-100 bg-opacity-90 rounded-xl">
