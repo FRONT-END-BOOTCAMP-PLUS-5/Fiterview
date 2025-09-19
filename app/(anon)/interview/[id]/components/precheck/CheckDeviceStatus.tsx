@@ -1,151 +1,45 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import apiClient from '@/lib/api/axiosInstance';
 import { DEVICE_STATUS_COLOR, DEVICE_STATUS_TEXT } from '@/constants/devicestatus';
-import type { DeviceStatus as Status } from '@/types/interview';
-
-type DeviceInfo = {
-  deviceId: string;
-  label: string;
-};
+import { useMediaStore } from '@/stores/useMediaStore';
+import Notice from '@/public/assets/icons/notice.svg';
+import NoticeDeviceAuth from '@/app/(anon)/interview/[id]/components/precheck/NoticeDeviceAuth';
 
 interface CheckDeviceStatusProps {
-  availableCameras: DeviceInfo[];
-  availableMicrophones: DeviceInfo[];
-  selectedCamera: string;
-  selectedMicrophone: string;
-  onStatusChange?: (statuses: { mic: Status; cam: Status; net: Status }) => void;
+  checking?: boolean;
 }
 
-function stopStream(stream: MediaStream | null) {
-  if (!stream) return;
-  for (const track of stream.getTracks()) {
-    track.stop();
-  }
-}
+export default function CheckDeviceStatus({ checking = false }: CheckDeviceStatusProps) {
+  const { camStatus, micStatus, netStatus, runAllChecks, checkNetwork } = useMediaStore();
 
-// MediaDevices API를 사용하여 마이크,카메라,네트워크 연결 상태를 확인
-export default function CheckDeviceStatus({
-  availableCameras,
-  availableMicrophones,
-  selectedCamera,
-  selectedMicrophone,
-  onStatusChange,
-}: CheckDeviceStatusProps) {
-  const [micStatus, setMicStatus] = useState<Status>('checking');
-  const [camStatus, setCamStatus] = useState<Status>('checking');
-  const [netStatus, setNetStatus] = useState<Status>('checking');
+  // 표시용 상태 (연결 체크 중에는 '확인중' 노출)
+  const viewCam = checking ? 'checking' : camStatus;
+  const viewMic = checking ? 'checking' : micStatus;
+  const viewNet = checking ? 'checking' : netStatus;
+  const DeviceStatusItems = [
+    { key: 'cam', label: '카메라', view: viewCam },
+    { key: 'mic', label: '마이크', view: viewMic },
+    { key: 'net', label: '인터넷', view: viewNet },
+  ];
 
-  async function checkMicrophone() {
-    try {
-      if (!navigator.mediaDevices?.enumerateDevices || !navigator.mediaDevices?.getUserMedia) {
-        setMicStatus('not-found');
-        return;
-      }
-
-      // 선택된 마이크가 있는지 확인
-      if (!selectedMicrophone || availableMicrophones.length === 0) {
-        setMicStatus('not-found');
-        return;
-      }
-
-      let stream: MediaStream | null = null;
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          audio: { deviceId: selectedMicrophone },
-        });
-        setMicStatus('ok');
-      } catch (err: unknown) {
-        const message = (err as Error)?.name || '';
-        if (message === 'NotAllowedError' || message === 'SecurityError') setMicStatus('blocked');
-        else if (message === 'NotFoundError' || message === 'OverconstrainedError')
-          setMicStatus('not-found');
-        else setMicStatus('error');
-      } finally {
-        stopStream(stream);
-      }
-    } catch {
-      setMicStatus('error');
+  const handleRecheck = async () => {
+    if (checking) return;
+    if (camStatus === 'blocked' || micStatus === 'blocked') {
+      alert('마이크나 카메라 권한이 없습니다. 권한을 확인해주세요.');
+    } else {
+      await runAllChecks();
     }
-  }
-
-  async function checkCamera() {
-    try {
-      if (!navigator.mediaDevices?.enumerateDevices || !navigator.mediaDevices?.getUserMedia) {
-        setCamStatus('not-found');
-        return;
-      }
-
-      // 선택된 카메라가 있는지 확인
-      if (!selectedCamera || availableCameras.length === 0) {
-        setCamStatus('not-found');
-        return;
-      }
-
-      let stream: MediaStream | null = null;
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { deviceId: selectedCamera },
-        });
-        setCamStatus('ok');
-      } catch (err: unknown) {
-        const message = (err as Error)?.name || '';
-        if (message === 'NotAllowedError' || message === 'SecurityError') setCamStatus('blocked');
-        else if (message === 'NotFoundError' || message === 'OverconstrainedError')
-          setCamStatus('not-found');
-        else setCamStatus('error');
-      } finally {
-        stopStream(stream);
-      }
-    } catch {
-      setCamStatus('error');
-    }
-  }
-
-  async function checkNetwork() {
-    try {
-      if (!navigator.onLine) {
-        setNetStatus('offline');
-        return;
-      }
-
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 5000); //5초 요청 후 취소
-      try {
-        // 인터넷 연결 상태 확인
-        const res = await apiClient.get(`/assets/icons/frame.svg?t=${Date.now()}`, {
-          signal: controller.signal,
-        });
-        setNetStatus(res.status === 200 ? 'ok' : navigator.onLine ? 'error' : 'offline');
-      } catch {
-        setNetStatus('offline');
-      } finally {
-        clearTimeout(timer);
-      }
-    } catch {
-      setNetStatus('error');
-    }
-  }
-
-  /*
-  장치 연결 상태 재확인 함수
-  */
-  async function runAll() {
-    setMicStatus('checking');
-    setCamStatus('checking');
-    setNetStatus('checking');
-    await Promise.allSettled([checkMicrophone(), checkCamera(), checkNetwork()]);
-  }
-
+  };
+  // 네트워크 상태 갱신 (디바이스 검사는 부모가 호출)
   useEffect(() => {
-    runAll();
-
+    checkNetwork();
     function handleOnline() {
       checkNetwork();
     }
     function handleOffline() {
-      setNetStatus('offline');
+      checkNetwork();
     }
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
@@ -153,58 +47,52 @@ export default function CheckDeviceStatus({
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [selectedCamera, selectedMicrophone]); // 선택된 장치가 변경될 때마다 재확인
-
-  useEffect(() => {
-    onStatusChange?.({ mic: micStatus, cam: camStatus, net: netStatus });
-  }, [micStatus, camStatus, netStatus, onStatusChange]);
+  }, [checkNetwork]);
 
   return (
     <>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-800  cursor-default">기기 상태 확인</h3>
+        <div className="relative group flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-gray-800 cursor-default">기기 상태 확인</h3>
+          <Notice
+            width={20}
+            height={20}
+            strokeWidth={1.6}
+            className="stroke-[#6FA5DA] opacity-50 cursor-pointer"
+            tabIndex={0}
+            aria-describedby="device-auth-tip"
+          />
+          <div
+            id="device-auth-tip"
+            role="tooltip"
+            className="hidden group-hover:block group-focus-within:block"
+          >
+            <NoticeDeviceAuth />
+          </div>
+        </div>
         <button
-          onClick={runAll}
-          className="px-3 py-1 rounded-[6px] text-[12px] font-medium text-[#64748B] border border-[#E2E8F0] border-solid hover:bg-[#F1F5F9] transition-colors duration-200 cursor-pointer"
+          onClick={handleRecheck}
+          disabled={checking}
+          className="px-3 py-1 rounded-[6px] text-[12px] font-medium text-[#64748B] border border-[#E2E8F0] border-solid hover:bg-[#F1F5F9] transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           재확인
         </button>
       </div>
       <div className="flex flex-col p-[24px] gap-[16px] bg-slate-50 rounded-[8px]">
         <div className="flex justify-between">
-          <div className="flex flex-col">
-            <p className="text-[#64748B] text-[14px] cursor-default">카메라</p>
-            <span className="mt-[8px] flex items-center">
-              <span
-                className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[camStatus]}`}
-              ></span>
-              <p className="text-[#64748B] text-[14px] cursor-default">
-                {DEVICE_STATUS_TEXT[camStatus]}
-              </p>
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-[#64748B] text-[14px] cursor-default">마이크</p>
-            <span className="mt-[8px] flex items-center">
-              <span
-                className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[micStatus]}`}
-              ></span>
-              <p className="text-[#64748B] text-[14px] cursor-default">
-                {DEVICE_STATUS_TEXT[micStatus]}
-              </p>
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-[#64748B] text-[14px] cursor-default">인터넷</p>
-            <span className="mt-[8px] flex items-center">
-              <span
-                className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[netStatus]}`}
-              ></span>
-              <p className="text-[#64748B] text-[14px] cursor-default">
-                {DEVICE_STATUS_TEXT[netStatus]}
-              </p>
-            </span>
-          </div>
+          {DeviceStatusItems.map(({ key, label, view }) => (
+            <div key={key} className="flex flex-col">
+              <p className="text-[#64748B] text-[14px] cursor-default">{label}</p>
+              <span className="mt-[8px] flex items-center">
+                <span
+                  className={`rounded-[4px] w-[8px] h-[8px] mr-[6px] ${DEVICE_STATUS_COLOR[view]}`}
+                ></span>
+                <p className="w-[96px] text-[#64748B] text-[14px] cursor-default">
+                  {DEVICE_STATUS_TEXT[view]}
+                </p>
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </>

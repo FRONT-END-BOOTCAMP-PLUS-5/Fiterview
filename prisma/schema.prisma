@@ -28,6 +28,7 @@ model Report {
   feedback   Feedback?    @relation("ReportFeedback")
   questions  Question[]   @relation("ReportQuestions")
   user       User         @relation("UserReports", fields: [userId], references: [id], onDelete: Cascade)
+  currentOrder Int? @default(1) @map("current_order")
 
   @@map("reports")
 }

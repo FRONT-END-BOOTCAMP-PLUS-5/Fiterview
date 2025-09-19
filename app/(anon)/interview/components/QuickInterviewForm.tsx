@@ -2,13 +2,16 @@
 
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { useUploadFiles } from '@/hooks/useUploadFiles';
 import { useState, useEffect } from 'react';
+import { useUploadFiles } from '@/hooks/useUploadFiles';
+
 import { useModalStore } from '@/stores/useModalStore';
 import { useReportStore } from '@/stores/useReportStore';
 import { useSessionUser } from '@/lib/auth/useSessionUser';
-import UploadOptions from '@/app/(anon)/interview/components/UploadOptions';
-import UploadedFiles from '@/app/(anon)/interview/components/UploadedFiles';
+import { NoneFiles } from '@/app/components/question/NoneFiles';
+import FilesOptions from '@/app/components/question/FilesOptions';
+import FilesList from '@/app/components/question/FilesList';
+import FileItem from '@/app/components/question/FileItem';
 import ErrorModal from '@/app/components/modal/ErrorModal';
 import GenerateQuestionModal from '@/app/components/modal/GenerateQuestionModal';
 import Sparkles from '@/public/assets/icons/sparkles.svg';
@@ -34,7 +37,7 @@ export default function QuickInterviewForm({
   } = useUploadFiles();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { openModal, currentStep, isOpen } = useModalStore();
-  const { reportId, setReportId, setJobId, setOnReportCompleted } = useReportStore();
+  const { setReportId, setJobId, setOnReportCompleted } = useReportStore();
   const { user } = useSessionUser();
 
   useEffect(() => {
@@ -108,17 +111,23 @@ export default function QuickInterviewForm({
         <h2 className="justify-start text-[#1E293B] text-[20px] font-semibold">빠른 AI 면접</h2>
       </div>
 
-      <UploadOptions onAddFiles={handleAddFiles} />
+      <FilesOptions onAddFiles={handleAddFiles} />
 
       <div className="h-full self-stretch flex flex-col justify-start items-start gap-4 mt-10">
-        <UploadedFiles
+        <FilesList
           files={uploadedFiles}
-          limitExceeded={limitExceeded}
           onRemove={handleRemoveFile}
+          maxFileLength={48}
+          limitExceeded={limitExceeded}
+          emptyComponent={<NoneFiles iconSize={48} gapSize={3} iconBgSize={20} />}
+          fileItemComponent={FileItem}
+          noneContainerClass="self-stretch flex flex-col justify-start items-start gap-2 h-[328px]"
+          containerClass="self-stretch flex flex-col justify-start items-start gap-2 h-[328px]"
+          warningClass="text-red-500 text-xs pl-1"
         />
 
         <motion.button
-          className={`mt-6 w-full h-12 py-[14px] rounded-xl flex justify-center items-center gap-3 ${
+          className={`w-full h-12 rounded-xl flex justify-center items-center gap-3 ${
             uploadedFiles.length === 0 || isSubmitting
               ? 'bg-slate-100 cursor-not-allowed'
               : 'bg-[#3B82F6] cursor-pointer'

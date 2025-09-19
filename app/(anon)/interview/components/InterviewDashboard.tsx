@@ -61,8 +61,8 @@ export default function InterviewDashboard() {
             </>
           ) : (
             <>
-              포트폴리오/채용공고를 올려 <strong>바로 면접을 시작</strong>하거나,{' '}
-              <strong>대기 중인 면접</strong>을 이어서 진행하려면 로그인이 필요합니다.
+              로그인하고 포트폴리오/채용공고를 올려 <strong>바로 면접을 시작</strong>하거나,{' '}
+              <strong>대기 중인 면접</strong>을 이어서 진행해보세요.
             </>
           )}
         </p>
