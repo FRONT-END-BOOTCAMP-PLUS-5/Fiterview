@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "start": "next start -p 3155 -H 0.0.0.0",
-    "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
+    "build": "prisma generate && NODE_OPTIONS='--max-old-space-size=4096' next build",
     "lint": "eslint .",
     "prepare": "husky install",
     "format": "prettier --write ."
