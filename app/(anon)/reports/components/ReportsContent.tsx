@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import apiClient from '@/lib/api/axiosInstance';
 import { useSessionUser } from '@/lib/auth/useSessionUser';
 import UserDashboard from '@/app/(anon)/reports/components/UserDashboard';
 import ReportsList from '@/app/(anon)/reports/components/ReportsList';
@@ -19,15 +20,11 @@ export default function ReportsContent() {
       }
 
       try {
-        const response = await fetch('/api/reports', {
-          credentials: 'include',
-        });
+        const response = await apiClient.get('/api/reports');
 
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success) {
-            setReports(result.data || []);
-          }
+        const result = response.data;
+        if (result.success) {
+          setReports(result.data || []);
         }
       } catch (error) {
         console.error('리포트 조회 오류:', error);

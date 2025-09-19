@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import apiClient from '@/lib/api/axiosInstance';
 import { DEVICE_STATUS_COLOR, DEVICE_STATUS_TEXT } from '@/constants/devicestatus';
 import { useMediaStore } from '@/stores/useMediaStore';
 import Notice from '@/public/assets/icons/notice.svg';
