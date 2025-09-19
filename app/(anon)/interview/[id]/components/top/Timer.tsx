@@ -57,7 +57,7 @@ export default function Timer({ running, duration, onComplete }: TimerProps) {
         rafIdRef.current = null;
       }
     };
-  }, [running, duration, onComplete]);
+  }, [running, duration]);
 
   // 진행바 % (실시간 계산)
   const percent = running ? Math.max(0, Math.min(remaining / duration, 1)) * 100 : 100;
