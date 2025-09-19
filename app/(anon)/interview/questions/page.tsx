@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import apiClient from '@/lib/api/axiosInstance';
 
 function QuestionsPageContent() {
   const searchParams = useSearchParams();
@@ -48,19 +49,11 @@ function QuestionsPageContent() {
     setResult(null);
 
     try {
-      const response = await fetch(
-        `/api/reports/${testReportId}/questions/${currentQuestionId}/transcribe`,
-        {
-          method: 'POST',
-        }
+      const response = await apiClient.post(
+        `/api/reports/${testReportId}/questions/${currentQuestionId}/transcribe`
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'API 요청 실패');
-      }
-
-      const data = await response.json();
+      const data = response.data;
       setResult(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.');

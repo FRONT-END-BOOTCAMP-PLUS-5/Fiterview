@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import apiClient from '@/lib/api/axiosInstance';
 import QuestionItem from '@/app/(anon)/reports/[id]/components/QuestionItem';
 import AudioFileSection from '@/app/(anon)/reports/[id]/components/AudioFileSection';
 import { useReportStatusStore } from '@/stores/useReportStatusStore';
@@ -18,11 +19,9 @@ export default function AudioReportViewer({ reportId }: AudioReportViewerProps) 
   useEffect(() => {
     const fetchReportData = async () => {
       try {
-        const response = await fetch(`/api/reports/${reportId}`, {
-          credentials: 'include', // 쿠키 포함하여 인증 정보 전달
-        });
+        const response = await apiClient.get(`/api/reports/${reportId}`);
 
-        const result = await response.json();
+        const result = response.data;
 
         if (result.success) {
           setReport(result.data);
