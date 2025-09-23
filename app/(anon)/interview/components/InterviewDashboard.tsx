@@ -8,7 +8,7 @@ import PendingInterviewsList from '@/app/(anon)/interview/components/PendingInte
 import QuickInterviewForm from '@/app/(anon)/interview/components/QuickInterviewForm';
 import LoginModal from '@/app/components/modal/LoginModal';
 import ProceedInterviewModal from '@/app/components/modal/ProceedInterviewModal';
-import { useProceedInterview } from '@/hooks/useResumeInterview';
+import { useProceedInterview } from '@/hooks/useProceedInterview';
 
 type PendingReport = {
   id: number;
