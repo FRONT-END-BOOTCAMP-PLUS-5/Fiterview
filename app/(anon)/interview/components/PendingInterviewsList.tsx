@@ -14,9 +14,14 @@ type PendingReport = {
 interface PendingInterviewsListProps {
   reports: PendingReport[];
   loading: boolean;
+  onSelect: (report: PendingReport) => void;
 }
 
-export default function PendingInterviewsList({ reports, loading }: PendingInterviewsListProps) {
+export default function PendingInterviewsList({
+  reports,
+  loading,
+  onSelect,
+}: PendingInterviewsListProps) {
   // 페이지네이션 설정: 페이지당 6개씩
   const {
     currentPage,
@@ -50,7 +55,11 @@ export default function PendingInterviewsList({ reports, loading }: PendingInter
             <NoneReports />
           ) : (
             currentItems.map((report) => (
-              <ReportCard key={`pending-report-${report.id}`} report={report} />
+              <ReportCard
+                key={`pending-report-${report.id}`}
+                report={report}
+                onClick={() => onSelect?.(report)}
+              />
             ))
           )}
         </div>

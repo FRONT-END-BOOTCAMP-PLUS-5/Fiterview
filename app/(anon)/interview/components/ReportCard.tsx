@@ -7,6 +7,7 @@ interface ReportCardProps {
   report: {
     id: string | number;
     title: string;
+    currentOrder?: number;
   };
   onClick?: () => void;
   className?: string;

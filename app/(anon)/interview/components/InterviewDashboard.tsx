@@ -7,6 +7,8 @@ import { useSessionUser } from '@/lib/auth/useSessionUser';
 import PendingInterviewsList from '@/app/(anon)/interview/components/PendingInterviewsList';
 import QuickInterviewForm from '@/app/(anon)/interview/components/QuickInterviewForm';
 import LoginModal from '@/app/components/modal/LoginModal';
+import ProceedInterviewModal from '@/app/components/modal/ProceedInterviewModal';
+import { useProceedInterview } from '@/hooks/useResumeInterview';
 
 type PendingReport = {
   id: number;
@@ -18,6 +20,14 @@ export default function InterviewDashboard() {
   const [loading, setLoading] = useState(true);
   const { currentStep, isOpen, openModal } = useModalStore();
   const { user } = useSessionUser();
+  const {
+    isOpen: isProceedOpen,
+    currentOrder,
+    selectInterview,
+    close,
+    resume,
+    restart,
+  } = useProceedInterview();
 
   const fetchPendingReports = useCallback(async () => {
     if (!user) {
@@ -73,8 +83,15 @@ export default function InterviewDashboard() {
           onReportCompleted={fetchPendingReports}
           LoginModal={isOpen && currentStep === 'login' ? <LoginModal /> : null}
         />
-        <PendingInterviewsList reports={reports} loading={loading} />
+        <PendingInterviewsList reports={reports} loading={loading} onSelect={selectInterview} />
       </div>
+      <ProceedInterviewModal
+        isOpen={isProceedOpen}
+        currentOrder={currentOrder}
+        onClose={close}
+        onResume={resume}
+        onRestart={restart}
+      />
     </div>
   );
 }
