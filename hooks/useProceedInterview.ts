@@ -13,7 +13,7 @@ interface UseProceedInterviewResult {
   currentOrder: number;
   selectInterview: (report: ProceedInterviewLike) => void;
   close: () => void;
-  resume: () => void;
+  proceed: () => void;
   restart: () => Promise<void>;
 }
 
@@ -38,7 +38,7 @@ export function useProceedInterview(): UseProceedInterviewResult {
 
   const close = useCallback(() => setTarget(null), []);
 
-  const resume = useCallback(() => {
+  const proceed = useCallback(() => {
     if (!target) return;
     const id = target.id;
     setTarget(null);
@@ -55,5 +55,5 @@ export function useProceedInterview(): UseProceedInterviewResult {
     router.push(`/interview/${id}`);
   }, [router, target]);
 
-  return { isOpen, currentOrder, selectInterview, close, resume, restart };
+  return { isOpen, currentOrder, selectInterview, close, proceed, restart };
 }

@@ -25,7 +25,7 @@ export default function InterviewDashboard() {
     currentOrder,
     selectInterview,
     close,
-    resume,
+    proceed,
     restart,
   } = useProceedInterview();
 
@@ -89,7 +89,7 @@ export default function InterviewDashboard() {
         isOpen={isProceedOpen}
         currentOrder={currentOrder}
         onClose={close}
-        onResume={resume}
+        onProceed={proceed}
         onRestart={restart}
       />
     </div>

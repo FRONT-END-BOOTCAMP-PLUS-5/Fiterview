@@ -5,6 +5,8 @@ import ReportDetailCard from '@/app/(anon)/reports/components/ReportDetailCard';
 import XCircle from '@/public/assets/icons/x-circle.svg';
 import { usePagination } from '@/hooks/usePagination';
 import { LoadingSpinner } from '@/app/components/loading/LoadingSpinner';
+import { useProceedInterview } from '@/hooks/useProceedInterview';
+import ProceedInterviewModal from '@/app/components/modal/ProceedInterviewModal';
 
 interface ReportsListProps {
   reports: any[];
@@ -13,6 +15,7 @@ interface ReportsListProps {
 
 export default function ReportsList({ reports, loading }: ReportsListProps) {
   const [sortBy, setSortBy] = useState<'created' | 'completed' | null>(null);
+  const { isOpen, currentOrder, selectInterview, close, proceed, restart } = useProceedInterview();
 
   // 정렬된 리포트 목록 생성
   const sortedReports = useMemo(() => {
@@ -161,7 +164,11 @@ export default function ReportsList({ reports, loading }: ReportsListProps) {
           <div className="min-h-[400px] max-h-[830px] w-full flex flex-col justify-between">
             <div className="self-stretch flex flex-col gap-4 h-full">
               {currentReports.map((report) => (
-                <ReportDetailCard key={`report-${report.id}`} report={report} />
+                <ReportDetailCard
+                  key={`report-${report.id}`}
+                  report={report}
+                  onStartInterview={selectInterview}
+                />
               ))}
             </div>
 
@@ -216,6 +223,13 @@ export default function ReportsList({ reports, loading }: ReportsListProps) {
           </div>
         </>
       )}
+      <ProceedInterviewModal
+        isOpen={isOpen}
+        currentOrder={currentOrder}
+        onClose={close}
+        onProceed={proceed}
+        onRestart={restart}
+      />
     </div>
   );
 }

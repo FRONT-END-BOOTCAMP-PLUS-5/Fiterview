@@ -8,7 +8,7 @@ interface ProceedInterviewModalProps {
   isOpen: boolean;
   currentOrder: number;
   onClose: () => void;
-  onResume: () => void;
+  onProceed: () => void;
   onRestart: () => void | Promise<void>;
 }
 
@@ -16,7 +16,7 @@ export default function ProceedInterviewModal({
   isOpen,
   currentOrder,
   onClose,
-  onResume,
+  onProceed,
   onRestart,
 }: ProceedInterviewModalProps) {
   if (!isOpen) return null;
@@ -41,7 +41,7 @@ export default function ProceedInterviewModal({
       </button>
       <button
         className="flex-1 h-11 px-5 bg-[#3B82F6] rounded-lg flex justify-center items-center cursor-pointer"
-        onClick={onResume}
+        onClick={onProceed}
       >
         <p className="text-white text-sm font-semibold">이어서 진행하기</p>
       </button>
