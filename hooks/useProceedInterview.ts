@@ -17,6 +17,7 @@ interface UseProceedInterviewResult {
   restart: () => Promise<void>;
 }
 
+// 인터뷰 재시작 모달 훅(currentOrder가 2이상인 경우만 모달 오픈)
 export function useProceedInterview(): UseProceedInterviewResult {
   const router = useRouter();
   const [target, setTarget] = useState<ProceedInterviewLike | null>(null);
@@ -38,6 +39,7 @@ export function useProceedInterview(): UseProceedInterviewResult {
 
   const close = useCallback(() => setTarget(null), []);
 
+  // 이어서 하기 버튼 선택 시
   const proceed = useCallback(() => {
     if (!target) return;
     const id = target.id;
@@ -45,6 +47,7 @@ export function useProceedInterview(): UseProceedInterviewResult {
     router.push(`/interview/${id}`);
   }, [router, target]);
 
+  // 처음부터 시작 버튼 선택 시
   const restart = useCallback(async () => {
     if (!target) return;
     const id = target.id;
