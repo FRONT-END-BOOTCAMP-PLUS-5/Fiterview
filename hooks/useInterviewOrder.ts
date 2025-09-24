@@ -18,7 +18,20 @@ export function useInterviewOrder(reportId: number | undefined) {
     staleTime: 0,
   });
 
+  const updateMutation = useMutation({
+    mutationFn: async (nextOrder: number) => {
+      if (!reportId) return;
+      await apiClient.put(`/api/reports/${reportId}/questions/order`, { currentOrder: nextOrder });
+      return nextOrder; // 서버가 값을 그대로 저장한다고 가정하므로 그대로 반환
+    },
+    onSuccess: (nextOrder) => {
+      if (!reportId || typeof nextOrder !== 'number') return;
+      qc.setQueryData(queryKey(reportId), nextOrder); // refetch 없이 캐시 확정
+    },
+  });
+
   return {
     orderQuery,
+    updateOrder: updateMutation.mutateAsync,
   };
 }
