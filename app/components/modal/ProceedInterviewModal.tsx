@@ -26,9 +26,7 @@ export default function ProceedInterviewModal({
       <div className="w-[64px] h-[64px] bg-[#E2E8F0] rounded-[32px] flex items-center justify-center">
         <Proceed width={40} height={40} strokeWidth={3.5} stroke="#3B82F6" />
       </div>
-      <p className="text-[#1E293B] font-semibold">
-        {currentOrder + 1}번 질문부터 진행할 수 있어요.
-      </p>
+      <p className="text-[#1E293B] font-semibold">{currentOrder}번 질문부터 진행할 수 있어요.</p>
     </div>
   );
   const Buttons = (

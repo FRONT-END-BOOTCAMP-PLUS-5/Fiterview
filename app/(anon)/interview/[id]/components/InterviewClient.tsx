@@ -108,11 +108,8 @@ export default function InterviewClient() {
     const formData = new FormData();
     formData.append('audio', file);
     const url = `/api/reports/${reportId}/questions/${order}/recording`;
-    // const res = await apiClient.post(url, formData);
-    // const json = res.data;
-    const res = await fetch(url, { method: 'POST', body: formData });
-    if (!res.ok) throw new Error('녹음 업로드 실패');
-    const json = await res.json();
+    const res = await apiClient.post(url, formData);
+    const json = res.data;
     if (!json?.success) throw new Error(json?.error || '녹음 업로드 실패');
     return json as { success: boolean; fileName?: string };
   };
