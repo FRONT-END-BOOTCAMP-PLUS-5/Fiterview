@@ -17,6 +17,11 @@ export default function Timer({ running, duration, onComplete }: TimerProps) {
   const rafIdRef = useRef<number | null>(null);
   // 완료 여부
   const completedRef = useRef(false);
+  // 최신 onComplete 콜백 저장
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   // running 토글에 따라 타이머 시작/정지
   useEffect(() => {
@@ -42,7 +47,7 @@ export default function Timer({ running, duration, onComplete }: TimerProps) {
       if (left <= 0) {
         if (!completedRef.current) {
           completedRef.current = true;
-          onComplete?.();
+          onCompleteRef.current?.();
         }
         return; // rAF 루프 종료
       }
@@ -57,7 +62,7 @@ export default function Timer({ running, duration, onComplete }: TimerProps) {
         rafIdRef.current = null;
       }
     };
-  }, [running, duration, onComplete]);
+  }, [running, duration]);
 
   // 진행바 % (실시간 계산)
   const percent = running ? Math.max(0, Math.min(remaining / duration, 1)) * 100 : 100;
