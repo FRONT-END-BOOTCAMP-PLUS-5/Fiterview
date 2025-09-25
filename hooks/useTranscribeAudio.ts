@@ -1,4 +1,4 @@
-import axios from 'axios';
+import apiClient from '@/lib/api/axiosInstance';
 import { STTResponse } from '@/backend/domain/dtos/STTResponse';
 
 interface TranscribeAudioParams {
@@ -26,6 +26,6 @@ export const transcribeAudio = async ({
   reportId,
   order,
 }: TranscribeAudioParams): Promise<TranscribeAudioResponse> => {
-  const response = await axios.post(`/api/reports/${reportId}/questions/${order}/transcribe`);
+  const response = await apiClient.post(`/api/reports/${reportId}/questions/${order}/transcribe`);
   return response.data;
 };
