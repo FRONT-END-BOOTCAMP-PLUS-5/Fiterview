@@ -30,7 +30,6 @@ export default function InterviewForm({ onReportCreated }: QuickInterviewFormPro
     setLimitExceeded,
   } = useUploadFiles();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [hasAttemptedSeed, setHasAttemptedSeed] = useState(false);
   const { openModal, currentStep, isOpen } = useModalStore();
   const { reportId, setReportId, setJobId } = useReportStore();
   const { user } = useSessionUser();
@@ -44,18 +43,25 @@ export default function InterviewForm({ onReportCreated }: QuickInterviewFormPro
   }, [uploadedFiles]);
 
   useEffect(() => {
-    async function insertTestFile() {
-      if (hasAttemptedSeed) return;
-      setHasAttemptedSeed(true);
-      if (user?.username === 'test2' && !isTestFileUploaded()) {
-        const response = await fetch('/assets/file/김피터_포트폴리오.pdf');
-        const blob = await response.blob();
-        const file = new File([blob], '김피터_포트폴리오.pdf', { type: 'application/pdf' });
-        handleAddFiles([file], 'portfolio');
-      }
+    let cancelled = false;
+    function ensureDemoFilePresent() {
+      if (user?.username !== 'test2' || isTestFileUploaded()) return;
+      fetch('/assets/file/김피터_포트폴리오.pdf')
+        .then((response) => response.blob())
+        .then((blob) => {
+          if (cancelled) return;
+          const file = new File([blob], '김피터_포트폴리오.pdf', { type: 'application/pdf' });
+          handleAddFiles([file], 'portfolio');
+        })
+        .catch((e) => {
+          if (process.env.NODE_ENV !== 'production') console.debug(e);
+        });
     }
-    insertTestFile();
-  }, [user?.username, handleAddFiles, isTestFileUploaded, hasAttemptedSeed]);
+    ensureDemoFilePresent();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.username, isTestFileUploaded, handleAddFiles]);
 
   const submitFiles = async () => {
     if (uploadedFiles.length === 0 || isSubmitting) return;
