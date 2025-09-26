@@ -4,6 +4,7 @@ import { useMemo, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ProgressStep } from '@/types/progress';
 import { STORAGE_KEYS } from '@/constants/progress';
+import apiClient from '@/lib/api/axiosInstance';
 
 type Step = ProgressStep;
 
@@ -36,9 +37,7 @@ export function useReportProgress(params: {
       const params = new URLSearchParams();
       if (jobId) params.set('jobId', jobId);
       if (reportId) params.set('reportId', String(reportId));
-      const res = await import('axios').then((axios) =>
-        axios.default.get(`/api/reports/progress?${params.toString()}`)
-      );
+      const res = await apiClient.get(`/api/reports/progress?${params.toString()}`);
       return res.data;
     },
     enabled: enabled && !!(jobId || reportId),

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { QuestionTTSResponse } from '@/backend/application/questions/dtos/QuestionTTSResponse';
-import axios from 'axios';
+import apiClient from '@/lib/api/axiosInstance';
 
 /**
  * 면접 질문을 조회하는 훅
@@ -8,7 +8,7 @@ import axios from 'axios';
  */
 
 const getTtsQuestions = async (reportId: number) => {
-  const res = await axios.get(`/api/reports/${reportId}/questions/tts`);
+  const res = await apiClient.get(`/api/reports/${reportId}/questions/tts`);
   return res.data;
 };
 
