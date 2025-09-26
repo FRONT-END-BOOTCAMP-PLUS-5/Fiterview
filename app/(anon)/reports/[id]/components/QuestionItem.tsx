@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import apiClient from '@/lib/api/axiosInstance';
 import ArrowDown from '@/public/assets/icons/arrow-down.svg';
 import ArrowUp from '@/public/assets/icons/arrow-up.svg';
 import { ReportStatus } from '@/types/report';
@@ -64,25 +65,15 @@ export default function QuestionItem({
     if (!reportId) return;
 
     try {
-      const response = await fetch(
+      const response = await apiClient.put(
         `/api/reports/${reportId}/questions/${questionNumber}/user-answer`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ userAnswer: editedAnswer }),
-        }
+        { userAnswer: editedAnswer }
       );
 
-      if (response.ok) {
-        setIsEditing(false);
-        // 부모 컴포넌트에 답변 업데이트 알림
-        if (onUserAnswerUpdate) {
-          onUserAnswerUpdate(questionNumber, editedAnswer);
-        }
-      } else {
-        console.error('답변 저장 실패');
+      setIsEditing(false);
+      // 부모 컴포넌트에 답변 업데이트 알림
+      if (onUserAnswerUpdate) {
+        onUserAnswerUpdate(questionNumber, editedAnswer);
       }
     } catch (error) {
       console.error('답변 저장 오류:', error);

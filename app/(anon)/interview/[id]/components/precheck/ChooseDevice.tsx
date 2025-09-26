@@ -1,12 +1,13 @@
 'use client';
 import CustomSelect from '@/app/(anon)/interview/[id]/components/precheck/CustomSelect';
+import { useMediaStore } from '@/stores/useMediaStore';
 
 interface ChooseDeviceProps {
   availableCameras: { deviceId: string; label: string }[];
   availableMicrophones: { deviceId: string; label: string }[];
   selectedCamera: string;
   selectedMicrophone: string;
-  onDeviceChange: (cameraId: string, microphoneId: string) => void;
+  onDeviceChange?: (cameraId: string, microphoneId: string) => void;
 }
 
 export default function ChooseDevice({
@@ -16,22 +17,24 @@ export default function ChooseDevice({
   selectedMicrophone,
   onDeviceChange,
 }: ChooseDeviceProps) {
+  const { setSelectedCam, setSelectedMic, runAllChecks } = useMediaStore();
+
   const handleCameraChange = (cameraId: string) => {
-    onDeviceChange(cameraId, selectedMicrophone);
+    setSelectedCam(cameraId);
+    runAllChecks();
+    onDeviceChange?.(cameraId, selectedMicrophone);
   };
 
   const handleMicrophoneChange = (microphoneId: string) => {
-    onDeviceChange(selectedCamera, microphoneId);
+    setSelectedMic(microphoneId);
+    runAllChecks();
+    onDeviceChange?.(selectedCamera, microphoneId);
   };
 
   return (
     <div>
       <div className="flex mb-4 gap-3 items-baseline">
         <h3 className="text-lg font-semibold text-gray-800  cursor-default">연결 기기 선택</h3>
-        {availableCameras.length === 0 ||
-          (availableMicrophones.length === 0 && (
-            <p className="text-sm text-[12px] text-red-500">카메라나 마이크 권한이 필요합니다.</p>
-          ))}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* 카메라 선택 */}

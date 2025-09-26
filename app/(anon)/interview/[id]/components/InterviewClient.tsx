@@ -13,7 +13,7 @@ import { useGetTtsQuestions } from '@/hooks/useGetTtsQuestions';
 import { transcribeAudio } from '@/hooks/useTranscribeAudio';
 import { QuestionTTSResponse } from '@/backend/application/questions/dtos/QuestionTTSResponse';
 import type { InterviewPhase } from '@/types/interview';
-import axios from 'axios';
+import apiClient from '@/lib/api/axiosInstance';
 import { useModalStore } from '@/stores/useModalStore';
 
 export default function InterviewClient() {
@@ -129,9 +129,8 @@ export default function InterviewClient() {
     const formData = new FormData();
     formData.append('audio', file);
     const url = `/api/reports/${reportId}/questions/${order}/recording`;
-    const res = await fetch(url, { method: 'POST', body: formData });
-    if (!res.ok) throw new Error('녹음 업로드 실패');
-    const json = await res.json();
+    const res = await apiClient.post(url, formData);
+    const json = res.data;
     if (!json?.success) throw new Error(json?.error || '녹음 업로드 실패');
     return json as { success: boolean; fileName?: string };
   };
@@ -169,7 +168,7 @@ export default function InterviewClient() {
       localStorage.removeItem(storageKey);
 
       // 피드백 생성도 백그라운드에서 실행
-      axios
+      apiClient
         .post(`/api/reports/${reportId}/feedback`)
         .then((feedbackResult) => {
           console.log('피드백 생성 완료:', feedbackResult.status);
@@ -179,7 +178,7 @@ export default function InterviewClient() {
         });
 
       // 모범 답변 생성
-      axios
+      apiClient
         .post(`/api/reports/${reportId}/sample-answer`)
         .then((sampleAnswerResult) => {
           console.log('샘플 답변 생성 완료:', sampleAnswerResult.status);

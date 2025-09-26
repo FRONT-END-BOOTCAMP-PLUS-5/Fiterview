@@ -1,64 +1,19 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { UploadOptionsProps } from '@/types/file';
 import Upload from '@/public/assets/icons/upload.svg';
 import Picture from '@/public/assets/icons/image.svg';
+import useDragAndPasteUpload from '@/hooks/useDragAndPasteUpload';
 
 export default function UploadOptions({ onAddFiles }: UploadOptionsProps) {
   const [selected, setSelected] = useState<'portfolio' | 'job' | null>(null);
   const portfolioInputRef = useRef<HTMLInputElement | null>(null);
   const jobInputRef = useRef<HTMLInputElement | null>(null);
-  const pasteImageCounterRef = useRef(1);
-
-  useEffect(() => {
-    const handlePaste = (e: ClipboardEvent) => {
-      const items = e.clipboardData?.items;
-      if (!items || items.length === 0) return;
-
-      const files: File[] = [];
-      for (let i = 0; i < items.length; i += 1) {
-        const item = items[i];
-        if (item.kind === 'file') {
-          const file = item.getAsFile();
-          if (file) files.push(file);
-        }
-      }
-      if (files.length === 0) return;
-
-      const pdfFiles = files.filter(
-        (f) => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')
-      );
-      const imageFiles = files.filter(
-        (f) => /^image\/(png|jpeg|jpg)$/i.test(f.type) || /\.(png|jpe?g)$/i.test(f.name)
-      );
-
-      if (pdfFiles.length > 0) {
-        onAddFiles(pdfFiles, 'portfolio');
-        setSelected('portfolio');
-      }
-      if (imageFiles.length > 0) {
-        const renamed = imageFiles.map((f) => {
-          const lower = f.name.toLowerCase();
-          const match = lower.match(/^(image)\.(png|jpe?g)$/i);
-          if (!match) return f;
-          const base = match[1];
-          const ext = match[2].toLowerCase();
-          const next = pasteImageCounterRef.current++;
-          const newName = `${base}-${next}.${ext}`;
-          return new File([f], newName, {
-            type: f.type,
-            lastModified: (f as any).lastModified ?? Date.now(),
-          });
-        });
-        onAddFiles(renamed, 'job');
-        setSelected('job');
-      }
-    };
-
-    window.addEventListener('paste', handlePaste as EventListener);
-    return () => window.removeEventListener('paste', handlePaste as EventListener);
-  }, [onAddFiles]);
+  const { isDragging, containerDragProps } = useDragAndPasteUpload((files, kind) => {
+    onAddFiles(files, kind);
+    setSelected(kind);
+  });
 
   //css
   const baseClasses =
@@ -75,7 +30,12 @@ export default function UploadOptions({ onAddFiles }: UploadOptionsProps) {
     }`;
 
   return (
-    <div className="self-stretch flex gap-8 w-full h-[200px]">
+    <div
+      className={`self-stretch flex gap-8 w-full h-[200px] ${
+        isDragging ? 'bg-sky-50 outline outline-2 outline-dashed outline-sky-400 rounded-2xl' : ''
+      }`}
+      {...containerDragProps}
+    >
       <input
         ref={portfolioInputRef}
         type="file"

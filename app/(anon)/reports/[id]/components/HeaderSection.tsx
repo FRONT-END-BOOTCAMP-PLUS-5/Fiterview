@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import apiClient from '@/lib/api/axiosInstance';
 import Edit from '@/public/assets/icons/edit.svg';
 import X from '@/public/assets/icons/x.svg';
 import Check from '@/public/assets/icons/check.svg';
@@ -18,11 +19,9 @@ export default function HeaderSection({ reportId }: HeaderSectionProps) {
   useEffect(() => {
     const fetchReportData = async () => {
       try {
-        const response = await fetch(`/api/reports/${reportId}`, {
-          credentials: 'include',
-        });
+        const response = await apiClient.get(`/api/reports/${reportId}`);
 
-        const result = await response.json();
+        const result = response.data;
         if (result.success) {
           setReport(result.data);
         }
@@ -52,22 +51,17 @@ export default function HeaderSection({ reportId }: HeaderSectionProps) {
     }
 
     try {
-      const response = await fetch(`/api/reports/${reportId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ title: editingTitle }),
+      const response = await apiClient.put(`/api/reports/${reportId}`, {
+        title: editingTitle,
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          setReport({
-            ...report,
-            title: result.data.title,
-          });
-          setIsEditingTitle(false);
-        }
+      const result = response.data;
+      if (result.success) {
+        setReport({
+          ...report,
+          title: result.data.title,
+        });
+        setIsEditingTitle(false);
       }
     } catch (error) {
       console.error('제목 업데이트 오류:', error);

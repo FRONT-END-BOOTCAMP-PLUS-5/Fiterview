@@ -164,4 +164,21 @@ export class ReportRepositoryImpl implements ReportRepository {
       where: { id: reportId },
     });
   }
+
+  async updateReportOrder(reportId: number, currentOrder: number): Promise<void> {
+    await prisma.report.update({
+      where: { id: reportId },
+      data: { currentOrder },
+    });
+  }
+
+  async findReportOrderById(reportId: number): Promise<number | null> {
+    const report = await prisma.report.findUnique({
+      where: { id: reportId },
+      select: {
+        currentOrder: true,
+      },
+    });
+    return report?.currentOrder || null;
+  }
 }
