@@ -1,6 +1,6 @@
 'use client';
 
-import axios from 'axios';
+import apiClient from '@/lib/api/axiosInstance';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useUploadFiles } from '@/hooks/useUploadFiles';
@@ -65,9 +65,7 @@ export default function QuickInterviewForm({
       clearReportId();
       clearJobId();
 
-      const response = await axios.post('/api/reports', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const response = await apiClient.post('/api/reports', formData);
 
       if (response.data.success) {
         setUploadedFiles([]);
@@ -83,24 +81,7 @@ export default function QuickInterviewForm({
         openModal('reportProgress');
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 401) {
-          openModal('login');
-        } else if (error.response?.status === 403) {
-          alert('권한이 없습니다.');
-        } else if (error.response?.status === 400) {
-          const errorMessage = error.response?.data?.message || '파일 분석에 실패했습니다.';
-          if (errorMessage.includes('JSON 응답을 찾을 수 없습니다')) {
-            openModal('fileError');
-          } else {
-            alert(errorMessage);
-          }
-        } else {
-          openModal('questionError');
-        }
-      } else {
-        alert('네트워크 오류가 발생했습니다.');
-      }
+      console.log('파일 업로드 실패');
     } finally {
       setIsSubmitting(false);
     }

@@ -2,7 +2,7 @@
 import InterviewModalOverlay from '@/app/(anon)/interview/[id]/components/modal/InterviewModalOverlay';
 import Modal from '@/app/components/modal/Modal';
 import { useModalStore } from '@/stores/useModalStore';
-import axios from 'axios';
+import apiClient from '@/lib/api/axiosInstance';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 
@@ -47,7 +47,7 @@ export default function ReflectionModal() {
 
   const handleSubmitReflection = async () => {
     try {
-      await axios.put(`/api/reports/${reportId}`, {
+      await apiClient.put(`/api/reports/${reportId}`, {
         reflection: reflection,
       });
       replaceModal('video');

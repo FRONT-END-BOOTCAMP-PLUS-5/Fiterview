@@ -1,6 +1,6 @@
 'use client';
 
-import axios from 'axios';
+import apiClient from '@/lib/api/axiosInstance';
 import { useCallback, useEffect, useState } from 'react';
 import { useModalStore } from '@/stores/useModalStore';
 import { useSessionUser } from '@/lib/auth/useSessionUser';
@@ -38,7 +38,7 @@ export default function InterviewDashboard() {
 
     try {
       setLoading(true);
-      const response = await axios.get('/api/reports?status=PENDING', {
+      const response = await apiClient.get('/api/reports?status=PENDING', {
         validateStatus: () => true,
       });
       if (response.status === 200 && response.data?.success) {

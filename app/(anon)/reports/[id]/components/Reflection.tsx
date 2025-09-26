@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import MessageSquareIcon from '@/public/assets/icons/message-square.svg';
 import { LoadingSpinner } from '@/app/components/loading/LoadingSpinner';
-import axios from 'axios';
+import apiClient from '@/lib/api/axiosInstance';
 
 export default function Reflection({
   reportId,
@@ -19,7 +19,7 @@ export default function Reflection({
 
   useEffect(() => {
     const dbFetch = async () => {
-      const result = await axios.get(`/api/reports/${reportId}`, {
+      const result = await apiClient.get(`/api/reports/${reportId}`, {
         data: reflection,
       });
       const fetched = result.data.data.reflection ?? '';
@@ -40,7 +40,7 @@ export default function Reflection({
 
   const handleSave = async () => {
     try {
-      await axios.put(`/api/reports/${reportId}`, {
+      await apiClient.put(`/api/reports/${reportId}`, {
         reflection: tempText,
       });
       setText(tempText);
