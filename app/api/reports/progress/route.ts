@@ -1,65 +1,137 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getJobProgress, getProgressByReportId } from '@/lib/server/progressStore';
-import { JobProgressState } from '@/lib/server/progressStore';
-import { PROGRESS_STARTED_TIMEOUT_MS } from '@/constants/progress';
+import { NextRequest } from 'next/server';
+import {
+  getJobProgress,
+  getProgressByReportId,
+  JobProgressState,
+} from '@/lib/server/progressStore';
+import { ProgressResponse } from '@/types/progress';
 
-function timeoutErrorResponse() {
-  return NextResponse.json({
-    success: true,
-    data: {
-      step: 'error',
-      errorMessage: '작업이 시작되지 않았습니다. 잠시 후 다시 시도해주세요.',
-    },
-  });
+function encodeEvent(event: string, data: ProgressResponse): string {
+  return `event: ${event}\n` + `data: ${JSON.stringify(data)}\n\n`;
+}
+
+export const dynamic = 'force-dynamic';
+
+function getProgress(
+  jobId?: string | null,
+  reportIdParam?: string | null
+): JobProgressState | undefined {
+  if (jobId) return getJobProgress(jobId);
+  if (reportIdParam) {
+    const rid = Number(reportIdParam);
+    if (!Number.isNaN(rid)) return getProgressByReportId(rid);
+  }
+  return undefined;
 }
 
 export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const jobId = searchParams.get('jobId');
-    const reportIdParam = searchParams.get('reportId');
+  const { searchParams } = new URL(request.url);
+  const jobId = searchParams.get('jobId');
+  const reportIdParam = searchParams.get('reportId');
 
-    if (!jobId && !reportIdParam) {
-      return NextResponse.json(
-        { success: false, message: 'jobId 또는 reportId가 필요합니다.' },
-        { status: 400 }
-      );
-    }
-
-    // 메모리 저장소에서 현재 진행 상태 조회
-    let state: JobProgressState | undefined;
-    if (jobId) {
-      state = getJobProgress(jobId);
-    } else if (reportIdParam) {
-      const reportId = Number(reportIdParam);
-      if (Number.isNaN(reportId)) {
-        return NextResponse.json(
-          { success: false, message: 'reportId가 올바르지 않습니다.' },
-          { status: 400 }
+  if (!jobId && !reportIdParam) {
+    const body = new ReadableStream({
+      start(controller) {
+        controller.enqueue(
+          new TextEncoder().encode(
+            encodeEvent('error', {
+              success: false,
+              data: {
+                step: 'error',
+                reportId: 0,
+                errorMessage: 'jobId 또는 reportId가 필요합니다.',
+              },
+            })
+          )
         );
-      }
-      state = getProgressByReportId(reportId);
-    }
-
-    const timeoutMs = PROGRESS_STARTED_TIMEOUT_MS;
-    if (!state) {
-      // 상태가 아직 생성되지 않은 케이스
-      return NextResponse.json({ success: true, data: { step: 'started' } });
-    }
-
-    if (state.step === 'started') {
-      const updatedAtMs = state.updatedAtMs as number | undefined;
-      const now = Date.now();
-      if (!updatedAtMs || now - updatedAtMs > timeoutMs) {
-        return timeoutErrorResponse();
-      }
-    }
-
-    return NextResponse.json({ success: true, data: state });
-  } catch (error) {
-    return NextResponse.json(
-      { success: false, message: '진행 상태 조회에 실패했습니다.' },
-      { status: 500 }
-    );
+        controller.close();
+      },
+    });
+    return new Response(body, {
+      status: 400,
+      headers: {
+        'Content-Type': 'text/event-stream; charset=utf-8',
+        'Cache-Control': 'no-cache, no-transform',
+        Connection: 'keep-alive',
+      },
+    });
   }
+
+  const intervalMs = 200;
+  let lastStateJson = '';
+
+  const body = new ReadableStream({
+    start(controller) {
+      const encoder = new TextEncoder();
+
+      const send = (event: string, data: ProgressResponse) => {
+        controller.enqueue(encoder.encode(encodeEvent(event, data)));
+      };
+
+      send('open', { success: true, data: { step: 'started', reportId: 0, errorMessage: '' } });
+
+      const timer = setInterval(() => {
+        try {
+          const state = getProgress(jobId, reportIdParam);
+          const payload = {
+            success: true,
+            data: {
+              step: state?.step ?? 'started',
+              reportId: state?.reportId ?? 0,
+              errorMessage: state?.errorMessage ?? '',
+            },
+          };
+          const json = JSON.stringify(payload);
+          // 상태가 변경된 경우에만 전송
+          if (json !== lastStateJson) {
+            lastStateJson = json;
+            send('message', payload);
+          }
+
+          const step = state?.step;
+          if (step === 'completed' || step === 'error') {
+            clearInterval(timer);
+            send('end', payload);
+            controller.close();
+          }
+        } catch (e) {
+          clearInterval(timer);
+          send('error', {
+            success: false,
+            data: {
+              step: 'error',
+              reportId: 0,
+              errorMessage: 'stream error',
+            },
+          });
+          controller.close();
+        }
+      }, intervalMs);
+
+      request.signal?.addEventListener('abort', () => {
+        clearInterval(timer);
+        try {
+          send('end', {
+            success: false,
+            data: {
+              step: 'error',
+              reportId: 0,
+              errorMessage: 'aborted',
+            },
+          });
+        } finally {
+          controller.close();
+        }
+      });
+    },
+  });
+
+  return new Response(body, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/event-stream; charset=utf-8',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive',
+    },
+  });
 }

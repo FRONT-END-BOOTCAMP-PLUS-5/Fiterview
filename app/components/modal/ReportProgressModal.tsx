@@ -1,65 +1,36 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import Modal from '@/app/components/modal/Modal';
-import ModalOverlay from '@/app/components/modal/ModalOverlay';
+import { ProgressStep } from '@/types/progress';
+import { useReportProgress } from '@/hooks/useReportProgress';
 import { useModalStore } from '@/stores/useModalStore';
 import { useReportStore } from '@/stores/useReportStore';
+import { getCopy, getPercent } from '@/lib/progress/progressStepInfo';
 import { LoadingSpinner } from '@/app/components/loading/LoadingSpinner';
 import ProgressBar from '@/app/components/loading/ProgressBar';
-import { useReportProgress } from '@/hooks/useReportProgress';
-import { ProgressStep } from '@/types/progress';
+import Modal from '@/app/components/modal/Modal';
+import ModalOverlay from '@/app/components/modal/ModalOverlay';
 import { STORAGE_KEYS } from '@/constants/progress';
 
 type Step = ProgressStep;
 
 export default function ReportProgressModal() {
-  const { isOpen, currentStep, closeModal, replaceModal, openModal } = useModalStore();
-  const { jobId, reportId, setReportId, setJobId, clearJobId, onReportCompleted } =
-    useReportStore();
+  const { isOpen, currentStep, closeModal, replaceModal } = useModalStore();
+  const { jobId, reportId, setReportId, clearJobId, onReportCompleted } = useReportStore();
   const [sampleMessageIndex, setSampleMessageIndex] = useState(0);
 
-  // 마운트 시 작업 ID 복구
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const stored = window.localStorage.getItem(STORAGE_KEYS.FITERVIEW_JOB_ID);
-    if (stored && !jobId) {
-      setJobId(stored);
-      if (!isOpen || currentStep !== 'reportProgress') {
-        openModal('reportProgress');
-      }
-    }
-  }, [jobId, setJobId, isOpen, currentStep, openModal]);
-
-  const persistKey = useMemo(
-    () => `${isOpen && currentStep === 'reportProgress'}:${jobId ?? ''}`,
-    [isOpen, currentStep, jobId]
-  );
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const sepIndex = persistKey.indexOf(':');
-    const activeStr = sepIndex >= 0 ? persistKey.slice(0, sepIndex) : 'false';
-    const job = sepIndex >= 0 ? persistKey.slice(sepIndex + 1) : '';
-    if (activeStr === 'true' && job) {
-      window.localStorage.setItem(STORAGE_KEYS.FITERVIEW_JOB_ID, job);
-    }
-  }, [persistKey]);
-
-  // 서버 진행 상태
-  const { data, isFetching, step, serverReportId, errorMessage, cancel, remove } =
-    useReportProgress({
-      enabled: isOpen && currentStep === 'reportProgress' && (!!jobId || !!reportId),
-      jobId,
-      reportId,
-      onJobIdClear: () => clearJobId(),
-    });
+  const { step, serverReportId, cancel, remove } = useReportProgress({
+    enabled: isOpen && currentStep === 'reportProgress' && (!!jobId || !!reportId),
+    jobId,
+    reportId,
+    onJobIdClear: () => clearJobId(),
+  });
 
   useEffect(() => {
     if (step === 'generating') {
       const interval = setInterval(() => {
         setSampleMessageIndex((prev) => (prev + 1) % 3);
       }, 5000);
-
       return () => clearInterval(interval);
     } else {
       setSampleMessageIndex(0);
@@ -70,21 +41,20 @@ export default function ReportProgressModal() {
     if (serverReportId && !reportId) {
       setReportId(String(serverReportId));
     }
-    if (step === 'completed' || step === 'error') {
+    if (step === 'completed') {
       cancel();
       if (typeof window !== 'undefined') {
         window.localStorage.removeItem(STORAGE_KEYS.FITERVIEW_JOB_ID);
       }
       remove();
-    }
-    if (step === 'completed') {
-      // 리포트 생성 완료 시 콜백 호출
-      if (onReportCompleted) {
-        onReportCompleted();
-      }
+      onReportCompleted?.();
       replaceModal('generateQuestion');
-    }
-    if (step === 'error') {
+    } else if (step === 'error') {
+      cancel();
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem(STORAGE_KEYS.FITERVIEW_JOB_ID);
+      }
+      remove();
       replaceModal('questionError');
     }
   }, [
@@ -120,10 +90,7 @@ export default function ReportProgressModal() {
       <Modal
         title={
           <div className="flex items-center gap-2 mb-1.5">
-            <div
-              className="text-[15px] flex items-center justify-center w-8 h-8 rounded-full bg-[#E2E8F0]
-            ] text-white"
-            >
+            <div className="text-[15px] flex items-center justify-center w-8 h-8 rounded-full bg-[#E2E8F0] text-white">
               {icon}
             </div>
             <span className="text-lg font-semibold">{title}</span>
@@ -135,25 +102,7 @@ export default function ReportProgressModal() {
           </div>
         }
         size="medium"
-        subTitle={
-          step === 'generating' ? (
-            <div className="relative h-6">
-              <div className="transition-opacity duration-1000 ease-in-out">
-                {sampleMessageIndex === 0 && (
-                  <div className="h-6 opacity-100">AI가 맞춤 질문을 생성하고 있어요.</div>
-                )}
-                {sampleMessageIndex === 1 && (
-                  <div className="h-6 opacity-100">지원자의 경험을 분석하고 있어요.</div>
-                )}
-                {sampleMessageIndex === 2 && (
-                  <div className="h-6 opacity-100">면접에 꼭 필요한 질문을 준비하고 있어요.</div>
-                )}
-              </div>
-            </div>
-          ) : (
-            description
-          )
-        }
+        subTitle={description}
         onClose={handleClose}
         hideX={true}
         body={<ModalBody step={step} />}
@@ -172,76 +121,4 @@ function ModalBody({ step }: { step?: Step }) {
       </div>
     </div>
   );
-}
-
-function getCopy(
-  step?: Step,
-  sampleMessageIndex?: number
-): { title: string; description: string; icon: string } {
-  switch (step) {
-    case 'started':
-      return {
-        title: '분석 준비 중',
-        description: '업로드한 파일을 확인하고 있어요.',
-        icon: '📋',
-      };
-    case 'extracting':
-      return {
-        title: '파일 분석 중',
-        description: '문서에서 주요 정보를 추출하고 있어요.',
-        icon: '🔍',
-      };
-    case 'generating': {
-      // 3개 샘플 문구를 2초마다 순환
-      const samples = [
-        'AI가 맞춤 질문을 생성하고 있어요.',
-        '지원자의 경험을 분석 중입니다.',
-        '면접에 꼭 필요한 질문을 준비하고 있어요.',
-      ];
-      return {
-        title: '질문 생성 중',
-        description: samples[sampleMessageIndex ?? 0],
-        icon: '💡',
-      };
-    }
-    case 'creating_report':
-      return {
-        title: '리포트 생성 중',
-        description: '리포트를 만드는 중이에요.',
-        icon: '📊',
-      };
-    case 'saving_questions':
-      return {
-        title: '질문 저장 중',
-        description: '생성된 질문을 저장하고 있어요.',
-        icon: '💾',
-      };
-    case 'error':
-      return {
-        title: '오류 발생',
-        description: '작업을 진행할 수 없습니다. 다시 시도해주세요.',
-        icon: '❌',
-      };
-    default:
-      return {
-        title: '진행 중',
-        description: '잠시만 기다려주세요.',
-        icon: '⏳',
-      };
-  }
-}
-
-function getPercent(step?: Step): number {
-  const order: Step[] = [
-    'started',
-    'extracting',
-    'generating',
-    'creating_report',
-    'saving_questions',
-    'completed',
-  ];
-  if (!step) return 0;
-  const idx = order.indexOf(step);
-  if (idx < 0) return 0;
-  return Math.round((idx / (order.length - 1)) * 100);
 }

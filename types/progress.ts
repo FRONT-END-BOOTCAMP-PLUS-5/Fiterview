@@ -6,3 +6,12 @@ export type ProgressStep =
   | 'saving_questions'
   | 'completed'
   | 'error';
+
+export interface ProgressResponse {
+  success: boolean;
+  data: {
+    step: ProgressStep;
+    reportId: number;
+    errorMessage: string;
+  };
+}

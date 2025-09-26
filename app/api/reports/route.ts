@@ -90,6 +90,9 @@ export async function POST(request: NextRequest) {
     }
 
     const jobId = crypto.randomUUID();
+    const startedAt = Date.now();
+    const startSec = Math.floor(startedAt / 1000);
+    console.log('[Reports API] startSec', startSec);
     createJob(jobId);
 
     // 응답은 즉시 반환 나머지는 백그라운드에서 UseCase로 처리 (진행상태 기록)
@@ -115,9 +118,16 @@ export async function POST(request: NextRequest) {
 
         linkReport(jobId, reportId);
         setJobStep(jobId, 'completed', { reportId });
+        const finishedAt = Date.now();
+        const finishSec = Math.floor(finishedAt / 1000);
+        console.log('[Reports API] finishSec', finishSec, 'durationSec', finishSec - startSec);
       } catch (e) {
         const message = e instanceof Error ? e.message : '알 수 없는 오류';
         setJobStep(jobId, 'error', { errorMessage: message });
+        const finishedAt = Date.now();
+        const finishSec = Math.floor(finishedAt / 1000);
+        console.log('[Reports API] startSec', startSec);
+        console.log('[Reports API] finishSec', finishSec, 'durationSec', finishSec - startSec);
       }
     })();
 
