@@ -11,14 +11,17 @@ interface ReportDetailCardProps {
     title: string;
     score?: number;
     status?: 'PENDING' | 'ANALYZING' | 'COMPLETED';
+    currentOrder?: number;
   };
   onClick?: () => void;
+  onStartInterview?: (report: ReportDetailCardProps['report']) => void;
   className?: string;
 }
 
 export default function ReportDetailCard({
   report,
   onClick,
+  onStartInterview,
   className = '',
 }: ReportDetailCardProps) {
   const router = useRouter();
@@ -82,7 +85,13 @@ export default function ReportDetailCard({
             {/* 면접 시작 */}
             <div
               className="flex items-center gap-1 cursor-pointer hover:opacity-80"
-              onClick={() => router.push(`/interview/${report.id}`)}
+              onClick={() => {
+                if (onStartInterview) {
+                  onStartInterview(report);
+                } else {
+                  router.push(`/interview/${report.id}`);
+                }
+              }}
             >
               <PlayCircle width={18} height={18} strokeWidth={1.3} className="text-blue-500" />
               <span className="text-blue-500 text-sm font-bold">면접 시작</span>

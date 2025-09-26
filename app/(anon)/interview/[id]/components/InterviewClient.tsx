@@ -15,25 +15,19 @@ import { QuestionTTSResponse } from '@/backend/application/questions/dtos/Questi
 import type { InterviewPhase } from '@/types/interview';
 import apiClient from '@/lib/api/axiosInstance';
 import { useModalStore } from '@/stores/useModalStore';
+import { useInterviewOrder } from '@/hooks/useInterviewOrder';
 
 export default function InterviewClient() {
   const { openModal } = useModalStore();
   const { id } = useParams<{ id: string }>();
   const reportId = Number(id);
-  const storageKey = `interview:${reportId}:currentOrder`;
 
   const [phase, setPhase] = useState<InterviewPhase>('idle');
-  // 초기 렌더 시 localStorage에서 가능한 한 동기적으로 복원 (SSR 가드 포함)
-  const [currentOrder, setCurrentOrder] = useState<number>(() => {
-    if (typeof window === 'undefined') return 1;
-    try {
-      const raw = window.localStorage.getItem(storageKey);
-      const saved = Number(raw);
-      return Number.isFinite(saved) && saved >= 1 && saved <= 10 ? saved : 1;
-    } catch {
-      return 1;
-    }
-  });
+  const { orderQuery, updateOrder } = useInterviewOrder(reportId);
+  const rawCurrentOrder = orderQuery.data ?? 0;
+  const currentOrder = Math.min(10, rawCurrentOrder);
+  const isOrderLoading = orderQuery.isLoading;
+
   const [isNextBtnDisabled, setIsNextBtnDisabled] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const lastAdvancedOrderRef = useRef(0);
@@ -46,21 +40,6 @@ export default function InterviewClient() {
   const current = items?.[currentOrder - 1];
   const currentQuestionText = current?.question ?? '질문을 불러오는 중입니다...';
   const currentAudioSrc = current ? `data:audio/mpeg;base64,${current.audioBuffer}` : undefined;
-
-  // 새로고침 복원: 저장된 order 불러오기
-  useEffect(() => {
-    if (!storageKey) return;
-    const saved = Number(localStorage.getItem(storageKey));
-    if (Number.isFinite(saved) && saved >= 1 && saved <= 10) {
-      setCurrentOrder(saved);
-    }
-  }, [storageKey]);
-
-  // 진행 중 order 저장
-  useEffect(() => {
-    if (!storageKey) return;
-    localStorage.setItem(storageKey, String(currentOrder));
-  }, [storageKey, currentOrder]);
 
   // 시작 버튼 클릭 후에만 TTS 허용
   const [ttsEnabled, setTtsEnabled] = useState(false);
@@ -165,8 +144,6 @@ export default function InterviewClient() {
 
     // 마지막 질문인 경우
     if (currentOrder >= 10) {
-      localStorage.removeItem(storageKey);
-
       // 피드백 생성도 백그라운드에서 실행
       apiClient
         .post(`/api/reports/${reportId}/feedback`)
@@ -190,7 +167,7 @@ export default function InterviewClient() {
       openModal('reflection');
     } else {
       // 즉시 다음 질문으로 이동하여 TTS 재생 시작
-      setCurrentOrder((o) => Math.min(10, o + 1));
+      await updateOrder(Math.min(10, currentOrder + 1));
     }
 
     // setIsNextBtnDisabled(false);
@@ -217,7 +194,7 @@ export default function InterviewClient() {
         currentQuestion={currentOrder}
         totalQuestions={10}
         onNext={goNext}
-        isDisabled={isNextBtnDisabled || isUploading}
+        isDisabled={isNextBtnDisabled || isUploading || isOrderLoading}
         nextLabel={currentOrder >= 10 ? '종료하기' : '다음 질문'}
       />
     </div>
