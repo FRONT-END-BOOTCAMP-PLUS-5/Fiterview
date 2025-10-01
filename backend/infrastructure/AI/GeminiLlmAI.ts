@@ -3,6 +3,7 @@ import { QuestionsResponse } from '@/backend/domain/dtos/QuestionsResponse';
 import { GeminiAI } from '@/utils/AIs/GeminiAI';
 import { DEFAULT_GENERATED_QUESTIONS, QUESTIONS_GENERATION_PROMPT } from '@/constants/questions';
 import mime from 'mime-types';
+import { perfLogger } from '@/lib/server/perfLogger';
 
 export class QuestionGenerator {
   private GeminiAI: GeminiAI;
@@ -11,9 +12,21 @@ export class QuestionGenerator {
     this.GeminiAI = new GeminiAI();
   }
 
-  async generate(files: QuestionsRequest[]): Promise<QuestionsResponse[]> {
+  async generate(
+    files: QuestionsRequest[],
+    onPartialBatch?: (batch: QuestionsResponse[]) => void
+  ): Promise<QuestionsResponse[]> {
     try {
-      const questions = await this.generateQuestions(files);
+      const stop = perfLogger.start();
+      const questions = await this.generateQuestions(files, onPartialBatch);
+      const duration = stop();
+      const testInput = files.length === 1 ? files[0].fileName : `${files.length} files`;
+      await perfLogger.record({
+        changeDesc: '구조화 출력 강제(토큰167->122ver)',
+        testInput,
+        durationMs: duration,
+        category: '질문생성과정',
+      });
       return questions.sort((a, b) => a.order - b.order);
     } catch (error) {
       throw new Error(
@@ -21,8 +34,12 @@ export class QuestionGenerator {
       );
     }
   }
+
   // 질문 생성
-  private async generateQuestions(files: QuestionsRequest[]): Promise<QuestionsResponse[]> {
+  private async generateQuestions(
+    files: QuestionsRequest[],
+    onPartialBatch?: (batch: QuestionsResponse[]) => void
+  ): Promise<QuestionsResponse[]> {
     const prompt = QUESTIONS_GENERATION_PROMPT;
 
     const genAI = this.GeminiAI.getClient();
@@ -39,37 +56,93 @@ export class QuestionGenerator {
 
     const contents = [{ text: prompt }, ...fileParts];
 
-    const response = await genAI.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents,
-    });
-
-    const responseText = response.text;
-    if (!responseText) {
-      throw new Error('응답 텍스트가 없습니다');
-    }
-
     try {
-      // 1) 코드 펜스 ```json ... ``` 내 JSON을 우선 추출
-      const fenced = responseText.match(/```(?:json)?\s*([\s\S]*?)```/i);
-      const candidate = fenced ? fenced[1] : (responseText.match(/\{[\s\S]*\}/)?.[0] ?? null);
-      if (!candidate) {
-        throw new Error('JSON 응답을 찾을 수 없습니다');
+      type QuestionsPayload = { questions: QuestionsResponse[] };
+
+      const parseQuestionsPayload = (text: string): QuestionsPayload | null => {
+        try {
+          const parsed = JSON.parse(text) as QuestionsPayload;
+          if (!parsed || !Array.isArray(parsed.questions)) return null;
+          for (const q of parsed.questions) {
+            if (typeof q?.order !== 'number' || typeof q?.question !== 'string') return null;
+          }
+          return parsed;
+        } catch {
+          return null;
+        }
+      };
+
+      const BATCH_SIZE = 5;
+      const stream = await genAI.models.generateContentStream({
+        model: 'gemini-2.5-flash',
+        contents,
+        config: {
+          responseMimeType: 'application/json',
+          responseJsonSchema: {
+            type: 'object',
+            properties: {
+              questions: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    order: { type: 'integer' },
+                    question: { type: 'string' },
+                  },
+                  required: ['order', 'question'],
+                },
+              },
+            },
+            required: ['questions'],
+          },
+        },
+      });
+
+      let accText = '';
+      let lastEmittedCount = 0;
+      let finalPayload: QuestionsPayload | null = null;
+
+      const tryParseFrom = (text: string): QuestionsPayload | null => {
+        const direct = parseQuestionsPayload(text);
+        if (direct) return direct;
+        const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+        const candidate = fenced ? fenced[1] : (text.match(/\{[\s\S]*\}/)?.[0] ?? null);
+        if (!candidate) return null;
+        const sanitized = candidate.replace(/^\uFEFF/, '').replace(/,\s*([}\]])/g, '$1');
+        return parseQuestionsPayload(sanitized);
+      };
+
+      for await (const chunk of stream) {
+        const part = chunk.text ?? '';
+        if (!part) continue;
+        accText += part;
+        const parsed = tryParseFrom(accText);
+        if (parsed) {
+          finalPayload = parsed;
+          const readyLen = parsed.questions.length;
+          const toEmitCount = Math.floor(readyLen / BATCH_SIZE) * BATCH_SIZE;
+          if (onPartialBatch && toEmitCount > lastEmittedCount) {
+            for (let i = lastEmittedCount; i < toEmitCount; i += BATCH_SIZE) {
+              onPartialBatch(parsed.questions.slice(i, i + BATCH_SIZE));
+            }
+            lastEmittedCount = toEmitCount;
+          }
+        }
       }
 
-      // 2) 후행 콤마 제거: 객체/배열 닫힘 앞의 , 제거
-      const sanitized = candidate.replace(/^\uFEFF/, '').replace(/,\s*([}\]])/g, '$1');
+      if (!finalPayload) {
+        throw new Error('구조화된 질문 페이로드 확인 실패');
+      }
 
-      const parsed = JSON.parse(sanitized);
-      const questions = (parsed.questions || []) as QuestionsResponse[];
-      // ai가 order를 주지 않으면 index순 처리
-      return questions.map((q, idx) => ({
-        order: typeof q.order === 'number' ? q.order : idx + 1,
-        question: q.question,
-      }));
+      return finalPayload.questions.map(
+        (q): QuestionsResponse => ({
+          order: q.order,
+          question: q.question,
+        })
+      );
     } catch (parseError) {
       console.error('JSON 파싱 오류:', parseError);
-      console.error('원본 응답:', responseText);
+      // console of accumulated text is skipped to avoid large logs
       return DEFAULT_GENERATED_QUESTIONS;
     }
   }
