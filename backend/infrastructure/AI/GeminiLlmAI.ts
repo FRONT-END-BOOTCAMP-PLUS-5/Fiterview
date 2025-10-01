@@ -20,13 +20,13 @@ export class QuestionGenerator {
       const stop = perfLogger.start();
       const questions = await this.generateQuestions(files, onPartialBatch);
       const duration = stop();
-      const testInput = files.length === 1 ? files[0].fileName : `${files.length} files`;
-      await perfLogger.record({
-        changeDesc: '구조화 출력 강제(토큰167->122ver)',
-        testInput,
-        durationMs: duration,
-        category: '질문생성과정',
-      });
+      // const testInput = files.length === 1 ? files[0].fileName : `${files.length} files`;
+      // await perfLogger.record({
+      //   changeDesc: '구조화 출력 강제(토큰167->122ver)',
+      //   testInput,
+      //   durationMs: duration,
+      //   category: '질문생성과정',
+      // });
       return questions.sort((a, b) => a.order - b.order);
     } catch (error) {
       throw new Error(
