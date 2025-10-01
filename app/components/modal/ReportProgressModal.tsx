@@ -15,8 +15,9 @@ import { STORAGE_KEYS } from '@/constants/progress';
 type Step = ProgressStep;
 
 export default function ReportProgressModal() {
-  const { isOpen, currentStep, closeModal, replaceModal } = useModalStore();
-  const { jobId, reportId, setReportId, clearJobId, onReportCompleted } = useReportStore();
+  const { isOpen, currentStep, closeModal, replaceModal, openModal } = useModalStore();
+  const { jobId, reportId, setReportId, setJobId, clearJobId, onReportCompleted } =
+    useReportStore();
   const [sampleMessageIndex, setSampleMessageIndex] = useState(0);
 
   const { step, serverReportId, cancel, remove } = useReportProgress({
@@ -25,6 +26,26 @@ export default function ReportProgressModal() {
     reportId,
     onJobIdClear: () => clearJobId(),
   });
+
+  //새로고침/재진입 시 jobId 복구
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const shouldRestore = !isOpen || currentStep !== 'reportProgress';
+    if ((!jobId || jobId.length === 0) && shouldRestore) {
+      const stored = window.localStorage.getItem(STORAGE_KEYS.FITERVIEW_JOB_ID);
+      if (stored) {
+        setJobId(stored);
+        openModal('reportProgress');
+      }
+    }
+  }, [jobId, isOpen, currentStep, setJobId, replaceModal]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (jobId && jobId.length > 0) {
+      window.localStorage.setItem(STORAGE_KEYS.FITERVIEW_JOB_ID, jobId);
+    }
+  }, [jobId]);
 
   useEffect(() => {
     if (step === 'generating') {
@@ -43,17 +64,13 @@ export default function ReportProgressModal() {
     }
     if (step === 'completed') {
       cancel();
-      if (typeof window !== 'undefined') {
-        window.localStorage.removeItem(STORAGE_KEYS.FITERVIEW_JOB_ID);
-      }
+      clearJobId();
       remove();
       onReportCompleted?.();
       replaceModal('generateQuestion');
     } else if (step === 'error') {
       cancel();
-      if (typeof window !== 'undefined') {
-        window.localStorage.removeItem(STORAGE_KEYS.FITERVIEW_JOB_ID);
-      }
+      clearJobId();
       remove();
       replaceModal('questionError');
     }
@@ -70,9 +87,7 @@ export default function ReportProgressModal() {
 
   const handleClose = () => {
     cancel();
-    if (typeof window !== 'undefined') {
-      window.localStorage.removeItem(STORAGE_KEYS.FITERVIEW_JOB_ID);
-    }
+    clearJobId();
     closeModal();
   };
 

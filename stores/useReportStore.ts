@@ -17,9 +17,23 @@ export const useReportStore = create<ReportState>((set) => ({
   jobId: null,
   onReportCompleted: undefined,
   setReportId: (id: string) => set({ reportId: id }),
-  setJobId: (id: string) => set({ jobId: id }),
+  setJobId: (id: string) => {
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.setItem('fiterview_job_id', id);
+      } catch {}
+    }
+    set({ jobId: id });
+  },
   setOnReportCompleted: (callback: () => void) => set({ onReportCompleted: callback }),
   clearReportId: () => set({ reportId: null }),
-  clearJobId: () => set({ jobId: null }),
+  clearJobId: () => {
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.removeItem('fiterview_job_id');
+      } catch {}
+    }
+    set({ jobId: null });
+  },
   clearOnReportCompleted: () => set({ onReportCompleted: undefined }),
 }));
