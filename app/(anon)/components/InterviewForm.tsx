@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import apiClient from '@/lib/api/axiosInstance';
 import { useUploadFiles } from '@/hooks/useUploadFiles';
@@ -42,6 +42,31 @@ export default function InterviewForm({
     uploadedFiles.length === 1
       ? 'grid grid-cols-1 gap-2 w-full h-full'
       : 'grid grid-cols-2 gap-2 w-full h-full';
+
+  const isTestFileUploaded = useCallback(() => {
+    return uploadedFiles.some((file) => file.name === '김피터_포트폴리오.pdf');
+  }, [uploadedFiles]);
+
+  useEffect(() => {
+    let cancelled = false;
+    function ensureDemoFilePresent() {
+      if (user?.username !== 'test2' || isTestFileUploaded()) return;
+      fetch('/assets/file/김피터_포트폴리오.pdf')
+        .then((response) => response.blob())
+        .then((blob) => {
+          if (cancelled) return;
+          const file = new File([blob], '김피터_포트폴리오.pdf', { type: 'application/pdf' });
+          handleAddFiles([file], 'portfolio');
+        })
+        .catch((e) => {
+          if (process.env.NODE_ENV !== 'production') console.debug(e);
+        });
+    }
+    ensureDemoFilePresent();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.username, isTestFileUploaded, handleAddFiles]);
 
   useEffect(() => {
     if (onReportCompleted) {
