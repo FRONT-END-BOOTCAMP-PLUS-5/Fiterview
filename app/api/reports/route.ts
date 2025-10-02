@@ -115,6 +115,8 @@ export async function POST(request: NextRequest) {
 
         linkReport(jobId, reportId);
         setJobStep(jobId, 'completed', { reportId });
+        const finishedAt = Date.now();
+        const finishSec = Math.floor(finishedAt / 1000);
       } catch (e) {
         const message = e instanceof Error ? e.message : '알 수 없는 오류';
         setJobStep(jobId, 'error', { errorMessage: message });
