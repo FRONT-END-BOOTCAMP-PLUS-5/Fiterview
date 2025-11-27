@@ -5,7 +5,7 @@ import ArrowRight from '@/public/assets/icons/arrow-right.svg';
 
 export default function FiterviewPrepare() {
   return (
-    <div className="px-[120px] self-stretch py-20 bg-white inline-flex flex-col justify-center items-center gap-12">
+    <div className="px-6 md:px-[120px] self-stretch py-20 bg-white flex flex-col justify-center items-center gap-12">
       <motion.div
         className="self-stretch flex flex-col justify-start items-center gap-4"
         initial={{ opacity: 0, y: 20 }}
@@ -21,8 +21,9 @@ export default function FiterviewPrepare() {
         </div>
       </motion.div>
 
-      <div className="w-full inline-flex justify-between items-center">
+      <div className="w-full grid grid-cols-1 md:grid-cols-5 items-center gap-6 md:gap-8 justify-items-center">
         <motion.div
+          className="flex justify-center"
           initial={{ opacity: 0, x: -50, scale: 0.8 }}
           whileInView={{ opacity: 1, x: 0, scale: 1 }}
           viewport={{ once: true }}
@@ -49,6 +50,22 @@ export default function FiterviewPrepare() {
         </motion.div>
 
         <motion.div
+          className="hidden md:flex justify-center"
+          initial={{ opacity: 0, scale: 0.5 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{
+            duration: 0.5,
+            delay: 0.6,
+            type: 'spring',
+            stiffness: 150,
+            damping: 20,
+          }}
+        >
+          <ArrowRight width={24} height={24} stroke="#CBD5E1" />
+        </motion.div>
+        <motion.div
+          className="flex md:hidden justify-center rotate-90"
           initial={{ opacity: 0, scale: 0.5 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
@@ -64,6 +81,7 @@ export default function FiterviewPrepare() {
         </motion.div>
 
         <motion.div
+          className="flex justify-center"
           initial={{ opacity: 0, x: -30, scale: 0.8 }}
           whileInView={{ opacity: 1, x: 0, scale: 1 }}
           viewport={{ once: true }}
@@ -90,6 +108,7 @@ export default function FiterviewPrepare() {
         </motion.div>
 
         <motion.div
+          className="hidden md:flex justify-center"
           initial={{ opacity: 0, scale: 0.5 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
@@ -103,8 +122,24 @@ export default function FiterviewPrepare() {
         >
           <ArrowRight width={24} height={24} stroke="#CBD5E1" />
         </motion.div>
+        <motion.div
+          className="flex md:hidden justify-center rotate-90"
+          initial={{ opacity: 0, scale: 0.5 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{
+            duration: 0.5,
+            delay: 1.0,
+            type: 'spring',
+            stiffness: 150,
+            damping: 20,
+          }}
+        >
+          <ArrowRight width={24} height={24} stroke="#CBD5E1" />
+        </motion.div>
 
         <motion.div
+          className="flex justify-center"
           initial={{ opacity: 0, x: -30, scale: 0.8 }}
           whileInView={{ opacity: 1, x: 0, scale: 1 }}
           viewport={{ once: true, margin: '0px' }}
