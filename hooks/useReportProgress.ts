@@ -1,104 +1,99 @@
 'use client';
 
-import { useMemo, useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ProgressStep } from '@/types/progress';
 import { STORAGE_KEYS } from '@/constants/progress';
 
-type Step = ProgressStep;
+type ProgressStatus = ProgressStep;
 
 interface ProgressResponse {
   success: boolean;
-  data?: { step: Step; reportId?: number; errorMessage?: string };
-}
-
-export function getReportProgressQueryKey(
-  jobId?: string | null,
-  reportId?: string | null
-): (string | null | undefined)[] {
-  return ['report-progress', jobId || null, reportId || null];
+  data: {
+    step: ProgressStatus;
+    reportId: number;
+    errorMessage: string;
+  };
 }
 
 export function useReportProgress(params: {
   enabled: boolean;
-  jobId?: string | null;
-  reportId?: string | null;
-  onJobIdClear?: () => void; // jobId 정리 콜백 추가
+  jobId: string | null;
+  reportId: string | null;
+  onJobIdClear: () => void;
 }) {
   const { enabled, jobId, reportId, onJobIdClear } = params;
-  const queryClient = useQueryClient();
 
-  const queryKey = useMemo(() => getReportProgressQueryKey(jobId, reportId), [jobId, reportId]);
+  const [progress, setProgress] = useState<ProgressResponse | undefined>(undefined);
+  const [connected, setConnected] = useState(false);
+  const eventSourceRef = useRef<EventSource | null>(null);
 
-  const { data, isFetching } = useQuery<ProgressResponse>({
-    queryKey,
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      if (jobId) params.set('jobId', jobId);
-      if (reportId) params.set('reportId', String(reportId));
-      const res = await import('axios').then((axios) =>
-        axios.default.get(`/api/reports/progress?${params.toString()}`)
-      );
-      return res.data;
-    },
-    enabled: enabled && !!(jobId || reportId),
-    refetchInterval: (q) => {
-      const step = q.state.data?.data?.step;
-      if (!step) return false; // undefined 상태면 폴링 중단
+  const sseUrl = useMemo(() => {
+    const paramsObj = new URLSearchParams();
+    if (jobId) paramsObj.set('jobId', jobId);
+    if (reportId) paramsObj.set('reportId', String(reportId));
+    return `/api/reports/progress?${paramsObj.toString()}`;
+  }, [jobId, reportId]);
 
-      switch (step) {
-        case 'extracting':
-          return 250;
-        case 'generating':
-          return 400;
-        case 'saving_questions':
-          return 250;
-        case 'completed':
-        case 'error':
-          return false; // 완료/에러 시 폴링 중단
-        default:
-          return 250; // 기본 간격 (250ms)
-      }
-    },
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    retry: (failureCount, _error) => {
-      const step = (data as any)?.data?.step as string | undefined;
-      if (step === 'error') return false;
-      return failureCount < 3;
-    },
-    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 5000),
-    staleTime: 0,
-    gcTime: 1000 * 60 * 2,
-  });
-
-  const step: Step | undefined = data?.data?.step;
-  const serverReportId = data?.data?.reportId;
-  const errorMessage = data?.data?.errorMessage;
-
-  const cancel = () => queryClient.cancelQueries({ queryKey });
-  const remove = () => queryClient.removeQueries({ queryKey });
-
-  // error 상태일 때 localStorage에서 jobId 제거
+  // SSE 연결 및 메시지 수신 관리
   useEffect(() => {
-    if (jobId && typeof window !== 'undefined') {
-      const step = data?.data?.step;
+    if (!enabled || (!jobId && !reportId)) return;
 
-      if (step === 'error') {
-        window.localStorage.removeItem(STORAGE_KEYS.FITERVIEW_JOB_ID);
-        onJobIdClear?.(); // 컴포넌트의 jobId 상태도 null로 설정
-      }
+    const eventSource = new EventSource(sseUrl, { withCredentials: false });
+    eventSourceRef.current = eventSource;
+
+    eventSource.addEventListener('open', () => {
+      setConnected(true);
+    });
+
+    eventSource.addEventListener('message', (evt) => {
+      try {
+        const parsed: ProgressResponse = JSON.parse(evt.data);
+        setProgress(parsed);
+      } catch {}
+    });
+
+    eventSource.addEventListener('end', () => {
+      eventSource.close();
+      setConnected(false);
+    });
+    eventSource.addEventListener('error', () => {
+      setConnected(false);
+      eventSource.close();
+    });
+
+    return () => {
+      eventSource.close();
+      eventSourceRef.current = null;
+    };
+  }, [enabled, sseUrl, jobId, reportId]);
+
+  const progressStep: ProgressStatus | undefined = progress?.data?.step;
+  const receivedReportId = progress?.data?.reportId;
+  const receivedErrorMessage = progress?.data?.errorMessage;
+
+  // 에러 발생 -> JobID 클리어 및 콜백 실행
+  useEffect(() => {
+    if (jobId && progressStep === 'error' && typeof window !== 'undefined') {
+      window.localStorage.removeItem(STORAGE_KEYS.FITERVIEW_JOB_ID);
+      onJobIdClear?.();
     }
-  }, [jobId, data?.data?.step, onJobIdClear]);
+  }, [jobId, progressStep, onJobIdClear]);
+
+  const cancel = () => {
+    eventSourceRef.current?.close();
+  };
+
+  const remove = () => {
+    setProgress(undefined);
+  };
 
   return {
-    data,
-    isFetching,
-    step,
-    serverReportId,
-    errorMessage,
+    progress,
+    isFetching: connected,
+    step: progressStep,
+    serverReportId: receivedReportId,
+    errorMessage: receivedErrorMessage,
     cancel,
     remove,
-    queryKey,
   };
 }

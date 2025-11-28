@@ -46,3 +46,6 @@ fiterview-62256864450d.json
 
 # audio files
 /public/assets/audios
+
+# perf logs
+perf_logs.csv

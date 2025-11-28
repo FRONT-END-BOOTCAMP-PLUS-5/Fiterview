@@ -1,12 +1,14 @@
 'use client';
 
-import axios from 'axios';
+import apiClient from '@/lib/api/axiosInstance';
 import { useCallback, useEffect, useState } from 'react';
 import { useModalStore } from '@/stores/useModalStore';
 import { useSessionUser } from '@/lib/auth/useSessionUser';
 import PendingInterviewsList from '@/app/(anon)/interview/components/PendingInterviewsList';
 import QuickInterviewForm from '@/app/(anon)/interview/components/QuickInterviewForm';
 import LoginModal from '@/app/components/modal/LoginModal';
+import ProceedInterviewModal from '@/app/components/modal/ProceedInterviewModal';
+import { useProceedInterview } from '@/hooks/useProceedInterview';
 
 type PendingReport = {
   id: number;
@@ -18,6 +20,14 @@ export default function InterviewDashboard() {
   const [loading, setLoading] = useState(true);
   const { currentStep, isOpen, openModal } = useModalStore();
   const { user } = useSessionUser();
+  const {
+    isOpen: isProceedOpen,
+    currentOrder,
+    selectInterview,
+    close,
+    proceed,
+    restart,
+  } = useProceedInterview();
 
   const fetchPendingReports = useCallback(async () => {
     if (!user) {
@@ -28,7 +38,7 @@ export default function InterviewDashboard() {
 
     try {
       setLoading(true);
-      const response = await axios.get('/api/reports?status=PENDING', {
+      const response = await apiClient.get('/api/reports?status=PENDING', {
         validateStatus: () => true,
       });
       if (response.status === 200 && response.data?.success) {
@@ -73,8 +83,15 @@ export default function InterviewDashboard() {
           onReportCompleted={fetchPendingReports}
           LoginModal={isOpen && currentStep === 'login' ? <LoginModal /> : null}
         />
-        <PendingInterviewsList reports={reports} loading={loading} />
+        <PendingInterviewsList reports={reports} loading={loading} onSelect={selectInterview} />
       </div>
+      <ProceedInterviewModal
+        isOpen={isProceedOpen}
+        currentOrder={currentOrder}
+        onClose={close}
+        onProceed={proceed}
+        onRestart={restart}
+      />
     </div>
   );
 }

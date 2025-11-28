@@ -8,4 +8,5 @@ export interface ReportDto {
   userId: number;
   reflection?: string;
   score?: number;
+  currentOrder?: number;
 }

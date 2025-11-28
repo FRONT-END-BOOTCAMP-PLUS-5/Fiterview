@@ -18,8 +18,7 @@ export function useUploadFiles(): UseUploadFilesReturn {
 
   const handleAddFiles = (files: File[], source: SourceType) => {
     setUploadedFiles((prev) => {
-      const getFileKey = (file: File) =>
-        `${file.name}:${file.size}:${file.type}:${(file as any).lastModified ?? ''}`;
+      const getFileKey = (file: File) => `${file.name}:${file.size}:${file.type}`;
       const existingKeys = new Set(prev.map((p) => getFileKey(p.file)));
 
       const dedupedNew = files.filter((f) => !existingKeys.has(getFileKey(f)));

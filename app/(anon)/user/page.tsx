@@ -6,7 +6,7 @@ import StaticField from '@/app/(anon)/user/components/StaticField';
 import SubmitButton from '@/app/(anon)/user/components/SubmitButton';
 import { useSessionUser } from '@/lib/auth/useSessionUser';
 import EyeOff from '@/public/assets/icons/eye-off.svg';
-import axios from 'axios';
+import apiClient from '@/lib/api/axiosInstance';
 import Modal from '@/app/components/modal/Modal';
 import { useRouter } from 'next/navigation';
 import ModalOverlay from '@/app/components/modal/ModalOverlay';
@@ -86,7 +86,7 @@ export default function User() {
     setError('');
 
     try {
-      await axios.put('/api/auth/user', {
+      await apiClient.put('/api/auth/user', {
         email,
         nickname,
         password,

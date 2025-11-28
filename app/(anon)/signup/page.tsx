@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import apiClient from '@/lib/api/axiosInstance';
 import SignupForm from '@/app/(anon)/signup/components/SignupForm';
 import SignupFeatures from '@/app/(anon)/signup/components/SignupFeatures';
 
@@ -48,7 +48,7 @@ export default function SignupPage() {
     }
 
     try {
-      await axios.post('/api/auth/signup', {
+      await apiClient.post('/api/auth/signup', {
         username: formData.username,
         email: formData.email,
         nickname: formData.nickname,

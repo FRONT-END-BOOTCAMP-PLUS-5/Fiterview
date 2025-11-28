@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Light from '@/public/assets/icons/light.svg';
 import { LoadingSpinner } from '@/app/components/loading/LoadingSpinner';
-import axios from 'axios';
+import apiClient from '@/lib/api/axiosInstance';
 import { useReportStatusStore } from '@/stores/useReportStatusStore';
 
 export default function AIFeedback({ reportId }: { reportId: number }) {
@@ -21,11 +21,7 @@ export default function AIFeedback({ reportId }: { reportId: number }) {
       setLoading(true);
 
       try {
-        const response = await axios.get(`/api/reports/${reportId}/feedback`, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+        const response = await apiClient.get(`/api/reports/${reportId}/feedback`);
 
         const data = response.data;
 

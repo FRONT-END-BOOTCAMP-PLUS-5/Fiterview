@@ -86,6 +86,7 @@ export class ReportRepositoryImpl implements ReportRepository {
       status: mapReportStatusToDomain(report.status as any),
       userId: report.userId,
       reflection: report.reflection || undefined,
+      currentOrder: report.currentOrder ?? undefined,
     };
   }
 
@@ -110,6 +111,7 @@ export class ReportRepositoryImpl implements ReportRepository {
       userId: report.userId,
       reflection: report.reflection ?? undefined,
       score: report.feedback?.score || undefined,
+      currentOrder: report.currentOrder ?? undefined,
     }));
   }
 
@@ -128,6 +130,7 @@ export class ReportRepositoryImpl implements ReportRepository {
       status: mapReportStatusToDomain(report.status),
       userId: report.userId,
       reflection: report.reflection ?? undefined,
+      currentOrder: report.currentOrder ?? undefined,
     }));
   }
 
@@ -156,6 +159,7 @@ export class ReportRepositoryImpl implements ReportRepository {
       userId: report.userId,
       reflection: report.reflection ?? undefined,
       score: report.feedback?.score || undefined,
+      currentOrder: report.currentOrder ?? undefined,
     }));
   }
 
