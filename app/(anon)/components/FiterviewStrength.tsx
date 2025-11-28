@@ -7,7 +7,7 @@ import Target from '@/public/assets/icons/target.svg';
 
 export default function FiterviewStrength() {
   return (
-    <div className="w-full px-[120px] py-20 bg-[#F8FAFC] inline-flex flex-col justify-center items-center gap-12">
+    <div className="w-full px-6 md:px-[120px] py-20 bg-[#F8FAFC] flex flex-col justify-center items-center gap-12">
       <motion.div
         className="self-stretch flex flex-col justify-start items-center"
         initial={{ opacity: 0, y: 30 }}
@@ -20,7 +20,7 @@ export default function FiterviewStrength() {
         </h2>
       </motion.div>
 
-      <div className="w-full flex justify-between items-start">
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
         <motion.div
           initial={{ opacity: 0, y: 50, scale: 0.9 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -32,6 +32,7 @@ export default function FiterviewStrength() {
             stiffness: 100,
             damping: 15,
           }}
+          className="flex justify-center items-center"
         >
           <StrengthCard
             icon={<Chart width={28} height={28} strokeWidth={0} stroke="#3B82F6" />}
@@ -56,6 +57,7 @@ export default function FiterviewStrength() {
             stiffness: 100,
             damping: 15,
           }}
+          className="flex justify-center items-center"
         >
           <StrengthCard
             icon={<Chat width={28} height={28} stroke="#3B82F6" opacity={0.7} strokeWidth={2.33} />}
@@ -81,6 +83,7 @@ export default function FiterviewStrength() {
             stiffness: 100,
             damping: 15,
           }}
+          className="flex justify-center items-center"
         >
           <StrengthCard
             icon={<Target width={28} height={28} stroke="#3B82F6" strokeWidth={2.33} />}
@@ -106,7 +109,7 @@ function StrengthCard({
 }) {
   return (
     <motion.div
-      className="w-[360px] p-8 rounded-[16px] flex flex-col items-start gap-5 bg-white shadow-md hover:shadow-lg transition-shadow duration-300"
+      className="w-[clamp(260px,25vw,360px)] min-h-[clamp(200px,28vw,240px)] p-6 md:p-8 rounded-[16px] flex flex-col items-start justify-center gap-5 bg-white shadow-md hover:shadow-lg transition-shadow duration-300"
       whileHover={{
         y: -8,
         transition: { duration: 0.6, type: 'spring', stiffness: 300, damping: 20 },
