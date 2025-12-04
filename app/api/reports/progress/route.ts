@@ -46,6 +46,9 @@ export async function GET(request: NextRequest) {
         );
         controller.close();
       },
+      cancel() {
+        // 스트림 취소 시 정리
+      },
     });
     return new Response(body, {
       status: 400,
@@ -53,24 +56,64 @@ export async function GET(request: NextRequest) {
         'Content-Type': 'text/event-stream; charset=utf-8',
         'Cache-Control': 'no-cache, no-transform',
         Connection: 'keep-alive',
+        'X-Accel-Buffering': 'no', //Nginx 버퍼링 비활성화
+        'X-Content-Type-Options': 'nosniff', // 보안 헤더 설정
       },
     });
   }
 
   const intervalMs = 200;
+  const keepAliveIntervalMs = 30000; // 30초마다 keep-alive
   let lastStateJson = '';
+  let timer: NodeJS.Timeout | null = null;
+  let keepAliveTimer: NodeJS.Timeout | null = null;
+  let isClosed = false;
 
   const body = new ReadableStream({
     start(controller) {
       const encoder = new TextEncoder();
 
+      const cleanup = () => {
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+        if (keepAliveTimer) {
+          clearInterval(keepAliveTimer);
+          keepAliveTimer = null;
+        }
+        isClosed = true;
+      };
+
       const send = (event: string, data: ProgressResponse) => {
-        controller.enqueue(encoder.encode(encodeEvent(event, data)));
+        if (isClosed) return;
+        try {
+          controller.enqueue(encoder.encode(encodeEvent(event, data)));
+        } catch (e) {
+          // 스트림이 이미 닫혔거나 에러가 발생한 경우
+          cleanup();
+        }
+      };
+
+      const sendKeepAlive = () => {
+        if (isClosed) return;
+        try {
+          // SSE 스펙에 따라 주석 메시지로 keep-alive 전송
+          controller.enqueue(encoder.encode(': keep-alive\n\n'));
+        } catch (e) {
+          cleanup();
+        }
       };
 
       send('open', { success: true, data: { step: 'started', reportId: 0, errorMessage: '' } });
 
-      const timer = setInterval(() => {
+      // 주기적으로 상태 체크
+      timer = setInterval(() => {
+        if (isClosed) {
+          cleanup();
+          return;
+        }
+
         try {
           const state = getProgress(jobId, reportIdParam);
           const payload = {
@@ -90,12 +133,16 @@ export async function GET(request: NextRequest) {
 
           const step = state?.step;
           if (step === 'completed' || step === 'error') {
-            clearInterval(timer);
+            cleanup();
             send('end', payload);
-            controller.close();
+            try {
+              controller.close();
+            } catch (e) {
+              // 이미 닫혔을 수 있음
+            }
           }
         } catch (e) {
-          clearInterval(timer);
+          cleanup();
           send('error', {
             success: false,
             data: {
@@ -104,12 +151,22 @@ export async function GET(request: NextRequest) {
               errorMessage: 'stream error',
             },
           });
-          controller.close();
+          try {
+            controller.close();
+          } catch (err) {
+            // 이미 닫혔을 수 있음
+          }
         }
       }, intervalMs);
 
+      // Keep-alive 메시지 전송 (연결 유지)
+      keepAliveTimer = setInterval(() => {
+        sendKeepAlive();
+      }, keepAliveIntervalMs);
+
+      // 클라이언트가 연결을 끊었을 때
       request.signal?.addEventListener('abort', () => {
-        clearInterval(timer);
+        cleanup();
         try {
           send('end', {
             success: false,
@@ -119,10 +176,28 @@ export async function GET(request: NextRequest) {
               errorMessage: 'aborted',
             },
           });
+        } catch (e) {
+          // 무시
         } finally {
-          controller.close();
+          try {
+            controller.close();
+          } catch (e) {
+            // 이미 닫혔을 수 있음
+          }
         }
       });
+    },
+    cancel() {
+      // 클라이언트가 스트림을 취소했을 때 정리
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+      if (keepAliveTimer) {
+        clearInterval(keepAliveTimer);
+        keepAliveTimer = null;
+      }
+      isClosed = true;
     },
   });
 
@@ -132,6 +207,8 @@ export async function GET(request: NextRequest) {
       'Content-Type': 'text/event-stream; charset=utf-8',
       'Cache-Control': 'no-cache, no-transform',
       Connection: 'keep-alive',
+      'X-Accel-Buffering': 'no', // Nginx 버퍼링 비활성화
+      'X-Content-Type-Options': 'nosniff',
     },
   });
 }
