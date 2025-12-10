@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Axios instance 생성
 const apiClient = axios.create({
-  timeout: 10000,
+  timeout: 20000,
   withCredentials: true,
 });
 
