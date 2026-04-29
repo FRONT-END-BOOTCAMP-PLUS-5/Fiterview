@@ -6,6 +6,9 @@ import { QuestionGenerator } from '@/backend/infrastructure/AI/GeminiLlmAI';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import prisma from '@/utils/prisma';
+import { GetObjectCommand } from '@aws-sdk/client-s3';
+import { r2Client } from '@/lib/r2/client';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 export class QuestionRepositoryImpl implements QuestionRepository {
   private generator: QuestionGenerator;
@@ -123,33 +126,25 @@ export class QuestionRepositoryImpl implements QuestionRepository {
       });
 
       if (!question || !question.recording) {
-        throw new Error(`질문 ${questionOrder}번의 녹음 파일을 찾을 수 없습니다.`);
+        throw new Error(`질문 ${questionOrder}번의 녹음 파일을 데이터베이스에서 찾을 수 없습니다.`);
       }
 
-      // 2. 파일 경로 구성
-      const filePath = join(
-        QuestionRepositoryImpl.AUDIO_BASE_PATH,
-        reportId.toString(),
-        question.recording
-      );
+      // 2. R2 키 구성
+      const fileKey = `${reportId}/${question.recording}`;
 
-      // 3. 파일 존재 여부 확인
-      if (!existsSync(filePath)) {
-        throw new Error(`파일이 존재하지 않습니다: ${filePath}`);
-      }
+      // 3. R2 접근 명령 생성
+      const command = new GetObjectCommand({
+        Bucket: process.env.R2_BUCKET_NAME!,
+        Key: fileKey,
+      });
 
-      // 4. 파일 읽기
-      const fileBuffer = readFileSync(filePath);
+      // 4. 임시 URL 생성 (유효기간 1시간)
+      const signedUrl = await getSignedUrl(r2Client, command, { expiresIn: 3600 });
 
       // 5. MIME 타입 추정
       const mimeType = this.getMimeTypeFromFileName(question.recording);
 
-      return {
-        filePath,
-        fileName: question.recording,
-        fileBuffer,
-        mimeType,
-      };
+      return { filePath: signedUrl };
     } catch (error) {
       console.error('음성 파일 조회 실패:', error);
       throw error;

@@ -39,7 +39,7 @@ export class GenerateRecordingUsecase {
     }
 
     // DB에는 파일명만 저장
-    // await this.questionRepository.generateRecording(reportId, order, safeName);
+    await this.questionRepository.generateRecording(reportId, order, safeName);
 
     return {
       success: true,

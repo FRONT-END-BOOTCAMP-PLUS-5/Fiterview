@@ -10,7 +10,4 @@ export interface Question {
 
 export interface AudioFileInfo {
   filePath: string;
-  fileName: string;
-  fileBuffer: Buffer;
-  mimeType: string;
 }
