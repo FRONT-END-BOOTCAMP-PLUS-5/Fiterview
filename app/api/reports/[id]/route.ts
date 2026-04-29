@@ -8,6 +8,7 @@ import { GetQuestionsUsecase } from '@/backend/application/questions/usecases/Ge
 import { ReportDto } from '@/backend/application/reports/dtos/ReportDto';
 import { QuestionDto } from '@/backend/application/questions/dtos/QuestionDto';
 import { getUserFromSession } from '@/lib/auth/api-auth';
+import { GetAudioByQuestionUseCase } from '@/backend/application/questions/usecases/GetAudioByQuestionUseCase';
 
 const reportsRepository = new ReportRepositoryImpl();
 const questionRepository = new QuestionRepositoryImpl();
@@ -15,6 +16,7 @@ const updateReportUsecase = new UpdateReportUsecase(reportsRepository);
 const deleteReportUsecase = new DeleteReportUsecase(reportsRepository);
 const getReportByIdUsecase = new GetReportByIdUsecase(reportsRepository);
 const getQuestionsUsecase = new GetQuestionsUsecase(questionRepository);
+const getAudioByQuestionUseCase = new GetAudioByQuestionUseCase(questionRepository);
 
 //수정 (제목, 회고)
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -143,14 +145,28 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     // 해당 리포트의 질문들도 함께 조회
     const questions = await getQuestionsUsecase.execute(reportId);
 
-    const questionDtos: QuestionDto[] = questions.map((q) => ({
-      id: q.id,
-      order: q.order,
-      question: q.question,
-      sampleAnswer: q.sampleAnswer,
-      userAnswer: q.userAnswer,
-      recording: q.recording,
-    }));
+    const questionDtos: QuestionDto[] = await Promise.all(
+      questions.map(async (q) => {
+        let recording = q.recording;
+        if (recording) {
+          try {
+            const audioInfo = await getAudioByQuestionUseCase.execute(reportId, q.order);
+            recording = audioInfo.filePath;
+          } catch (error) {
+            console.error('녹음본 정보 조회 오류:', error);
+            recording = undefined;
+          }
+        }
+        return {
+          id: q.id,
+          order: q.order,
+          question: q.question,
+          sampleAnswer: q.sampleAnswer,
+          userAnswer: q.userAnswer,
+          recording,
+        };
+      })
+    );
 
     const data = {
       id: report.id,
