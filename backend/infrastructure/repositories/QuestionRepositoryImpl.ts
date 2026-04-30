@@ -141,10 +141,22 @@ export class QuestionRepositoryImpl implements QuestionRepository {
       // 4. 임시 URL 생성 (유효기간 1시간)
       const signedUrl = await getSignedUrl(r2Client, command, { expiresIn: 3600 });
 
-      // 5. MIME 타입 추정
+      // 5. R2에서 파일 다운로드 후 Buffer 변환
+      const objectResponse = await r2Client.send(command);
+      if (!objectResponse.Body) {
+        throw new Error(`R2에서 파일을 찾을 수 없습니다: ${fileKey}`);
+      }
+      const fileBuffer = Buffer.from(await objectResponse.Body.transformToByteArray());
+
+      // 6. MIME 타입 추정
       const mimeType = this.getMimeTypeFromFileName(question.recording);
 
-      return { filePath: signedUrl };
+      return {
+        filePath: signedUrl,
+        fileName: question.recording,
+        fileBuffer,
+        mimeType,
+      };
     } catch (error) {
       console.error('음성 파일 조회 실패:', error);
       throw error;
