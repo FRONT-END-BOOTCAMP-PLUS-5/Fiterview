@@ -23,7 +23,8 @@ export class GenerateQuestionsTTSUsecase {
       const ttsPromises = questions.map(async (question) => {
         const ttsRequest: TTSRequest = {
           text: question.question,
-          voice: 'ko-KR-Neural2-A',
+          // 구글TTS는 'ko-KR-Neural2-A', AzureTTS는 'ko-KR-SunHiNeural'로 설정
+          voice: 'ko-KR-SunHiNeural',
         };
 
         const ttsResponse: TTSResponse = await this.ttsAI.synthesizeSpeech(ttsRequest);

@@ -1,5 +1,5 @@
 import { GenerateQuestionsTTSUsecase } from '@/backend/application/questions/usecases/GenerateQuestionsTTSUsecase';
-import { GoogleCloudTtsAI } from '@/backend/infrastructure/AI/GoogleCloudTtsAI';
+import { AzureTtsAI } from '@/backend/infrastructure/AI/AzureTtsAI';
 import { QuestionTTSResponse } from '@/backend/application/questions/dtos/QuestionTTSResponse';
 import { QuestionRepositoryImpl } from '@/backend/infrastructure/repositories/QuestionRepositoryImpl';
 import { getUserFromSession } from '@/lib/auth/api-auth';
@@ -43,10 +43,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       );
     }
 
-    const useCase = new GenerateQuestionsTTSUsecase(
-      new QuestionRepositoryImpl(),
-      new GoogleCloudTtsAI()
-    );
+    const useCase = new GenerateQuestionsTTSUsecase(new QuestionRepositoryImpl(), new AzureTtsAI());
 
     const questionsWithTTS: QuestionTTSResponse[] = await useCase.execute(reportId);
 
