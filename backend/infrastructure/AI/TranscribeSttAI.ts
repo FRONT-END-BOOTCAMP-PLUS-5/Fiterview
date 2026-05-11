@@ -15,6 +15,7 @@ export class TranscribeSttAI implements SttAI {
         file: audioFile,
         model: 'gpt-4o-transcribe',
         ...(audioRequest.language && { language: audioRequest.language }),
+        ...(audioRequest.prompt && { prompt: audioRequest.prompt }),
         response_format: 'json',
       });
 
