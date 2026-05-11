@@ -7,6 +7,8 @@
     "start": "next start -p 3155 -H 0.0.0.0",
     "build": "prisma generate && NODE_OPTIONS='--max-old-space-size=4096' next build",
     "lint": "eslint .",
+    "benchmark:stt": "node scripts/benchmark-stt.mjs",
+    "test:stt": "node scripts/test-stt-pipeline.mjs",
     "prepare": "husky install",
     "format": "prettier --write ."
   },
