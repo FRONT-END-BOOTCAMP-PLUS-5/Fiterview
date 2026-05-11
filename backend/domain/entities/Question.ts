@@ -4,7 +4,8 @@ export interface Question {
   question: string;
   reportId: number;
   sampleAnswer?: string;
-  userAnswer?: string;
+  userAnswerRaw?: string;
+  userAnswerClean?: string;
   recording?: string;
 }
 

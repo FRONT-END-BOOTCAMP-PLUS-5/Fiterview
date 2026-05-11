@@ -44,14 +44,15 @@ model Feedback {
 }
 
 model Question {
-  id           Int     @id @default(autoincrement())
-  question     String
-  sampleAnswer String? @map("sample_answer")
-  userAnswer   String? @map("user_answer")
-  recording    String?
-  reportId     Int     @map("report_id")
-  order        Int?
-  report       Report  @relation("ReportQuestions", fields: [reportId], references: [id], onDelete: Cascade)
+  id              Int     @id @default(autoincrement())
+  question        String
+  sampleAnswer    String? @map("sample_answer")
+  userAnswerRaw   String? @map("user_answer_raw")
+  userAnswerClean String? @map("user_answer_clean")
+  recording       String?
+  reportId        Int     @map("report_id")
+  order           Int?
+  report          Report  @relation("ReportQuestions", fields: [reportId], references: [id], onDelete: Cascade)
 
   @@map("questions")
 }

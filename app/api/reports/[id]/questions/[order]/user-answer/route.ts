@@ -30,9 +30,9 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { userAnswer } = body as { userAnswer: string };
+    const { userAnswerClean } = body as { userAnswerClean: string };
 
-    if (!userAnswer || typeof userAnswer !== 'string') {
+    if (!userAnswerClean || typeof userAnswerClean !== 'string') {
       return NextResponse.json(
         { success: false, message: '사용자 답변이 필요합니다.' },
         { status: 400 }
@@ -62,7 +62,7 @@ export async function PUT(
     await updateUserAnswerUseCase.execute({
       reportId,
       order: questionOrder,
-      userAnswer,
+      userAnswerClean,
     });
 
     return NextResponse.json({

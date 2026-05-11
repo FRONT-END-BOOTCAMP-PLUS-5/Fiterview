@@ -46,7 +46,8 @@ export class QuestionRepositoryImpl implements QuestionRepository {
       order: (q as any).order ?? sortedQuestions[idx].order,
       question: q.question,
       sampleAnswer: q.sampleAnswer || undefined,
-      userAnswer: q.userAnswer || undefined,
+      userAnswerRaw: q.userAnswerRaw || undefined,
+      userAnswerClean: q.userAnswerClean || undefined,
       recording: q.recording || undefined,
       reportId: q.reportId,
     }));
@@ -99,7 +100,8 @@ export class QuestionRepositoryImpl implements QuestionRepository {
         question: q.question,
         reportId: q.reportId,
         sampleAnswer: q.sampleAnswer || undefined,
-        userAnswer: q.userAnswer || undefined,
+        userAnswerRaw: q.userAnswerRaw || undefined,
+        userAnswerClean: q.userAnswerClean || undefined,
         recording: q.recording || undefined,
       }));
     } catch (error) {

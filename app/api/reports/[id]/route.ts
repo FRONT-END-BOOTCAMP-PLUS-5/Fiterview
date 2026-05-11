@@ -148,7 +148,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       order: q.order,
       question: q.question,
       sampleAnswer: q.sampleAnswer,
-      userAnswer: q.userAnswer,
+      userAnswerRaw: q.userAnswerRaw,
+      userAnswerClean: q.userAnswerClean,
       recording: q.recording,
     }));
 

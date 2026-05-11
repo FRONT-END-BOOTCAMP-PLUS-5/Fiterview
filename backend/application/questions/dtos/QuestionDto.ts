@@ -3,6 +3,7 @@ export interface QuestionDto {
   order: number;
   question: string;
   sampleAnswer?: string;
-  userAnswer?: string;
+  userAnswerRaw?: string;
+  userAnswerClean?: string;
   recording?: string;
 }

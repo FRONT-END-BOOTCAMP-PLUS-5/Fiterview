@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { TranscribeAudioUseCase } from '@/backend/application/questions/usecases/TranscribeAudioUseCase';
 import { SaveUserAnswerUseCase } from '@/backend/application/questions/usecases/SaveUserAnswerUseCase';
 import { GetAudioByQuestionUseCase } from '@/backend/application/questions/usecases/GetAudioByQuestionUseCase';
+import { CleanTranscriptionService } from '@/backend/application/questions/services/CleanTranscriptionService';
 import { TranscribeSttAI } from '@/backend/infrastructure/AI/TranscribeSttAI';
 import { QuestionRepositoryImpl } from '@/backend/infrastructure/repositories/QuestionRepositoryImpl';
 import { FileProcessingService } from '@/backend/infrastructure/services/FileProcessingService';
@@ -34,8 +35,12 @@ export async function POST(
     const prisma = new PrismaClient();
     const sttRepository = new TranscribeSttAI();
     const questionRepository = new QuestionRepositoryImpl();
+    const cleanTranscriptionService = new CleanTranscriptionService();
 
-    const transcribeAudioUseCase = new TranscribeAudioUseCase(sttRepository);
+    const transcribeAudioUseCase = new TranscribeAudioUseCase(
+      sttRepository,
+      cleanTranscriptionService
+    );
     const saveUserAnswerUseCase = new SaveUserAnswerUseCase(prisma);
     const getAudioByQuestionUseCase = new GetAudioByQuestionUseCase(questionRepository);
 
@@ -58,8 +63,8 @@ export async function POST(
       );
     }
 
-    // STT 처리
-    const sttResult = await transcribeAudioUseCase.execute(
+    // STT 처리 (raw + clean)
+    const { raw, cleanText } = await transcribeAudioUseCase.execute(
       audioFileInfo.fileBuffer,
       audioFileInfo.fileName,
       'ko' // 기본값으로 한국어 설정
@@ -69,7 +74,8 @@ export async function POST(
     await saveUserAnswerUseCase.execute({
       reportId: reportIdNumber,
       order: orderNumber,
-      transcription: sttResult,
+      rawText: raw.text,
+      cleanText,
     });
 
     // 응답 생성
@@ -79,8 +85,9 @@ export async function POST(
       reportId: reportIdNumber,
       order: orderNumber,
       transcription: {
-        text: sttResult.text,
-        language: sttResult.language,
+        raw: raw.text,
+        clean: cleanText,
+        language: raw.language,
         model: 'gpt-4o-transcribe',
       },
     };

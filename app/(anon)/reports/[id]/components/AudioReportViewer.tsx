@@ -49,11 +49,13 @@ export default function AudioReportViewer({ reportId }: AudioReportViewerProps) 
     setSelectedQuestion(question);
   };
 
-  // 사용자 답변 업데이트 핸들러
-  const handleUserAnswerUpdate = (questionOrder: number, newUserAnswer: string) => {
+  // 사용자 답변 업데이트 핸들러 (clean 텍스트만 갱신)
+  const handleUserAnswerUpdate = (questionOrder: number, newUserAnswerClean: string) => {
     if (report) {
       const updatedQuestions = report.questions.map((question: any) =>
-        question.order === questionOrder ? { ...question, userAnswer: newUserAnswer } : question
+        question.order === questionOrder
+          ? { ...question, userAnswerClean: newUserAnswerClean }
+          : question
       );
 
       setReport({
@@ -65,7 +67,7 @@ export default function AudioReportViewer({ reportId }: AudioReportViewerProps) 
       if (selectedQuestion && selectedQuestion.order === questionOrder) {
         setSelectedQuestion({
           ...selectedQuestion,
-          userAnswer: newUserAnswer,
+          userAnswerClean: newUserAnswerClean,
         });
       }
     }
@@ -90,7 +92,7 @@ export default function AudioReportViewer({ reportId }: AudioReportViewerProps) 
               key={question.id}
               questionNumber={question.order}
               questionText={question.question}
-              userAnswer={question.userAnswer}
+              userAnswerClean={question.userAnswerClean}
               sampleAnswer={question.sampleAnswer}
               isExpanded={false}
               showActions={false}

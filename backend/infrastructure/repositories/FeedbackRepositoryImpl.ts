@@ -1,7 +1,6 @@
 import prisma from '@/utils/prisma';
 import { FeedbackRepository } from '@/backend/domain/repositories/FeedbackRepository';
 import { Feedback } from '@/backend/domain/entities/Feedback';
-import { Question } from '@/backend/domain/entities/Question';
 import { ReportStatus } from '@prisma/client';
 
 export class FeedbackRepositoryImpl implements FeedbackRepository {
@@ -65,17 +64,18 @@ export class FeedbackRepositoryImpl implements FeedbackRepository {
 
   async getQuestionsAndAnswers(
     reportId: number
-  ): Promise<Pick<Question, 'question' | 'sampleAnswer' | 'userAnswer'>[]> {
+  ): Promise<{ question: string; sampleAnswer?: string | null; userAnswer?: string | null }[]> {
     const rows = await prisma.question.findMany({
       where: { reportId },
-      select: { question: true, sampleAnswer: true, userAnswer: true },
+      select: { question: true, sampleAnswer: true, userAnswerClean: true },
       take: 10,
     });
 
+    // LLM 평가는 후처리된 clean 텍스트를 사용한다.
     return rows.map((r) => ({
       question: r.question,
       sampleAnswer: r.sampleAnswer ?? undefined,
-      userAnswer: r.userAnswer ?? undefined,
+      userAnswer: r.userAnswerClean ?? undefined,
     }));
   }
 }

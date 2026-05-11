@@ -9,7 +9,7 @@ import { ReportStatus } from '@/types/report';
 interface QuestionItemProps {
   questionNumber: number;
   questionText: string;
-  userAnswer?: string;
+  userAnswerClean?: string;
   sampleAnswer?: string;
   isExpanded?: boolean;
   showActions?: boolean;
@@ -17,13 +17,13 @@ interface QuestionItemProps {
   reportId?: number;
   reportStatus?: ReportStatus;
   onQuestionSelect?: () => void;
-  onUserAnswerUpdate?: (questionOrder: number, newUserAnswer: string) => void;
+  onUserAnswerUpdate?: (questionOrder: number, newUserAnswerClean: string) => void;
 }
 
 export default function QuestionItem({
   questionNumber,
   questionText,
-  userAnswer,
+  userAnswerClean,
   sampleAnswer,
   isExpanded = false,
   showActions = false,
@@ -36,7 +36,7 @@ export default function QuestionItem({
   const [expanded, setExpanded] = useState(isExpanded);
   const [showSampleAnswer, setShowSampleAnswer] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editedAnswer, setEditedAnswer] = useState(userAnswer || '');
+  const [editedAnswer, setEditedAnswer] = useState(userAnswerClean || '');
 
   const toggleExpanded = () => {
     const newExpanded = !expanded;
@@ -57,7 +57,7 @@ export default function QuestionItem({
 
   const handleEdit = () => {
     setIsEditing(true);
-    setEditedAnswer(userAnswer || '');
+    setEditedAnswer(userAnswerClean || '');
     // 수정 모드 진입 시에는 AudioPlayer 업데이트하지 않음
   };
 
@@ -67,7 +67,7 @@ export default function QuestionItem({
     try {
       const response = await apiClient.put(
         `/api/reports/${reportId}/questions/${questionNumber}/user-answer`,
-        { userAnswer: editedAnswer }
+        { userAnswerClean: editedAnswer }
       );
 
       setIsEditing(false);
@@ -82,7 +82,7 @@ export default function QuestionItem({
 
   const handleCancel = () => {
     setIsEditing(false);
-    setEditedAnswer(userAnswer || '');
+    setEditedAnswer(userAnswerClean || '');
   };
 
   return (
@@ -156,7 +156,7 @@ export default function QuestionItem({
             </div>
           ) : (
             <div className="self-stretch justify-start text-gray-700 text-sm font-normal leading-snug">
-              {userAnswer || '사용자 답변이 존재하지 않습니다'}
+              {userAnswerClean || '사용자 답변이 존재하지 않습니다'}
             </div>
           )}
 
